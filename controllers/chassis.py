@@ -150,7 +150,7 @@ class SwerveModule:
 
     def get_angle_absolute(self) -> float:
         """Gets steer angle (radians) from absolute encoder"""
-        return math.radians(self.encoder.getAbsolutePosition())
+        return math.radians(self.encoder.get_absolute_position())
 
     def get_angle_integrated(self) -> float:
         """Gets steer angle from motor's integrated relative encoder"""
