@@ -167,7 +167,8 @@ class SwerveModule:
         # return self.drive.getSelectedSensorVelocity() * self.DRIVE_COUNTS_TO_METRES * 10
 
     def get_distance_traveled(self) -> float:
-        return self.drive.getSelectedSensorPosition() * self.DRIVE_COUNTS_TO_METRES
+        return self.drive.get_position() * self.DRIVE_COUNTS_TO_METRES
+        # return self.drive.getSelectedSensorPosition() * self.DRIVE_COUNTS_TO_METRES
 
     def set(self, desired_state: SwerveModuleState):
         if self.module_locked:
