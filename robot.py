@@ -8,7 +8,6 @@ from wpimath.geometry import Quaternion, Rotation3d, Translation3d, Pose2d, Rota
 from components.chassis import Chassis
 
 from utilities.scalers import rescale_js
-from utilities.game import is_red
 
 class MyRobot(magicbot.MagicRobot):
 
