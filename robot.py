@@ -6,6 +6,7 @@ import magicbot
 
 from wpimath.geometry import Quaternion, Rotation3d, Translation3d, Pose2d, Rotation2d
 from components.chassis import Chassis
+from controllers.movement import Movement
 
 from utilities.scalers import rescale_js
 
@@ -13,6 +14,8 @@ from utilities.scalers import rescale_js
 class MyRobot(magicbot.MagicRobot):
     # Components
     chassis: Chassis
+
+    movement: Movement
 
     max_speed = magicbot.tunable(Chassis.max_wheel_speed * 0.95)
 
