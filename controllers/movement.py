@@ -227,7 +227,6 @@ class Movement(StateMachine):
 
         self.time_to_goal = self.trajectory.totalTime() - state_tm
 
-    @state(must_finish=True)
     def set_input(
         self, vx: float, vy: float, vz: float, local: bool, override: bool = False
     ) -> None:
