@@ -6,6 +6,7 @@ import ctre
 
 from pyfrc.physics.core import PhysicsInterface
 from wpimath.kinematics import SwerveDrive4Kinematics
+from wpilib.simulation import SimDeviceSim
 
 from components.chassis import SwerveModule
 from utilities.ctre import FALCON_CPR, VERSA_ENCODER_CPR
@@ -65,6 +66,10 @@ class PhysicsEngine:
             for module in robot.chassis.modules
         ]
 
+        self.imu = SimDeviceSim("navX-Sensor", 4)
+        self.imu_yaw = self.imu.getDouble("Yaw")
+
+    def update_sim(self, now: float, tm_diff: float) -> None:
         for wheel in self.wheels:
             wheel.update(tm_diff)
         for steer in self.steer:
