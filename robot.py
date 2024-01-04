@@ -9,8 +9,8 @@ from components.chassis import Chassis
 
 from utilities.scalers import rescale_js
 
-class MyRobot(magicbot.MagicRobot):
 
+class MyRobot(magicbot.MagicRobot):
     # Components
     chassis: Chassis
 
@@ -100,14 +100,14 @@ class MyRobot(magicbot.MagicRobot):
         if self.rumble_timer.hasElapsed(self.rumble_duration):
             self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
 
-
     def testInit(self) -> None:
-
-        self.port_localizer.add_to_estimator = True
-        self.starboard_localizer.add_to_estimator = True
+        pass
+        # disabled vision
+        # self.port_localizer.add_to_estimator = True
+        # self.starboard_localizer.add_to_estimator = True
 
     def testPeriodic(self) -> None:
-        #dpad_angle = self.gamepad.getPOV()
+        # dpad_angle = self.gamepad.getPOV()
 
         # Cancel any running controllers
         if self.gamepad.getBackButtonPressed():
@@ -115,20 +115,20 @@ class MyRobot(magicbot.MagicRobot):
 
         # Tick the controllers
         # These will only do anything if engage() has been called on them
-            
+
         self.chassis.update_odometry()
 
     def cancel_controllers(self):
         self.movement.done()
 
-
     def disabledPeriodic(self) -> None:
         self.chassis.update_odometry()
 
-
     def autonomousInit(self) -> None:
-        self.port_localizer.add_to_estimator = True
-        self.starboard_localizer.add_to_estimator = True
+        pass
+        # disabled vision
+        # self.port_localizer.add_to_estimator = True
+        # self.starboard_localizer.add_to_estimator = True
 
 
 if __name__ == "__main__":
