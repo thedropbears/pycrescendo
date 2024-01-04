@@ -66,7 +66,6 @@ class SwerveModule:
         self.drive_id = drive_id
         self.encoder = phoenix6.hardware.CANcoder(encoder_id)
 
-
         # Reduce CAN status frame rates before configuring
         self.steer.get_fault_field().set_update_frequency(4, 0.01)
         self.drive.get_fault_field().set_update_frequency(4, 0.01)
@@ -79,31 +78,72 @@ class SwerveModule:
         # )
 
         # Configure steer motor
-        self.steer.setNeutralMode(ctre.NeutralMode.Brake)
-        self.steer.setInverted(steer_reversed)
-        self.steer.config_kP(0, 0.15035, 10)
-        self.steer.config_kI(0, 0, 10)
-        self.steer.config_kD(0, 5.6805, 10)
-        self.steer.configAllowableClosedloopError(
-            0, self.STEER_RAD_TO_COUNTS * math.radians(4)
-        )
-        self.steer.configSelectedFeedbackSensor(
-            ctre.FeedbackDevice.IntegratedSensor, 0, 10
-        )
+        steer_config = self.steer.configurator
+
+        steer_motor_config = phoenix6.configs.MotorOutputConfigs()
+        steer_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
+        steer_motor_config.inverted = steer_reversed
+
+        steer_pid = phoenix6.configs.Slot0Configs()  # configuration for motor pid
+        steer_pid.k_p = 0.15035
+        steer_pid.k_i = 0
+        steer_pid.k_d = 5.6805
+
+        steer_config.apply(steer_motor_config)
+        steer_config.apply(steer_pid, 0.01)
+
+        # self.steer.setNeutralMode(ctre.NeutralMode.Brake)
+        # self.steer.setInverted(steer_reversed)
+        # self.steer.config_kP(0, 0.15035, 10)
+        # self.steer.config_kI(0, 0, 10)
+        # self.steer.config_kD(0, 5.6805, 10)
+
+        # # feature omitted from phoenix 5
+        # self.steer.configAllowableClosedloopError(
+        #     0, self.STEER_RAD_TO_COUNTS * math.radians(4)
+        # )
+
+        # #phoenix 6 utilises the default RotorSensor by default
+        # self.steer.configSelectedFeedbackSensor(
+        #     ctre.FeedbackDevice.IntegratedSensor, 0, 10
+        # )
 
         # Configure drive motor
-        self.drive.setNeutralMode(ctre.NeutralMode.Brake)
-        self.drive.setInverted(drive_reversed)
-        self.drive.configVoltageCompSaturation(self.MAX_DRIVE_VOLTS, timeoutMs=10)
-        self.drive.enableVoltageCompensation(True)
-        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
-        self.drive.configVelocityMeasurementPeriod(
-            ctre.sensors.SensorVelocityMeasPeriod.Period_5Ms
-        )
-        self.drive.configVelocityMeasurementWindow(8)
-        self.drive.config_kP(0, 0.011489, 10)
-        self.drive.config_kI(0, 0, 10)
-        self.drive.config_kD(0, 0, 10)
+        drive_config = self.drive.configurator
+
+        drive_motor_config = phoenix6.configs.MotorOutputConfigs()
+        drive_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
+        drive_motor_config.inverted = steer_reversed
+
+        drive_pid_ff = (
+            phoenix6.configs.Slot0Configs()
+        )  # configuration for motor pid and feedforward
+        drive_pid_ff.k_p = 0.011489
+        drive_pid_ff.k_i = 0
+        drive_pid_ff.k_d = 0
+        drive_pid_ff.k_s = 0.18877
+        drive_pid_ff.k_v = 2.7713
+        drive_pid_ff.k_a = 0.18824
+
+        self.drive.set_control(phoenix6.controls.voltage_out(self.MAX_DRIVE_VOLTS))
+        drive_config.apply(drive_motor_config)
+        drive_config.apply(drive_pid_ff, 0.01)
+
+        # self.drive.setNeutralMode(ctre.NeutralMode.Brake)
+        # self.drive.setInverted(drive_reversed)
+        # self.drive.configVoltageCompSaturation(self.MAX_DRIVE_VOLTS, timeoutMs=10)
+        # self.drive.enableVoltageCompensation(True)
+        # self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
+
+        # feature omitted
+        # self.drive.configVelocityMeasurementPeriod(
+        #     ctre.sensors.SensorVelocityMeasPeriod.Period_5Ms
+        # )
+        # self.drive.configVelocityMeasurementWindow(8)
+
+        # self.drive.config_kP(0, 0.011489, 10)
+        # self.drive.config_kI(0, 0, 10)
+        # self.drive.config_kD(0, 0, 10)
 
         self.central_angle = math.atan2(x, y)
         self.module_locked = False
