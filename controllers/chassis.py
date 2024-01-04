@@ -1,6 +1,6 @@
 from logging import Logger
 import math
-
+import phoenix6
 import ctre
 import ctre.sensors
 import magicbot
@@ -61,18 +61,22 @@ class SwerveModule:
         self.do_smooth = True
 
         # Create Motor and encoder objects
-        self.steer = ctre.WPI_TalonFX(steer_id)
-        self.drive = ctre.WPI_TalonFX(drive_id)
+        self.steer = phoenix6.hardware.TalonFX(steer_id)
+        self.drive = phoenix6.hardware.TalonFX(drive_id)
         self.drive_id = drive_id
-        self.encoder = ctre.sensors.CANCoder(encoder_id)
+        self.encoder = phoenix6.hardware.CANcoder(encoder_id)
+
 
         # Reduce CAN status frame rates before configuring
-        self.steer.setStatusFramePeriod(
-            ctre.StatusFrameEnhanced.Status_1_General, 250, 10
-        )
-        self.drive.setStatusFramePeriod(
-            ctre.StatusFrameEnhanced.Status_1_General, 250, 10
-        )
+        self.steer.get_fault_field().set_update_frequency(4, 0.01)
+        self.drive.get_fault_field().set_update_frequency(4, 0.01)
+
+        # self.steer.setStatusFramePeriod(
+        #     ctre.StatusFrameEnhanced.Status_1_General, 250, 10
+        # )
+        # self.drive.setStatusFramePeriod(
+        #     ctre.StatusFrameEnhanced.Status_1_General, 250, 10
+        # )
 
         # Configure steer motor
         self.steer.setNeutralMode(ctre.NeutralMode.Brake)
