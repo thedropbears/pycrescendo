@@ -4,24 +4,11 @@ import math
 import typing
 import ctre
 
-import rev
-import numpy as np
-import wpilib
-from wpilib.simulation import (
-    SingleJointedArmSim,
-    ElevatorSim,
-    SimDeviceSim,
-    DutyCycleEncoderSim,
-    SolenoidSim,
-    DoubleSolenoidSim,
-)
 from pyfrc.physics.core import PhysicsInterface
 from wpimath.kinematics import SwerveDrive4Kinematics
-from wpimath.system.plant import DCMotor
 
 from components.chassis import SwerveModule
 from utilities.ctre import FALCON_CPR, VERSA_ENCODER_CPR
-from ids import TalonIds
 
 if typing.TYPE_CHECKING:
     from robot import MyRobot
