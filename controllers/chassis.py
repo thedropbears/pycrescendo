@@ -163,7 +163,8 @@ class SwerveModule:
 
     def get_speed(self) -> float:
         # velocity is in counts / 100ms, return in m/s
-        return self.drive.getSelectedSensorVelocity() * self.DRIVE_COUNTS_TO_METRES * 10
+        return self.drive.get_velocity() * self.DRIVE_COUNTS_TO_METRES * 10
+        # return self.drive.getSelectedSensorVelocity() * self.DRIVE_COUNTS_TO_METRES * 10
 
     def get_distance_traveled(self) -> float:
         return self.drive.getSelectedSensorPosition() * self.DRIVE_COUNTS_TO_METRES
