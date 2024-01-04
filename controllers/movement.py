@@ -48,14 +48,6 @@ class Movement(StateMachine):
     driver_inputs = will_reset_to((0.0, 0.0, 0.0))
     inputs_lock = will_reset_to(False)
 
-    BALANCE_MAX_SPEED = 0.5
-    BALANCE_GAIN = tunable(1.0)
-    BALANCE_RATE_GAIN = tunable(
-        -0.2
-    )  # Needs to be negative to counteract increasing pitch when the charge station shifts
-    BALANCE_TILT_ANGLE_THRESHOLD = math.radians(2)
-    BALANCE_TILT_RATE_THRESHOLD = math.radians(2)
-
     data_log: wpiutil.log.DataLog
 
     def __init__(self) -> None:
@@ -235,22 +227,6 @@ class Movement(StateMachine):
         self.time_to_goal = self.trajectory.totalTime() - state_tm
 
     @state(must_finish=True)
-    def balance(self):
-        tilt_error = 0.0 - self.chassis.get_tilt()
-        tilt_rate_error = 0.0 - self.chassis.get_tilt_rate()
-        speed_x = (
-            tilt_error * self.BALANCE_GAIN + tilt_rate_error * self.BALANCE_RATE_GAIN
-        )
-        speed_x = clamp(
-            speed_x, -Movement.BALANCE_MAX_SPEED, Movement.BALANCE_MAX_SPEED
-        )
-        self.chassis.drive_local(speed_x, 0, 0)
-        if (
-            abs(tilt_error) < Movement.BALANCE_TILT_ANGLE_THRESHOLD
-            and abs(tilt_rate_error) < Movement.BALANCE_TILT_RATE_THRESHOLD
-        ):
-            self.done()
-
     def set_input(
         self, vx: float, vy: float, vz: float, local: bool, override: bool = False
     ) -> None:
@@ -270,16 +246,3 @@ class Movement(StateMachine):
 
     def do_autodrive(self) -> None:
         self.engage("autodrive")
-
-    # for testing
-    def toggle_balance(self) -> None:
-        if self.is_executing:
-            self.start_balance()
-        else:
-            self.stop_balance()
-
-    def start_balance(self) -> None:
-        self.engage("balance", force=True)
-
-    def stop_balance(self) -> None:
-        self.done()
