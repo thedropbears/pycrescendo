@@ -84,7 +84,7 @@ class MyRobot(magicbot.MagicRobot):
         self.rumble_for(0.8, 0.3)
 
     def teleopInit(self) -> None:
-        self.recover.engage()
+        pass
 
     def teleopPeriodic(self) -> None:
         self.event_loop.poll()
