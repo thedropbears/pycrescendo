@@ -1,5 +1,6 @@
 from logging import Logger
 import math
+
 import ctre
 import ctre.sensors
 import magicbot
@@ -63,9 +64,9 @@ class SwerveModule:
         self.steer = ctre.WPI_TalonFX(steer_id)
         self.drive = ctre.WPI_TalonFX(drive_id)
         self.drive_id = drive_id
-        self.encoder = ctre.sensors.CANcoder(encoder_id)
+        self.encoder = ctre.sensors.CANCoder(encoder_id)
 
-  # Reduce CAN status frame rates before configuring
+        # Reduce CAN status frame rates before configuring
         self.steer.setStatusFramePeriod(
             ctre.StatusFrameEnhanced.Status_1_General, 250, 10
         )
@@ -105,12 +106,11 @@ class SwerveModule:
 
     def get_angle_absolute(self) -> float:
         """Gets steer angle (radians) from absolute encoder"""
-        return math.radians(self.encoder.get_absolute_position())
+        return math.radians(self.encoder.getAbsolutePosition())
 
     def get_angle_integrated(self) -> float:
         """Gets steer angle from motor's integrated relative encoder"""
-        return self.steer.get_position() * self.STEER_COUNTS_TO_RAD
-        # return self.steer.getSelectedSensorPosition() * self.STEER_COUNTS_TO_RAD
+        return self.steer.getSelectedSensorPosition() * self.STEER_COUNTS_TO_RAD
 
     def get_rotation(self) -> Rotation2d:
         """Get the steer angle as a Rotation2d"""
@@ -118,12 +118,10 @@ class SwerveModule:
 
     def get_speed(self) -> float:
         # velocity is in counts / 100ms, return in m/s
-        return self.drive.get_velocity() * self.DRIVE_COUNTS_TO_METRES * 10
-        # return self.drive.getSelectedSensorVelocity() * self.DRIVE_COUNTS_TO_METRES * 10
+        return self.drive.getSelectedSensorVelocity() * self.DRIVE_COUNTS_TO_METRES * 10
 
     def get_distance_traveled(self) -> float:
-        return self.drive.get_position() * self.DRIVE_COUNTS_TO_METRES
-        # return self.drive.getSelectedSensorPosition() * self.DRIVE_COUNTS_TO_METRES
+        return self.drive.getSelectedSensorPosition() * self.DRIVE_COUNTS_TO_METRES
 
     def set(self, desired_state: SwerveModuleState):
         if self.module_locked:
