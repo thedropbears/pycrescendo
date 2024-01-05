@@ -168,9 +168,6 @@ class SwerveModule:
 
     def sync_steer_encoders(self) -> None:
         self.steer.set_position(self.get_angle_absolute() * self.STEER_RAD_TO_COUNTS)
-        # self.steer.setSelectedSensorPosition(
-        #     self.get_angle_absolute() * self.STEER_RAD_TO_COUNTS
-        # )
 
     def get_position(self) -> SwerveModulePosition:
         return SwerveModulePosition(self.get_distance_traveled(), self.get_rotation())
