@@ -68,13 +68,6 @@ class SwerveModule:
         self.steer.get_fault_field().set_update_frequency(4, 0.01)
         self.drive.get_fault_field().set_update_frequency(4, 0.01)
 
-        # self.steer.setStatusFramePeriod(
-        #     ctre.StatusFrameEnhanced.Status_1_General, 250, 10
-        # )
-        # self.drive.setStatusFramePeriod(
-        #     ctre.StatusFrameEnhanced.Status_1_General, 250, 10
-        # )
-
         # Configure steer motor
         steer_config = self.steer.configurator
 
