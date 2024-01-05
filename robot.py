@@ -5,14 +5,12 @@ import wpilib.event
 import magicbot
 
 from components.chassis import Chassis
-from controllers.movement import Movement
 
 from utilities.scalers import rescale_js
 
 
 class MyRobot(magicbot.MagicRobot):
     # Controllers
-    movement: Movement
 
     # Components
     chassis: Chassis
@@ -53,7 +51,11 @@ class MyRobot(magicbot.MagicRobot):
         drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * self.max_speed
         drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
         local_driving = self.gamepad.getBButton()
-        self.movement.set_input(vx=drive_x, vy=drive_y, vz=drive_z, local=local_driving)
+        driver_inputs = (drive_x, drive_y, drive_z)
+        if local_driving:
+            self.chassis.drive_local(*driver_inputs)
+        else:
+            self.chassis.drive_field(*driver_inputs)
 
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):
@@ -63,7 +65,6 @@ class MyRobot(magicbot.MagicRobot):
         pass
 
     def testPeriodic(self) -> None:
-
         # Cancel any running controllers
         if self.gamepad.getBackButtonPressed():
             self.cancel_controllers()
@@ -71,7 +72,7 @@ class MyRobot(magicbot.MagicRobot):
         self.chassis.update_odometry()
 
     def cancel_controllers(self):
-        self.movement.done()
+        pass
 
     def disabledPeriodic(self) -> None:
         self.chassis.update_odometry()
