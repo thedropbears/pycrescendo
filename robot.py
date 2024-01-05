@@ -105,9 +105,6 @@ class MyRobot(magicbot.MagicRobot):
 
     def testInit(self) -> None:
         pass
-        # disabled vision
-        # self.port_localizer.add_to_estimator = True
-        # self.starboard_localizer.add_to_estimator = True
 
     def testPeriodic(self) -> None:
         # dpad_angle = self.gamepad.getPOV()
