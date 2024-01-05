@@ -27,8 +27,6 @@ from wpimath.spline import Spline3
 import math
 from wpilib import Field2d
 
-from utilities.functions import clamp
-
 import wpiutil.log
 
 
