@@ -192,16 +192,6 @@ class Movement(StateMachine):
         hitting_wall = self.time_to_goal < -0.1 and self.chassis.may_be_stalled()
         return real_at_goal or hitting_wall
 
-    # will execute if no other states are executing
-    @default_state
-    def manualdrive(self) -> None:
-        if self.debug_trajectory:
-            self.generate_trajectory()
-        if self.drive_local:
-            self.chassis.drive_local(*self.driver_inputs)
-        else:
-            self.chassis.drive_field(*self.driver_inputs)
-
     @state(first=True)
     def autodrive(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
