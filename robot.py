@@ -22,26 +22,6 @@ class MyRobot(magicbot.MagicRobot):
         self.data_log = wpilib.DataLogManager.getLog()
 
         self.gamepad = wpilib.XboxController(0)
-        self.joystick = wpilib.Joystick(1)
-
-        self.event_loop = wpilib.event.EventLoop()
-        # Right trigger events
-        self.right_trigger_down_full = self.gamepad.rightTrigger(
-            0.95, self.event_loop
-        ).rising()
-        self.right_trigger_down_half = self.gamepad.rightTrigger(0.05, self.event_loop)
-        self.right_trigger_up = self.gamepad.rightTrigger(
-            0.95, self.event_loop
-        ).falling()
-
-        # Left trigger events
-        self.left_trigger_down_full = self.gamepad.leftTrigger(
-            0.95, self.event_loop
-        ).rising()
-        self.left_trigger_down_half = self.gamepad.leftTrigger(
-            0.05, self.event_loop
-        ).rising()
-        self.left_trigger_up = self.gamepad.leftTrigger(0.95, self.event_loop).falling()
 
         self.rumble_timer = wpilib.Timer()
         self.rumble_timer.start()
