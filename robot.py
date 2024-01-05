@@ -28,7 +28,6 @@ class MyRobot(magicbot.MagicRobot):
 
         self.field = wpilib.Field2d()
         wpilib.SmartDashboard.putData(self.field)
-        self.target_node = self.field.getObject("target_node")
 
     def rumble_for(self, intensity: float, duration: float):
         self.rumble_duration = duration
