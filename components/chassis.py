@@ -141,8 +141,11 @@ class SwerveModule:
         self.state = SwerveModuleState.optimize(self.state, self.get_rotation())
 
         if abs(self.state.speed) < 0.01 and not self.module_locked:
-            self.drive.set(ctre.ControlMode.Velocity, 0)
-            self.steer.set(ctre.ControlMode.PercentOutput, 0)
+            drive_reqest = phoenix6.controls.VelocityVoltage(0).with_slot(1)
+            self.drive.set_control(drive_reqest)
+
+            steer_request = phoenix6.controls.VoltageOut(0)
+            self.steer.set_control(steer_request)
             return
 
         current_angle = self.get_angle_integrated()
@@ -150,19 +153,18 @@ class SwerveModule:
             self.state.angle.radians() - current_angle
         )
         target_angle = target_displacement + current_angle
-        self.steer.set(
-            ctre.ControlMode.Position, target_angle * self.STEER_RAD_TO_COUNTS
+        steer_request = (
+            phoenix6.controls.PositionVoltage()
+            .with_velocity(target_angle * self.STEER_RAD_TO_COUNTS)
+            .with_slot(0)
         )
+        self.steer.set_control(steer_request)
 
         # rescale the speed target based on how close we are to being correctly aligned
         target_speed = self.state.speed * math.cos(target_displacement) ** 2
-        speed_volt = self.drive_ff.calculate(target_speed)
-        self.drive.set(
-            ctre.ControlMode.Velocity,
-            target_speed * self.METRES_TO_DRIVE_COUNTS / 10,
-            ctre.DemandType.ArbitraryFeedForward,
-            speed_volt / self.MAX_DRIVE_VOLTS,
-        )
+
+        drive_reqest = phoenix6.controls.VelocityVoltage(0).with_slot(1)
+        self.drive.set_control(drive_reqest.with_velocity(target_speed))
 
     def sync_steer_encoders(self) -> None:
         self.steer.set_position(self.get_angle_absolute() * self.STEER_RAD_TO_COUNTS)
