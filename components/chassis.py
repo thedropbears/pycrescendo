@@ -104,22 +104,6 @@ class SwerveModule:
         drive_config.apply(drive_motor_config)
         drive_config.apply(drive_pid_ff, 0.01)
 
-        # self.drive.setNeutralMode(ctre.NeutralMode.Brake)
-        # self.drive.setInverted(drive_reversed)
-        # self.drive.configVoltageCompSaturation(self.MAX_DRIVE_VOLTS, timeoutMs=10)
-        # self.drive.enableVoltageCompensation(True)
-        # self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
-
-        # feature omitted
-        # self.drive.configVelocityMeasurementPeriod(
-        #     ctre.sensors.SensorVelocityMeasPeriod.Period_5Ms
-        # )
-        # self.drive.configVelocityMeasurementWindow(8)
-
-        # self.drive.config_kP(0, 0.011489, 10)
-        # self.drive.config_kI(0, 0, 10)
-        # self.drive.config_kD(0, 0, 10)
-
         self.central_angle = math.atan2(x, y)
         self.module_locked = False
 
