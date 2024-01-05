@@ -52,27 +52,6 @@ class MyRobot(magicbot.MagicRobot):
         wpilib.SmartDashboard.putData(self.field)
         self.target_node = self.field.getObject("target_node")
 
-        self.port_localizer_name = "cam_port"
-        self.port_localizer_pos = Translation3d(-0.35001, 0.06583, 0.25)
-        self.port_localizer_rot = Rotation3d(
-            Quaternion(
-                0.0850897952914238,
-                0.21561633050441742,
-                -0.9725809097290039,
-                0.018864024430513382,
-            )
-        )
-
-        self.starboard_localizer_name = "cam_starboard"
-        self.starboard_localizer_pos = Translation3d(-0.35001, -0.06583, 0.247)
-        self.starboard_localizer_rot = Rotation3d(
-            Quaternion(
-                0.08508981764316559,
-                -0.21561576426029205,
-                -0.9725810289382935,
-                -0.01886390522122383,
-            )
-        )
         self.last_dpad = -1
 
     def rumble_for(self, intensity: float, duration: float):
