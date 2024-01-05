@@ -91,7 +91,7 @@ class SwerveModule:
         drive_motor_config.inverted = steer_reversed
 
         drive_pid_ff = (
-            phoenix6.configs.Slot0Configs()
+            phoenix6.configs.Slot1Configs()
         )  # configuration for motor pid and feedforward
         drive_pid_ff.k_p = 0.011489
         drive_pid_ff.k_i = 0
