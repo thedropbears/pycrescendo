@@ -3,5 +3,4 @@ robotpy[apriltag,cscore]~=2024.0.0b3
 robotpy-ctre~=2024.0.0b1
 robotpy-navx~=2024.0.0b1
 robotpy-rev~=2024.0.0b1.post1
-robotpy-photonvision~=2023.4.2
 robotpy-wpilib-utilities~=2024.0.0b1
