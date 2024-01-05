@@ -122,9 +122,6 @@ class MyRobot(magicbot.MagicRobot):
 
     def autonomousInit(self) -> None:
         pass
-        # disabled vision
-        # self.port_localizer.add_to_estimator = True
-        # self.starboard_localizer.add_to_estimator = True
 
 
 if __name__ == "__main__":
