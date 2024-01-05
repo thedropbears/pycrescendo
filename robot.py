@@ -107,14 +107,10 @@ class MyRobot(magicbot.MagicRobot):
         pass
 
     def testPeriodic(self) -> None:
-        # dpad_angle = self.gamepad.getPOV()
 
         # Cancel any running controllers
         if self.gamepad.getBackButtonPressed():
             self.cancel_controllers()
-
-        # Tick the controllers
-        # These will only do anything if engage() has been called on them
 
         self.chassis.update_odometry()
 
