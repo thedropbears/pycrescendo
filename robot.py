@@ -4,7 +4,6 @@ import wpilib
 import wpilib.event
 import magicbot
 
-from wpimath.geometry import Quaternion, Rotation3d, Translation3d, Pose2d, Rotation2d
 from components.chassis import Chassis
 from controllers.movement import Movement
 
