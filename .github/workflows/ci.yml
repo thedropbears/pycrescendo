@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  merge_group:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install coverage pytest-forked pytest-github-actions-annotate-failures
+      - run: python robot.py test -- -v --forked
+      - run: python robot.py coverage test -- -v
+      - uses: codecov/codecov-action@v3
+
+  mypy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mypy -r requirements-dev.txt
+      - name: mypy
+        uses: liskin/gh-problem-matcher-wrap@v2
+        with:
+          linters: mypy
+          run: mypy --show-column-numbers .
