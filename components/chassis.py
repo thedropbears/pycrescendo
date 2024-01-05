@@ -1,8 +1,6 @@
 from logging import Logger
 import math
 import phoenix6
-import ctre
-import ctre.sensors
 import magicbot
 import navx
 import wpilib
