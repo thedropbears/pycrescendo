@@ -83,22 +83,6 @@ class SwerveModule:
         steer_config.apply(steer_motor_config)
         steer_config.apply(steer_pid, 0.01)
 
-        # self.steer.setNeutralMode(ctre.NeutralMode.Brake)
-        # self.steer.setInverted(steer_reversed)
-        # self.steer.config_kP(0, 0.15035, 10)
-        # self.steer.config_kI(0, 0, 10)
-        # self.steer.config_kD(0, 5.6805, 10)
-
-        # # feature omitted from phoenix 5
-        # self.steer.configAllowableClosedloopError(
-        #     0, self.STEER_RAD_TO_COUNTS * math.radians(4)
-        # )
-
-        # #phoenix 6 utilises the default RotorSensor by default
-        # self.steer.configSelectedFeedbackSensor(
-        #     ctre.FeedbackDevice.IntegratedSensor, 0, 10
-        # )
-
         # Configure drive motor
         drive_config = self.drive.configurator
 
