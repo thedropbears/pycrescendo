@@ -366,12 +366,7 @@ class Chassis:
         SwerveModulePosition,
         SwerveModulePosition,
     ]:
-        return (
-            self.modules[0].get_position(),
-            self.modules[1].get_position(),
-            self.modules[2].get_position(),
-            self.modules[3].get_position(),
-        )
+        return [module.get_position() for module in self.modules]
 
     def get_pose(self) -> Pose2d:
         """Get the current location of the robot relative to ???"""
