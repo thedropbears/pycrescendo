@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 import typing
 import phoenix6
+import phoenix5
 
 from pyfrc.physics.core import PhysicsInterface
 from wpimath.kinematics import SwerveDrive4Kinematics
@@ -33,7 +34,7 @@ class SimpleTalonFXMotorSim:
 
 class SimpleTalonSRXMotorSim:
     def __init__(
-        self, motor: phoenix6.hardware.TalonSRX, kV: float, rev_per_unit: float
+        self, motor: phoenix5.TalonSRX, kV: float, rev_per_unit: float
     ) -> None:
         self.sim_collection = motor.getSimCollection()
         self.kV = kV  # volt seconds per unit
