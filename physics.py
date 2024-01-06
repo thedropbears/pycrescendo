@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 import typing
-import phoenix5
+import phoenix6
 
 from pyfrc.physics.core import PhysicsInterface
 from wpimath.kinematics import SwerveDrive4Kinematics
@@ -16,22 +16,24 @@ if typing.TYPE_CHECKING:
 
 
 class SimpleTalonFXMotorSim:
-    def __init__(self, motor: phoenix5.TalonFX, kV: float, rev_per_unit: float) -> None:
-        self.sim_collection = motor.getSimCollection()
+    def __init__(
+        self, motor: phoenix6.hardware.TalonFX, kV: float, rev_per_unit: float
+    ) -> None:
+        self.sim_collection = phoenix6.sim.TalonFXSimState(motor)
         self.kV = kV  # volt seconds per unit
         self.rev_per_unit = rev_per_unit
 
     def update(self, dt: float) -> None:
-        voltage = self.sim_collection.getMotorOutputLeadVoltage()
+        voltage = self.sim_collection.motor_voltage()
         velocity = voltage / self.kV  # units per second
         velocity_cps = velocity * self.rev_per_unit * FALCON_CPR
-        self.sim_collection.setIntegratedSensorVelocity(int(velocity_cps / 10))
-        self.sim_collection.addIntegratedSensorPosition(int(velocity_cps * dt))
+        self.sim_collection.set_rotor_velocity(int(velocity_cps))
+        self.sim_collection.add_rotor_position(int(velocity_cps * dt))
 
 
 class SimpleTalonSRXMotorSim:
     def __init__(
-        self, motor: phoenix5.TalonSRX, kV: float, rev_per_unit: float
+        self, motor: phoenix6.hardware.TalonSRX, kV: float, rev_per_unit: float
     ) -> None:
         self.sim_collection = motor.getSimCollection()
         self.kV = kV  # volt seconds per unit
@@ -55,7 +57,9 @@ class PhysicsEngine:
         # Motors
         self.wheels = [
             SimpleTalonFXMotorSim(
-                module.drive, module.drive_ff.kV, 1 / module.DRIVE_MOTOR_REV_TO_METRES
+                module.drive,
+                module.drive_pid_ff.k_v,
+                1 / module.DRIVE_MOTOR_REV_TO_METRES,
             )
             for module in robot.chassis.modules
         ]
