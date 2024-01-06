@@ -57,6 +57,24 @@ class SwerveModule:
         self.state = SwerveModuleState(0, Rotation2d(0))
         self.do_smooth = True
 
+        if drive_reversed:
+            drive_reversed = (
+                phoenix6.configs.config_groups.InvertedValue.CLOCKWISE_POSITIVE
+            )
+        else:
+            drive_reversed = (
+                phoenix6.configs.config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+            )
+
+        if steer_reversed:
+            steer_reversed = (
+                phoenix6.configs.config_groups.InvertedValue.CLOCKWISE_POSITIVE
+            )
+        else:
+            steer_reversed = (
+                phoenix6.configs.config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+            )
+
         # Create Motor and encoder objects
         self.steer = phoenix6.hardware.TalonFX(steer_id)
         self.drive = phoenix6.hardware.TalonFX(drive_id)
