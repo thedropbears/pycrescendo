@@ -9,7 +9,13 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v3
@@ -22,8 +28,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
-          pip install coverage pytest-forked pytest-github-actions-annotate-failures
-      - run: python robot.py test -- -v --forked
+          pip install coverage pytest-github-actions-annotate-failures
       - run: python robot.py coverage test -- -v
       - uses: codecov/codecov-action@v3
 
