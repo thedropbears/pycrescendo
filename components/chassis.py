@@ -108,7 +108,7 @@ class SwerveModule:
 
         drive_motor_config = phoenix6.configs.MotorOutputConfigs()
         drive_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
-        drive_motor_config.inverted = steer_reversed
+        drive_motor_config.inverted = drive_reversed
 
         # configuration for motor pid and feedforward
         self.drive_pid_ff = (
