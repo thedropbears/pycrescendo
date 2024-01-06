@@ -112,12 +112,11 @@ class SwerveModule:
 
     def get_angle_absolute(self) -> float:
         """Gets steer angle (radians) from absolute encoder"""
-        return math.radians(self.encoder.get_absolute_position())
+        return math.radians(self.encoder.get_absolute_position().value)
 
     def get_angle_integrated(self) -> float:
         """Gets steer angle from motor's integrated relative encoder"""
-        return self.steer.get_position() * self.STEER_COUNTS_TO_RAD
-        # return self.steer.getSelectedSensorPosition() * self.STEER_COUNTS_TO_RAD
+        return self.steer.get_rotor_position().value * self.STEER_COUNTS_TO_RAD
 
     def get_rotation(self) -> Rotation2d:
         """Get the steer angle as a Rotation2d"""
@@ -125,12 +124,10 @@ class SwerveModule:
 
     def get_speed(self) -> float:
         # velocity is in counts / 100ms, return in m/s
-        return self.drive.get_velocity() * self.DRIVE_COUNTS_TO_METRES * 10
-        # return self.drive.getSelectedSensorVelocity() * self.DRIVE_COUNTS_TO_METRES * 10
+        return self.drive.get_rotor_velocity().value * self.DRIVE_COUNTS_TO_METRES * 10
 
     def get_distance_traveled(self) -> float:
-        return self.drive.get_position() * self.DRIVE_COUNTS_TO_METRES
-        # return self.drive.getSelectedSensorPosition() * self.DRIVE_COUNTS_TO_METRES
+        return self.drive.get_rotor_position().value * self.DRIVE_COUNTS_TO_METRES
 
     def set(self, desired_state: SwerveModuleState):
         if self.module_locked:
