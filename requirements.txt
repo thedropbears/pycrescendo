@@ -1,6 +1,6 @@
 numpy~=1.25.2
-robotpy[apriltag,cscore]~=2024.0.0b3
-robotpy-ctre~=2024.0.0b1
-robotpy-navx~=2024.0.0b1
-robotpy-rev~=2024.0.0b1.post1
-robotpy-wpilib-utilities~=2024.0.0b1
+robotpy[apriltag,cscore]==2024.0.0b4
+robotpy-ctre==2024.0.0b4
+robotpy-navx==2024.0.0b1
+robotpy-rev==2024.0.0b1.post1
+robotpy-wpilib-utilities==2024.0.0b1
