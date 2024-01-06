@@ -11,10 +11,8 @@ pip install -r requirements-dev.txt
 ```
 
 ### Setup pre-commit
-Pre-commit is setup to automatically run formatters and linters when you commit. It is suggested to install pre-commit via pipx to keep it seperate from robot code dependencies. First install pipx:
-```
-pip install pipx
-```
+Pre-commit is setup to automatically run formatters and linters when you commit. It is suggested to install pre-commit via pipx to keep it seperate from robot code dependencies. First [install pipx](https://pipx.pypa.io/stable/installation/).
+
 
 Install pre-commit with pipx:
 ```
@@ -23,7 +21,7 @@ pipx install pre-commit
 
 Setup the pre-commit hooks to run on commit:
 ```
-pipx run pre-commit install
+pre-commit install
 ```
 
 
