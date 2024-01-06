@@ -78,7 +78,7 @@ class PhysicsEngine:
             steer.update(tm_diff)
 
         speeds = self.kinematics.toChassisSpeeds(
-            *(module.get() for module in self.swerve_modules)
+            [module.get() for module in self.swerve_modules]
         )
 
         self.imu_yaw.set(self.imu_yaw.get() - math.degrees(speeds.omega * tm_diff))
