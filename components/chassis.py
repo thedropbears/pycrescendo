@@ -144,8 +144,8 @@ class SwerveModule:
         self.state = SwerveModuleState.optimize(self.state, self.get_rotation())
 
         if abs(self.state.speed) < 0.01 and not self.module_locked:
-            drive_reqest = phoenix6.controls.VelocityVoltage(0).with_slot(1)
-            self.drive.set_control(drive_reqest)
+            drive_request = phoenix6.controls.VelocityVoltage(0)
+            self.drive.set_control(drive_request)
 
             steer_request = phoenix6.controls.VoltageOut(0)
             self.steer.set_control(steer_request)
