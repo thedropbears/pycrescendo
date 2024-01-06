@@ -170,8 +170,9 @@ class SwerveModule:
             self.state.angle.radians() - current_angle
         )
         target_angle = target_displacement + current_angle
-        steer_request = phoenix6.controls.PositionVoltage().with_velocity(
-            target_angle * self.STEER_RAD_TO_COUNTS
+        steer_request = phoenix6.controls.PositionVoltage(
+            self.steer.get_rotor_position().value,
+            target_angle * self.STEER_RAD_TO_COUNTS,
         )
         self.steer.set_control(steer_request)
 
