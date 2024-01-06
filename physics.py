@@ -20,7 +20,7 @@ class SimpleTalonFXMotorSim:
     def __init__(
         self, motor: phoenix6.hardware.TalonFX, kV: float, rev_per_unit: float
     ) -> None:
-        self.sim_collection = phoenix6.sim.TalonFXSimState(motor)
+        self.sim_collection = motor.sim_state
         self.kV = kV  # volt seconds per unit
         self.rev_per_unit = rev_per_unit
 
