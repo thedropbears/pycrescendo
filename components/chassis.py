@@ -103,7 +103,6 @@ class SwerveModule:
             .with_k_a(0.18824)
         )
 
-        self.drive.set_control(phoenix6.controls.voltage_out(self.MAX_DRIVE_VOLTS))
         drive_config.apply(drive_motor_config)
         drive_config.apply(self.drive_pid_ff, 0.01)
 
