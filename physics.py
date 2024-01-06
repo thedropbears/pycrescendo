@@ -2,21 +2,21 @@ from __future__ import annotations
 
 import math
 import typing
-import ctre
+import phoenix5
 
 from pyfrc.physics.core import PhysicsInterface
 from wpimath.kinematics import SwerveDrive4Kinematics
 from wpilib.simulation import SimDeviceSim
 
 from components.chassis import SwerveModule
-from utilities.ctre import FALCON_CPR, VERSA_ENCODER_CPR
+from utilities.phoenix5 import FALCON_CPR, VERSA_ENCODER_CPR
 
 if typing.TYPE_CHECKING:
     from robot import MyRobot
 
 
 class SimpleTalonFXMotorSim:
-    def __init__(self, motor: ctre.TalonFX, kV: float, rev_per_unit: float) -> None:
+    def __init__(self, motor: phoenix5.TalonFX, kV: float, rev_per_unit: float) -> None:
         self.sim_collection = motor.getSimCollection()
         self.kV = kV  # volt seconds per unit
         self.rev_per_unit = rev_per_unit
@@ -30,7 +30,9 @@ class SimpleTalonFXMotorSim:
 
 
 class SimpleTalonSRXMotorSim:
-    def __init__(self, motor: ctre.TalonSRX, kV: float, rev_per_unit: float) -> None:
+    def __init__(
+        self, motor: phoenix5.TalonSRX, kV: float, rev_per_unit: float
+    ) -> None:
         self.sim_collection = motor.getSimCollection()
         self.kV = kV  # volt seconds per unit
         self.rev_per_unit = rev_per_unit
