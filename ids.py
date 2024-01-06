@@ -15,6 +15,7 @@ class TalonIds(enum.IntEnum):
     drive_4 = 4
     steer_4 = 8
 
+
 @enum.unique
 class CancoderIds(enum.IntEnum):
     swerve_1 = 1
