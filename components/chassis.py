@@ -317,7 +317,12 @@ class Chassis:
     def get_velocity(self) -> ChassisSpeeds:
         """Gets field relative measured robot ChassisSpeeds"""
         self.local_speed = self.kinematics.toChassisSpeeds(
-            tuple([module.get() for module in self.modules])
+            [
+                self.modules[0].get(),
+                self.modules[1].get(),
+                self.modules[2].get(),
+                self.modules[3].get(),
+            ]
         )
         return ChassisSpeeds.fromFieldRelativeSpeeds(
             self.local_speed, -self.get_rotation()
@@ -366,7 +371,12 @@ class Chassis:
         SwerveModulePosition,
         SwerveModulePosition,
     ]:
-        return tuple([module.get_position() for module in self.modules])
+        return [
+            self.modules[0].get_position(),
+            self.modules[1].get_position(),
+            self.modules[2].get_position(),
+            self.modules[3].get_position(),
+        ]
 
     def get_pose(self) -> Pose2d:
         """Get the current location of the robot relative to ???"""
