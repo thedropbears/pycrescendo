@@ -74,10 +74,13 @@ class SwerveModule:
         steer_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
         steer_motor_config.inverted = steer_reversed
 
-        steer_pid = phoenix6.configs.Slot0Configs()  # configuration for motor pid
-        steer_pid.k_p = 0.15035
-        steer_pid.k_i = 0
-        steer_pid.k_d = 5.6805
+        # configuration for motor pid
+        steer_pid = (
+            phoenix6.configs.Slot0Configs()
+            .with_k_p(0.15035)
+            .with_k_i(0)
+            .with_k_d(5.6805)
+        )
 
         steer_config.apply(steer_motor_config)
         steer_config.apply(steer_pid, 0.01)
@@ -90,14 +93,14 @@ class SwerveModule:
         drive_motor_config.inverted = steer_reversed
 
         self.drive_pid_ff = (
-            phoenix6.configs.Slot1Configs()
-        )  # configuration for motor pid and feedforward
-        self.drive_pid_ff.k_p = 0.011489
-        self.drive_pid_ff.k_i = 0
-        self.drive_pid_ff.k_d = 0
-        self.drive_pid_ff.k_s = 0.18877
-        self.drive_pid_ff.k_v = 2.7713
-        self.drive_pid_ff.k_a = 0.18824
+            phoenix6.configs.Slot0Configs()
+            .with_k_p(0.011489)
+            .with_k_i(0)
+            .with_k_d(0)
+            .with_k_s(0.18877)
+            .with_k_v(2.7713)
+            .with_k_a(0.18824)
+        )
 
         self.drive.set_control(phoenix6.controls.voltage_out(self.MAX_DRIVE_VOLTS))
         drive_config.apply(drive_motor_config)
