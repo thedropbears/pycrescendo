@@ -417,7 +417,7 @@ class Chassis:
 
     @feedback
     def get_drive_current(self) -> float:
-        return sum(abs(x.drive.get_stator_current()) for x in self.modules)
+        return sum(abs(x.drive.get_stator_current().value) for x in self.modules)
 
     @feedback
     def may_be_stalled(self) -> bool:
