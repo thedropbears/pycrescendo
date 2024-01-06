@@ -19,7 +19,7 @@ from wpimath.controller import SimpleMotorFeedforwardMeters
 from magicbot import feedback
 
 from utilities.functions import constrain_angle, rate_limit_module
-from utilities.phoenix5 import FALCON_CPR, FALCON_FREE_RPS
+from utilities.ctre import FALCON_CPR, FALCON_FREE_RPS
 from ids import CancoderIds, TalonIds
 
 

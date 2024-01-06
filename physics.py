@@ -9,7 +9,7 @@ from wpimath.kinematics import SwerveDrive4Kinematics
 from wpilib.simulation import SimDeviceSim
 
 from components.chassis import SwerveModule
-from utilities.phoenix5 import FALCON_CPR, VERSA_ENCODER_CPR
+from utilities.ctre import FALCON_CPR, VERSA_ENCODER_CPR
 
 if typing.TYPE_CHECKING:
     from robot import MyRobot
