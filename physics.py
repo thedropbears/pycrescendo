@@ -25,7 +25,7 @@ class SimpleTalonFXMotorSim:
         self.rev_per_unit = rev_per_unit
 
     def update(self, dt: float) -> None:
-        voltage = self.sim_collection.motor_voltage()
+        voltage = self.sim_collection.motor_voltage
         velocity = voltage / self.kV  # units per second
         velocity_cps = velocity * self.rev_per_unit * FALCON_CPR
         self.sim_collection.set_rotor_velocity(int(velocity_cps))
