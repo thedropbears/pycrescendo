@@ -1,4 +1,4 @@
-numpy~=1.26.0
+numpy~=1.25.2
 robotpy[apriltag,cscore]~=2024.0.0b3
 robotpy-ctre~=2024.0.0b1
 robotpy-navx~=2024.0.0b1
