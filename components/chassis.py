@@ -1,8 +1,8 @@
 from logging import Logger
 import math
 
-import ctre
-import ctre.sensors
+import phoenix5
+import phoenix5.sensors
 import magicbot
 import navx
 import wpilib
@@ -61,21 +61,21 @@ class SwerveModule:
         self.do_smooth = True
 
         # Create Motor and encoder objects
-        self.steer = ctre.WPI_TalonFX(steer_id)
-        self.drive = ctre.WPI_TalonFX(drive_id)
+        self.steer = phoenix5.WPI_TalonFX(steer_id)
+        self.drive = phoenix5.WPI_TalonFX(drive_id)
         self.drive_id = drive_id
-        self.encoder = ctre.sensors.CANCoder(encoder_id)
+        self.encoder = phoenix5.sensors.CANCoder(encoder_id)
 
         # Reduce CAN status frame rates before configuring
         self.steer.setStatusFramePeriod(
-            ctre.StatusFrameEnhanced.Status_1_General, 250, 10
+            phoenix5.StatusFrameEnhanced.Status_1_General, 250, 10
         )
         self.drive.setStatusFramePeriod(
-            ctre.StatusFrameEnhanced.Status_1_General, 250, 10
+            phoenix5.StatusFrameEnhanced.Status_1_General, 250, 10
         )
 
         # Configure steer motor
-        self.steer.setNeutralMode(ctre.NeutralMode.Brake)
+        self.steer.setNeutralMode(phoenix5.NeutralMode.Brake)
         self.steer.setInverted(steer_reversed)
         self.steer.config_kP(0, 0.15035, 10)
         self.steer.config_kI(0, 0, 10)
@@ -84,17 +84,17 @@ class SwerveModule:
             0, self.STEER_RAD_TO_COUNTS * math.radians(4)
         )
         self.steer.configSelectedFeedbackSensor(
-            ctre.FeedbackDevice.IntegratedSensor, 0, 10
+            phoenix5.FeedbackDevice.IntegratedSensor, 0, 10
         )
 
         # Configure drive motor
-        self.drive.setNeutralMode(ctre.NeutralMode.Brake)
+        self.drive.setNeutralMode(phoenix5.NeutralMode.Brake)
         self.drive.setInverted(drive_reversed)
         self.drive.configVoltageCompSaturation(self.MAX_DRIVE_VOLTS, timeoutMs=10)
         self.drive.enableVoltageCompensation(True)
         self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
         self.drive.configVelocityMeasurementPeriod(
-            ctre.sensors.SensorVelocityMeasPeriod.Period_5Ms
+            phoenix5.sensors.SensorVelocityMeasPeriod.Period_5Ms
         )
         self.drive.configVelocityMeasurementWindow(8)
         self.drive.config_kP(0, 0.011489, 10)
@@ -135,8 +135,8 @@ class SwerveModule:
         self.state = SwerveModuleState.optimize(self.state, self.get_rotation())
 
         if abs(self.state.speed) < 0.01 and not self.module_locked:
-            self.drive.set(ctre.ControlMode.Velocity, 0)
-            self.steer.set(ctre.ControlMode.PercentOutput, 0)
+            self.drive.set(phoenix5.ControlMode.Velocity, 0)
+            self.steer.set(phoenix5.ControlMode.PercentOutput, 0)
             return
 
         current_angle = self.get_angle_integrated()
@@ -145,16 +145,16 @@ class SwerveModule:
         )
         target_angle = target_displacement + current_angle
         self.steer.set(
-            ctre.ControlMode.Position, target_angle * self.STEER_RAD_TO_COUNTS
+            phoenix5.ControlMode.Position, target_angle * self.STEER_RAD_TO_COUNTS
         )
 
         # rescale the speed target based on how close we are to being correctly aligned
         target_speed = self.state.speed * math.cos(target_displacement) ** 2
         speed_volt = self.drive_ff.calculate(target_speed)
         self.drive.set(
-            ctre.ControlMode.Velocity,
+            phoenix5.ControlMode.Velocity,
             target_speed * self.METRES_TO_DRIVE_COUNTS / 10,
-            ctre.DemandType.ArbitraryFeedForward,
+            phoenix5.DemandType.ArbitraryFeedForward,
             speed_volt / self.MAX_DRIVE_VOLTS,
         )
 
@@ -317,10 +317,12 @@ class Chassis:
     def get_velocity(self) -> ChassisSpeeds:
         """Gets field relative measured robot ChassisSpeeds"""
         self.local_speed = self.kinematics.toChassisSpeeds(
-            self.modules[0].get(),
-            self.modules[1].get(),
-            self.modules[2].get(),
-            self.modules[3].get(),
+            (
+                self.modules[0].get(),
+                self.modules[1].get(),
+                self.modules[2].get(),
+                self.modules[3].get(),
+            )
         )
         return ChassisSpeeds.fromFieldRelativeSpeeds(
             self.local_speed, -self.get_rotation()

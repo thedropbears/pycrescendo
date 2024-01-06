@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 import typing
-import ctre
+import phoenix5
 
 from pyfrc.physics.core import PhysicsInterface
 from wpimath.kinematics import SwerveDrive4Kinematics
@@ -16,7 +16,7 @@ if typing.TYPE_CHECKING:
 
 
 class SimpleTalonFXMotorSim:
-    def __init__(self, motor: ctre.TalonFX, kV: float, rev_per_unit: float) -> None:
+    def __init__(self, motor: phoenix5.TalonFX, kV: float, rev_per_unit: float) -> None:
         self.sim_collection = motor.getSimCollection()
         self.kV = kV  # volt seconds per unit
         self.rev_per_unit = rev_per_unit
@@ -30,7 +30,9 @@ class SimpleTalonFXMotorSim:
 
 
 class SimpleTalonSRXMotorSim:
-    def __init__(self, motor: ctre.TalonSRX, kV: float, rev_per_unit: float) -> None:
+    def __init__(
+        self, motor: phoenix5.TalonSRX, kV: float, rev_per_unit: float
+    ) -> None:
         self.sim_collection = motor.getSimCollection()
         self.kV = kV  # volt seconds per unit
         self.rev_per_unit = rev_per_unit
@@ -76,7 +78,12 @@ class PhysicsEngine:
             steer.update(tm_diff)
 
         speeds = self.kinematics.toChassisSpeeds(
-            *(module.get() for module in self.swerve_modules)
+            (
+                self.swerve_modules[0].get(),
+                self.swerve_modules[1].get(),
+                self.swerve_modules[2].get(),
+                self.swerve_modules[3].get(),
+            )
         )
 
         self.imu_yaw.set(self.imu_yaw.get() - math.degrees(speeds.omega * tm_diff))
