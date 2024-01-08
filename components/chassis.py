@@ -119,7 +119,7 @@ class SwerveModule:
         # configuration for motor pid and feedforward
         self.drive_pid_ff = (
             phoenix6.configs.Slot0Configs()
-            .with_k_p(0.011489)
+            .with_k_p(0.02760055366568915)
             .with_k_i(0)
             .with_k_d(0)
             .with_k_s(0.18877)
