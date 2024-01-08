@@ -10,7 +10,7 @@ from wpimath.kinematics import SwerveDrive4Kinematics
 from wpilib.simulation import SimDeviceSim
 
 from components.chassis import SwerveModule
-from utilities.ctre import FALCON_CPR, VERSA_ENCODER_CPR
+from utilities.ctre import VERSA_ENCODER_CPR
 
 if typing.TYPE_CHECKING:
     from robot import MyRobot
@@ -27,7 +27,7 @@ class SimpleTalonFXMotorSim:
     def update(self, dt: float) -> None:
         voltage = self.sim_collection.motor_voltage
         velocity = voltage / self.kV  # units per second
-        velocity_cps = velocity * self.rev_per_unit * FALCON_CPR
+        velocity_cps = velocity * self.rev_per_unit * 10
         self.sim_collection.set_rotor_velocity(int(velocity_cps))
         self.sim_collection.add_rotor_position(int(velocity_cps * dt))
 
