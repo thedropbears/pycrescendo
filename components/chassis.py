@@ -16,7 +16,7 @@ from wpimath.estimator import SwerveDrive4PoseEstimator
 from magicbot import feedback
 
 from utilities.functions import constrain_angle, rate_limit_module
-from utilities.ctre import FALCON_CPR, FALCON_FREE_RPS
+from utilities.ctre import FALCON_FREE_RPS
 from ids import CancoderIds, TalonIds
 
 
@@ -26,12 +26,7 @@ class SwerveModule:
     WHEEL_CIRCUMFERENCE = 4 * 2.54 / 100 * math.pi
 
     DRIVE_MOTOR_REV_TO_METRES = WHEEL_CIRCUMFERENCE * DRIVE_GEAR_RATIO
-    METRES_TO_DRIVE_COUNTS = FALCON_CPR / DRIVE_MOTOR_REV_TO_METRES
-    DRIVE_COUNTS_TO_METRES = DRIVE_MOTOR_REV_TO_METRES / FALCON_CPR
-
     STEER_MOTOR_REV_TO_RAD = math.tau * STEER_GEAR_RATIO
-    STEER_COUNTS_TO_RAD = STEER_MOTOR_REV_TO_RAD / FALCON_CPR
-    STEER_RAD_TO_COUNTS = FALCON_CPR / STEER_MOTOR_REV_TO_RAD
 
     MAX_DRIVE_VOLTS = 11.5
 
@@ -80,6 +75,13 @@ class SwerveModule:
         self.drive = phoenix6.hardware.TalonFX(drive_id)
         self.drive_id = drive_id
         self.encoder = phoenix6.hardware.CANcoder(encoder_id)
+
+        encoder_config = self.encoder.configurator
+        encoder_range_config = phoenix6.configs.MagnetSensorConfigs()
+        encoder_range_config.absolute_sensor_range = (
+            phoenix6.signals.AbsoluteSensorRangeValue.UNSIGNED_0_TO1
+        )
+        encoder_config.apply(encoder_range_config)
 
         # Reduce CAN status frame rates before configuring
         self.steer.get_fault_field().set_update_frequency(
@@ -131,13 +133,14 @@ class SwerveModule:
         self.central_angle = math.atan2(x, y)
         self.module_locked = False
 
+    # unit need changing
     def get_angle_absolute(self) -> float:
         """Gets steer angle (radians) from absolute encoder"""
-        return math.radians(self.encoder.get_absolute_position().value)
+        return math.radians(self.encoder.get_absolute_position().value * 360)
 
     def get_angle_integrated(self) -> float:
         """Gets steer angle from motor's integrated relative encoder"""
-        return self.steer.get_rotor_position().value * self.STEER_COUNTS_TO_RAD
+        return self.steer.get_rotor_position().value * self.STEER_MOTOR_REV_TO_RAD
 
     def get_rotation(self) -> Rotation2d:
         """Get the steer angle as a Rotation2d"""
@@ -148,10 +151,10 @@ class SwerveModule:
 
     def get_speed(self) -> float:
         # velocity is in counts / 100ms, return in m/s
-        return self.drive.get_rotor_velocity().value * self.DRIVE_COUNTS_TO_METRES * 10
+        return self.drive.get_rotor_velocity().value * self.DRIVE_MOTOR_REV_TO_METRES
 
     def get_distance_traveled(self) -> float:
-        return self.drive.get_rotor_position().value * self.DRIVE_COUNTS_TO_METRES
+        return self.drive.get_rotor_position().value * self.DRIVE_MOTOR_REV_TO_METRES
 
     def set(self, desired_state: SwerveModuleState):
         if self.module_locked:
@@ -177,20 +180,20 @@ class SwerveModule:
             self.state.angle.radians() - current_angle
         )
         target_angle = target_displacement + current_angle
-        steer_request = phoenix6.controls.PositionVoltage(
-            self.steer.get_rotor_position().value,
-            target_angle * self.STEER_RAD_TO_COUNTS,
-        )
+        steer_request = phoenix6.controls.PositionVoltage(target_angle / math.tau)
         self.steer.set_control(steer_request)
 
         # rescale the speed target based on how close we are to being correctly aligned
         target_speed = self.state.speed * math.cos(target_displacement) ** 2
 
         drive_request = phoenix6.controls.VelocityVoltage(0)
-        self.drive.set_control(drive_request.with_velocity(target_speed))
+        self.drive.set_control(
+            drive_request.with_velocity(target_speed / self.METRES_TO_DRIVE)
+        )
 
+    #
     def sync_steer_encoders(self) -> None:
-        self.steer.set_position(self.get_angle_absolute() * self.STEER_RAD_TO_COUNTS)
+        self.steer.set_position(self.get_angle_absolute() / self.STEER_MOTOR_REV_TO_RAD)
 
     def get_position(self) -> SwerveModulePosition:
         return SwerveModulePosition(self.get_distance_traveled(), self.get_rotation())
