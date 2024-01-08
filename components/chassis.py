@@ -188,7 +188,7 @@ class SwerveModule:
 
         drive_request = phoenix6.controls.VelocityVoltage(0)
         self.drive.set_control(
-            drive_request.with_velocity(target_speed / self.METRES_TO_DRIVE)
+            drive_request.with_velocity(target_speed / self.DRIVE_MOTOR_REV_TO_METRES)
         )
 
     #
