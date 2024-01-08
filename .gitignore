@@ -51,3 +51,6 @@ dmypy.json
 networktables.json
 simgui*.json
 *.wpilog
+
+### CTRE ###
+ctre_sim/
