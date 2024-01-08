@@ -12,6 +12,7 @@ from wpimath.kinematics import (
 )
 from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 from wpimath.estimator import SwerveDrive4PoseEstimator
+from wpimath.controller import SimpleMotorFeedforwardMeters
 
 from magicbot import feedback
 
@@ -122,10 +123,8 @@ class SwerveModule:
             .with_k_p(0.02760055366568915)
             .with_k_i(0)
             .with_k_d(0)
-            .with_k_s(0.18877)
-            .with_k_v(2.7713)
-            .with_k_a(0.18824)
         )
+        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
 
         drive_config.apply(drive_motor_config)
         drive_config.apply(self.drive_pid_ff, 0.01)
@@ -185,10 +184,12 @@ class SwerveModule:
 
         # rescale the speed target based on how close we are to being correctly aligned
         target_speed = self.state.speed * math.cos(target_displacement) ** 2
-
+        speed_volt = self.drive_ff.calculate(target_speed)
         drive_request = phoenix6.controls.VelocityVoltage(0)
         self.drive.set_control(
-            drive_request.with_velocity(target_speed / self.DRIVE_MOTOR_REV_TO_METRES)
+            drive_request.with_velocity(
+                target_speed / self.DRIVE_MOTOR_REV_TO_METRES
+            ).with_feed_forward(speed_volt / self.MAX_DRIVE_VOLTS)
         )
 
     #
