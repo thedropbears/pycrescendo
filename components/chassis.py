@@ -99,6 +99,12 @@ class SwerveModule:
         steer_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
         steer_motor_config.inverted = steer_reversed
 
+        steer_gear_ratio_config = (
+            phoenix6.configs.FeedbackConfigs().with_sensor_to_mechanism_ratio(
+                1 / self.STEER_GEAR_RATIO
+            )
+        )
+
         # configuration for motor pid
         steer_pid = (
             phoenix6.configs.Slot0Configs()
@@ -109,6 +115,7 @@ class SwerveModule:
 
         steer_config.apply(steer_motor_config)
         steer_config.apply(steer_pid, 0.01)
+        steer_config.apply(steer_gear_ratio_config)
 
         # Configure drive motor
         drive_config = self.drive.configurator
@@ -116,6 +123,12 @@ class SwerveModule:
         drive_motor_config = phoenix6.configs.MotorOutputConfigs()
         drive_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
         drive_motor_config.inverted = drive_reversed
+
+        drive_gear_ratio_config = (
+            phoenix6.configs.FeedbackConfigs().with_sensor_to_mechanism_ratio(
+                1 / self.DRIVE_GEAR_RATIO
+            )
+        )
 
         # configuration for motor pid and feedforward
         self.drive_pid_ff = (
@@ -128,18 +141,19 @@ class SwerveModule:
 
         drive_config.apply(drive_motor_config)
         drive_config.apply(self.drive_pid_ff, 0.01)
+        drive_config.apply(drive_gear_ratio_config)
 
         self.central_angle = math.atan2(x, y)
         self.module_locked = False
 
     # unit need changing
     def get_angle_absolute(self) -> float:
-        """Gets steer angle (radians) from absolute encoder"""
-        return math.radians(self.encoder.get_absolute_position().value * 360)
+        """Gets steer angle (rot) from absolute encoder"""
+        return self.encoder.get_absolute_position().value
 
     def get_angle_integrated(self) -> float:
         """Gets steer angle from motor's integrated relative encoder"""
-        return self.steer.get_rotor_position().value * self.STEER_MOTOR_REV_TO_RAD
+        return self.steer.get_position().value * math.tau
 
     def get_rotation(self) -> Rotation2d:
         """Get the steer angle as a Rotation2d"""
@@ -150,10 +164,10 @@ class SwerveModule:
 
     def get_speed(self) -> float:
         # velocity is in counts / 100ms, return in m/s
-        return self.drive.get_rotor_velocity().value * self.DRIVE_MOTOR_REV_TO_METRES
+        return self.drive.get_velocity().value * self.WHEEL_CIRCUMFERENCE
 
     def get_distance_traveled(self) -> float:
-        return self.drive.get_rotor_position().value * self.DRIVE_MOTOR_REV_TO_METRES
+        return self.drive.get_position().value * self.WHEEL_CIRCUMFERENCE
 
     def set(self, desired_state: SwerveModuleState):
         if self.module_locked:
@@ -188,13 +202,13 @@ class SwerveModule:
         drive_request = phoenix6.controls.VelocityVoltage(0)
         self.drive.set_control(
             drive_request.with_velocity(
-                target_speed / self.DRIVE_MOTOR_REV_TO_METRES
+                target_speed / self.WHEEL_CIRCUMFERENCE
             ).with_feed_forward(speed_volt / self.MAX_DRIVE_VOLTS)
         )
 
     #
     def sync_steer_encoders(self) -> None:
-        self.steer.set_position(self.get_angle_absolute() / self.STEER_MOTOR_REV_TO_RAD)
+        self.steer.set_position(self.get_angle_absolute())
 
     def get_position(self) -> SwerveModulePosition:
         return SwerveModulePosition(self.get_distance_traveled(), self.get_rotation())
