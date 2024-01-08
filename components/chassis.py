@@ -82,8 +82,12 @@ class SwerveModule:
         self.encoder = phoenix6.hardware.CANcoder(encoder_id)
 
         # Reduce CAN status frame rates before configuring
-        self.steer.get_fault_field().set_update_frequency(4, 0.01)
-        self.drive.get_fault_field().set_update_frequency(4, 0.01)
+        self.steer.get_fault_field().set_update_frequency(
+            frequency_hz=4, timeout_seconds=0.01
+        )
+        self.drive.get_fault_field().set_update_frequency(
+            frequency_hz=4, timeout_seconds=0.01
+        )
 
         # Configure steer motor
         steer_config = self.steer.configurator
