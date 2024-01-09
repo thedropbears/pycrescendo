@@ -1,8 +1,8 @@
 from logging import Logger
 import math
-import phoenix6
 from phoenix6.hardware import TalonFX, CANcoder
 from phoenix6.controls import VoltageOut, VelocityVoltage, PositionDutyCycle
+from phoenix6.signals import AbsoluteSensorRangeValue, NeutralModeValue
 from phoenix6.configs import (
     MagnetSensorConfigs,
     config_groups,
@@ -79,7 +79,7 @@ class SwerveModule:
         encoder_config = self.encoder.configurator
         encoder_range_config = MagnetSensorConfigs()
         encoder_range_config.absolute_sensor_range = (
-            phoenix6.signals.AbsoluteSensorRangeValue.UNSIGNED_0_TO1
+            AbsoluteSensorRangeValue.UNSIGNED_0_TO1
         )
         encoder_config.apply(encoder_range_config)
 
@@ -95,7 +95,7 @@ class SwerveModule:
         steer_config = self.steer.configurator
 
         steer_motor_config = MotorOutputConfigs()
-        steer_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
+        steer_motor_config.neutral_mode = NeutralModeValue.BRAKE
         steer_motor_config.inverted = steer_reversed
 
         steer_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
@@ -118,7 +118,7 @@ class SwerveModule:
         drive_config = self.drive.configurator
 
         drive_motor_config = MotorOutputConfigs()
-        drive_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
+        drive_motor_config.neutral_mode = NeutralModeValue.BRAKE
         drive_motor_config.inverted = drive_reversed
 
         drive_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
