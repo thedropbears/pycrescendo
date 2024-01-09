@@ -186,7 +186,9 @@ class SwerveModule:
         print(f"pos: {target_angle / math.tau}")
         self.steer_request = PositionDutyCycle(target_angle / math.tau)
         self.steer.set_control(self.steer_request)
-        print(f"steer {self.steer.get_velocity()}")
+        print(
+            f"steer {self.steer_request.with_position(target_angle / math.tau).position}"
+        )
 
         # rescale the speed target based on how close we are to being correctly aligned
         target_speed = self.state.speed * math.cos(target_displacement) ** 2
