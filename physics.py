@@ -22,16 +22,16 @@ class SimpleTalonFXMotorSim:
     def __init__(
         self, motor: phoenix6.hardware.TalonFX, kV: float, rev_per_unit: float
     ) -> None:
-        self.sim_collection = motor.sim_state
+        self.sim_state = motor.sim_state
         self.kV = kV  # volt seconds per unit
         self.rev_per_unit = rev_per_unit
 
     def update(self, dt: float) -> None:
-        voltage = self.sim_collection.motor_voltage
+        voltage = self.sim_state.motor_voltage
         velocity = voltage / self.kV  # units per second
         velocity_cps = velocity * self.rev_per_unit * 10
-        self.sim_collection.set_rotor_velocity(int(velocity_cps))
-        self.sim_collection.add_rotor_position(int(velocity_cps * dt))
+        self.sim_state.set_rotor_velocity(int(velocity_cps))
+        self.sim_state.add_rotor_position(int(velocity_cps * dt))
 
 
 class SimpleTalonSRXMotorSim:
