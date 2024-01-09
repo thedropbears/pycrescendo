@@ -171,12 +171,11 @@ class SwerveModule:
             self.state = desired_state
         self.state = SwerveModuleState.optimize(self.state, self.get_rotation())
 
+        self.drive_request = VelocityVoltage(0)
+        self.steer_request = VoltageOut(0)
         if abs(self.state.speed) < 0.01 and not self.module_locked:
-            drive_request = VelocityVoltage(0)
-            self.drive.set_control(drive_request)
-
-            steer_request = VoltageOut(0)
-            self.steer.set_control(steer_request)
+            self.drive.set_control(self.drive_request.with_velocity(0))
+            self.steer.set_control(self.steer_request)
             return
 
         current_angle = self.get_angle_integrated()
@@ -185,8 +184,8 @@ class SwerveModule:
         )
         target_angle = target_displacement + current_angle
         print(f"pos: {target_angle / math.tau}")
-        steer_request = PositionDutyCycle(target_angle / math.tau)
-        self.steer.set_control(steer_request)
+        self.steer_request = PositionDutyCycle(target_angle / math.tau)
+        self.steer.set_control(self.steer_request)
         print(f"steer {self.steer.get_velocity()}")
 
         # rescale the speed target based on how close we are to being correctly aligned
@@ -195,8 +194,11 @@ class SwerveModule:
 
         print(f"drive_velo {target_speed/ self.WHEEL_CIRCUMFERENCE}")
         # original position change/100ms, new m/s -> rot/s
-        drive_request = VelocityVoltage(target_speed / self.WHEEL_CIRCUMFERENCE)
-        self.drive.set_control(drive_request.with_feed_forward(speed_volt))
+        self.drive.set_control(
+            self.drive_request.with_velocity(
+                target_speed / self.WHEEL_CIRCUMFERENCE
+            ).with_feed_forward(speed_volt)
+        )
         print(f"drive {self.drive.get_motor_voltage()}")
 
     #
