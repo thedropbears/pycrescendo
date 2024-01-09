@@ -3,7 +3,9 @@ from __future__ import annotations
 import math
 import typing
 import phoenix6
+import phoenix6.unmanaged
 import phoenix5
+import wpilib
 
 from pyfrc.physics.core import PhysicsInterface
 from wpimath.kinematics import SwerveDrive4Kinematics
@@ -77,6 +79,11 @@ class PhysicsEngine:
         self.imu_yaw = self.imu.getDouble("Yaw")
 
     def update_sim(self, now: float, tm_diff: float) -> None:
+        # Enable the Phoenix6 simulated devices
+        # TODO: delete when phoenix6 integrates with wpilib
+        if wpilib.DriverStation.isEnabled():
+            phoenix6.unmanaged.feed_enable(0.1)
+
         for wheel in self.wheels:
             wheel.update(tm_diff)
         for steer in self.steer:
