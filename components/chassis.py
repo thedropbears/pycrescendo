@@ -192,7 +192,7 @@ class SwerveModule:
             self.state.angle.radians() - current_angle
         )
         target_angle = target_displacement + current_angle
-        steer_request = phoenix6.controls.PositionVoltage(target_angle / math.tau)
+        steer_request = phoenix6.controls.PositionDutyCycle(target_angle / math.tau)
         self.steer.set_control(steer_request)
 
         # rescale the speed target based on how close we are to being correctly aligned
