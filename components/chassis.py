@@ -162,7 +162,7 @@ class SwerveModule:
         return self.drive.get_stator_current().value
 
     def get_speed(self) -> float:
-        # velocity is in counts / 100ms, return in m/s
+        # velocity is in rot/s, return in m/s
         return self.drive.get_velocity().value * self.WHEEL_CIRCUMFERENCE
 
     def get_distance_traveled(self) -> float:
