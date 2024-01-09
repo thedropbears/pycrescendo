@@ -5,9 +5,11 @@ name = "pypi"
 
 [packages]
 numpy = "~=1.25.2"
+pyfrc = "==2024.0.0b1"
+robotpy-installer = "==2024.0.0b3"
 robotpy = {version = "==2024.0.0b4", extras = ["apriltag", "cscore"]}
 robotpy-ctre = "==2024.0.0b4"
-robotpy-navx = "~=2024.0.0b1"
+robotpy-navx = "==2024.0.0b4"
 robotpy-rev = "~=2024.0.0b1.post1"
 robotpy-wpilib-utilities = "~=2024.0.0b1"
 
