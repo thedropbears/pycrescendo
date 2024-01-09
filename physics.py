@@ -29,6 +29,7 @@ class SimpleTalonFXMotorSim:
     def update(self, dt: float) -> None:
         voltage = self.sim_state.motor_voltage
         velocity = voltage / self.kV  # units per second
+        print(f"sim {velocity}")
         velocity_cps = velocity * self.rev_per_unit * 10
         self.sim_state.set_rotor_velocity(int(velocity_cps))
         self.sim_state.add_rotor_position(int(velocity_cps * dt))
