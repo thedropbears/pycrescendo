@@ -108,9 +108,9 @@ class SwerveModule:
         # configuration for motor pid
         steer_pid = (
             phoenix6.configs.Slot0Configs()
-            .with_k_p(0.15035)
+            .with_k_p(0.3009939393939394)
             .with_k_i(0)
-            .with_k_d(5.6805)
+            .with_k_d(0.011372105571847507)
         )
 
         steer_config.apply(steer_motor_config)
