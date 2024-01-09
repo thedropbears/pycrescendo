@@ -131,7 +131,7 @@ class SwerveModule:
         )
 
         # configuration for motor pid and feedforward
-        self.drive_pid_ff = (
+        self.drive_pid = (
             phoenix6.configs.Slot0Configs()
             .with_k_p(0.02760055366568915)
             .with_k_i(0)
@@ -140,7 +140,7 @@ class SwerveModule:
         self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
 
         drive_config.apply(drive_motor_config)
-        drive_config.apply(self.drive_pid_ff, 0.01)
+        drive_config.apply(self.drive_pid, 0.01)
         drive_config.apply(drive_gear_ratio_config)
 
         self.central_angle = math.atan2(x, y)
