@@ -198,12 +198,12 @@ class SwerveModule:
         # rescale the speed target based on how close we are to being correctly aligned
         target_speed = self.state.speed * math.cos(target_displacement) ** 2
         speed_volt = self.drive_ff.calculate(target_speed)
-        drive_request = phoenix6.controls.VelocityVoltage(0)
-        self.drive.set_control(
-            drive_request.with_velocity(
-                target_speed / self.WHEEL_CIRCUMFERENCE
-            ).with_feed_forward(speed_volt / self.MAX_DRIVE_VOLTS)
+
+        # original position change/100ms, new m/s -> rot/s
+        drive_request = phoenix6.controls.VelocityVoltage(
+            target_speed / self.WHEEL_CIRCUMFERENCE
         )
+        self.drive.set_control(drive_request.with_feed_forward(speed_volt))
 
     #
     def sync_steer_encoders(self) -> None:
