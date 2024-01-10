@@ -30,7 +30,7 @@ pre-commit install
 ### Simulation
 
 ```
-python -m robot sim
+python -m robotpy sim
 ```
 
 ### Deploy to Robot
@@ -38,13 +38,13 @@ python -m robot sim
 Once on robots network
 
 ```
-python -m robot deploy
+python -m robotpy deploy
 ```
 
 ### Test
 
 ```
-python -m robot test
+python -m robotpy test
 ```
 
 
