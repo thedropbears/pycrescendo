@@ -1,5 +1,5 @@
 hypothesis
 pytest
-pyfrc==2024.0.0b1
-robotpy-installer==2024.0.0b3
+pyfrc==2024.0.1
+robotpy-installer==2024.0.2
 -r requirements.txt
