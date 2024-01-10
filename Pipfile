@@ -20,6 +20,6 @@ pytest = ">=7.2.0"
 python_version = "3.11"
 
 [scripts]
-deploy = "python -m robot deploy"
-sim = "python -m robot sim"
-test = "python -m robot test"
+deploy = "python -m robotpy deploy"
+sim = "python -m robotpy sim"
+test = "python -m robotpy test"
