@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "43a8a9e9579e8b5f6d84c1ba0e53a4147fb080d10e3fc782130b91ff213a1a19"
+            "sha256": "b239b42a08296f0c5d874040ff6912ba27d73067c442767f861da1854e218947"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -232,8 +232,7 @@
                 "sha256:011076dbc62606b08eec6eb1bb30497d085d34cb71537a7ce0d06f44c8492855",
                 "sha256:2386be296bfb7e482a26c25e85ee61495ea10154f920d7450fec575defb8cc05"
             ],
-            "index": "pypi",
-            "markers": "python_version >= '3.8'",
+            "markers": "platform_machine != 'roborio' and platform_machine != 'armv7l' and platform_machine != 'aarch64'",
             "version": "==2024.0.1"
         },
         "pynacl": {
@@ -424,8 +423,7 @@
                 "sha256:302987a3e64580dae0f2e21969aa61fa2f59114c077d2fe011629f641dee514b",
                 "sha256:9b93cfba473716c6b899d8f5c550ba64f52ae328f393fb00df3b086762b34142"
             ],
-            "index": "pypi",
-            "markers": "python_version >= '3.8'",
+            "markers": "platform_machine != 'roborio' and platform_machine != 'armv7l' and platform_machine != 'aarch64'",
             "version": "==2024.0.2"
         },
         "robotpy-navx": {
@@ -603,12 +601,12 @@
         },
         "hypothesis": {
             "hashes": [
-                "sha256:f8af0545a5a504abce9cb1ec1dbf6d737c356f22f002036ffee0421a2119b7e5",
-                "sha256:fbb69c8e704427eadfd91fa81da8a82f6938dfcc9b4364027e476590bb7d7d8c"
+                "sha256:5208b726b779fb78e3ae7d9274402215259579ef3b460fc5a3d0a66b12a2876c",
+                "sha256:dd73ed486acd0e2d3c2d6d4b5dd9141f30ab1cde6cff9a2bf0451db5332d63a9"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==6.92.6"
+            "version": "==6.92.7"
         },
         "iniconfig": {
             "hashes": [
