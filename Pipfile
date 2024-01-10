@@ -5,14 +5,12 @@ name = "pypi"
 
 [packages]
 numpy = "~=1.25.2"
-pyfrc = "==2024.0.1"
-robotpy-installer = "==2024.0.2"
+phoenix6 = "==24.1.0"
 robotpy = {version = "==2024.1.1.1", extras = ["apriltag", "cscore"]}
 robotpy-ctre = "==2024.1.0"
 robotpy-navx = "==2024.1.0"
 robotpy-rev = "==2024.2.0"
 robotpy-wpilib-utilities = "==2024.0.0"
-phoenix6 = "==24.1.0"
 
 [dev-packages]
 hypothesis = "*"
