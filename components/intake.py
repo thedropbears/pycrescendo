@@ -18,15 +18,15 @@ class Intake:
 
     @feedback
     def is_note_present(self) -> bool:
-        pass
+        return True
 
     @feedback
     def is_fully_retracted(self) -> bool:
-        pass
+        return True
 
     @feedback
     def is_fully_deployed(self) -> bool:
-        pass
+        return True
 
     def execute(self) -> None:
         pass
