@@ -5,13 +5,12 @@ name = "pypi"
 
 [packages]
 numpy = "~=1.25.2"
-pyfrc = "==2024.0.0b1"
-robotpy-installer = "==2024.0.0b3"
-robotpy = {version = "==2024.0.0b4", extras = ["apriltag", "cscore"]}
-robotpy-ctre = "==2024.0.0b4"
-robotpy-navx = "==2024.0.0b4"
-robotpy-rev = "~=2024.0.0b1.post1"
-robotpy-wpilib-utilities = "~=2024.0.0b1"
+phoenix6 = "==24.1.0"
+robotpy = {version = "==2024.1.1.1", extras = ["apriltag", "cscore"]}
+robotpy-ctre = "==2024.1.0"
+robotpy-navx = "==2024.1.0"
+robotpy-rev = "==2024.2.0"
+robotpy-wpilib-utilities = "==2024.0.0"
 
 [dev-packages]
 hypothesis = "*"
@@ -21,6 +20,6 @@ pytest = ">=7.2.0"
 python_version = "3.11"
 
 [scripts]
-deploy = "python robot.py deploy"
-sim = "python robot.py sim"
-test = "python robot.py test"
+deploy = "python -m robotpy deploy"
+sim = "python -m robotpy sim"
+test = "python -m robotpy test"

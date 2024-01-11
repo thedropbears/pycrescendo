@@ -23,7 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
           pip install coverage pytest-github-actions-annotate-failures
-      - run: python robot.py coverage test -- -v
+      - run: python -m robotpy coverage test -- -v
       - uses: codecov/codecov-action@v3
 
   mypy:
