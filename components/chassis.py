@@ -50,7 +50,7 @@ class SwerveModule:
         steer_id: int,
         encoder_id: int,
         steer_reversed=True,
-        drive_reversed=False,
+        drive_reversed=True,
     ):
         """
         x, y: where the module is relative to the center of the robot
@@ -65,16 +65,19 @@ class SwerveModule:
         else:
             drive_reversed = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
 
+
         if steer_reversed:
             steer_reversed = config_groups.InvertedValue.CLOCKWISE_POSITIVE
         else:
             steer_reversed = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+
 
         # Create Motor and encoder objects
         self.steer = TalonFX(steer_id)
         self.drive = TalonFX(drive_id)
         self.drive_id = drive_id
         self.encoder = CANcoder(encoder_id)
+
 
         # Reduce CAN status frame rates before configuring
         self.steer.get_fault_field().set_update_frequency(
@@ -92,15 +95,15 @@ class SwerveModule:
         steer_motor_config.inverted = steer_reversed
 
         steer_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
-            self.STEER_GEAR_RATIO
+            1 / self.STEER_GEAR_RATIO
         )
 
         # configuration for motor pid
         steer_pid = (
             Slot0Configs()
-            .with_k_p(0.3009939393939394)
+            .with_k_p(0.3409939393939394)
             .with_k_i(0)
-            .with_k_d(0.011372105571847507)
+            .with_k_d(0)
         )
 
         steer_config.apply(steer_motor_config)
@@ -115,12 +118,15 @@ class SwerveModule:
         drive_motor_config.inverted = drive_reversed
 
         drive_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
-            self.DRIVE_GEAR_RATIO
+            1 / self.DRIVE_GEAR_RATIO
         )
 
         # configuration for motor pid and feedforward
         self.drive_pid = (
-            Slot0Configs().with_k_p(0.026450530596285438).with_k_i(0).with_k_d(0)
+            Slot0Configs()
+            .with_k_p(0.026450530596285438)
+            .with_k_i(0)
+            .with_k_d(0)
         )
         self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
 
@@ -209,9 +215,9 @@ class SwerveModule:
 
 class Chassis:
     # metres between centre of left and right wheels
-    TRACK_WIDTH = 0.54665
+    TRACK_WIDTH = 0.61
     # metres between centre of front and back wheels
-    WHEEL_BASE = 0.68665
+    WHEEL_BASE = 0.61
 
     # size including bumpers
     LENGTH = 1.0105
