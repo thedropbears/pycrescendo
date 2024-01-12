@@ -76,13 +76,6 @@ class SwerveModule:
         self.drive_id = drive_id
         self.encoder = CANcoder(encoder_id)
 
-        encoder_config = self.encoder.configurator
-        encoder_range_config = MagnetSensorConfigs()
-        encoder_range_config.absolute_sensor_range = (
-            AbsoluteSensorRangeValue.UNSIGNED_0_TO1
-        )
-        encoder_config.apply(encoder_range_config)
-
         # Reduce CAN status frame rates before configuring
         self.steer.get_fault_field().set_update_frequency(
             frequency_hz=4, timeout_seconds=0.01
