@@ -4,10 +4,20 @@ The Drop Bears' robot code for FRC 2024
 
 ## Setup
 
-### Install Dependencies
+### Install dependencies
 
-```
-pip install -r requirements-dev.txt
+We use `pdm` to manage our dependencies in a virtual environment.
+
+First, install `pdm`, either by using your system package manager, using [`pipx`][],
+or following the instructions on the [`pdm` website][].
+
+[`pipx`]: https://pipx.pypa.io
+[`pdm` website]: https://pdm-project.org
+
+After installing `pdm`, use it to create a virtual environment and install our dependencies.
+
+```sh
+pdm install
 ```
 
 ### Setup pre-commit
@@ -30,7 +40,7 @@ pre-commit install
 ### Simulation
 
 ```
-python -m robotpy sim
+pdm run robotpy sim
 ```
 
 ### Deploy to Robot
@@ -38,13 +48,13 @@ python -m robotpy sim
 Once on robots network
 
 ```
-python -m robotpy deploy
+pdm run deploy
 ```
 
 ### Test
 
 ```
-python -m robotpy test
+pdm run test
 ```
 
 
