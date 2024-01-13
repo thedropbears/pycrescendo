@@ -185,7 +185,7 @@ class SwerveModule:
         )
 
     #
-    def sync_steer_encoders(self) -> None:
+    def sync_steer_encoder(self) -> None:
         self.steer.set_position(self.get_angle_absolute())
 
     def get_position(self) -> SwerveModulePosition:
@@ -370,7 +370,7 @@ class Chassis:
 
     def sync_all(self) -> None:
         for m in self.modules:
-            m.sync_steer_encoders()
+            m.sync_steer_encoder()
 
     def set_pose(self, pose: Pose2d) -> None:
         self.estimator.resetPosition(
