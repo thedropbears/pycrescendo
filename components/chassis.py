@@ -412,14 +412,6 @@ class Chassis:
         return self.get_pose().rotation()
 
     @feedback
-    def get_tilt(self) -> float:
-        return math.radians(self.imu.getRoll())
-
-    @feedback
-    def get_tilt_rate(self) -> float:
-        return math.radians(self.imu.getRawGyroY())
-
-    @feedback
     def get_drive_current(self) -> float:
         return sum(abs(x.get_drive_current()) for x in self.modules)
 
