@@ -137,7 +137,7 @@ class SwerveModule:
         """Get the steer angle as a Rotation2d"""
         return Rotation2d(self.get_angle_integrated())
 
-    def get_module_current(self) -> float:
+    def get_drive_current(self) -> float:
         return self.drive.get_stator_current().value
 
     def get_speed(self) -> float:
@@ -421,7 +421,7 @@ class Chassis:
 
     @feedback
     def get_drive_current(self) -> float:
-        return sum(abs(x.get_module_current()) for x in self.modules)
+        return sum(abs(x.get_drive_current()) for x in self.modules)
 
     @feedback
     def may_be_stalled(self) -> bool:
