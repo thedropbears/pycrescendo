@@ -170,25 +170,19 @@ class SwerveModule:
             self.state.angle.radians() - current_angle
         )
         target_angle = target_displacement + current_angle
-        print(f"pos: {target_angle / math.tau}")
         self.steer_request = PositionDutyCycle(target_angle / math.tau)
         self.steer.set_control(self.steer_request)
-        print(
-            f"steer {self.steer_request.with_position(target_angle / math.tau).position}"
-        )
 
         # rescale the speed target based on how close we are to being correctly aligned
         target_speed = self.state.speed * math.cos(target_displacement) ** 2
         speed_volt = self.drive_ff.calculate(target_speed)
 
-        print(f"drive_velo {target_speed/ self.WHEEL_CIRCUMFERENCE}")
         # original position change/100ms, new m/s -> rot/s
         self.drive.set_control(
             self.drive_request.with_velocity(
                 target_speed / self.WHEEL_CIRCUMFERENCE
             ).with_feed_forward(speed_volt)
         )
-        print(f"drive {self.drive.get_motor_voltage()}")
 
     #
     def sync_steer_encoders(self) -> None:
