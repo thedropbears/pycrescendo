@@ -15,6 +15,9 @@ class TalonIds(enum.IntEnum):
     drive_4 = 4
     steer_4 = 8
 
+    top_flywheel = 9
+    bottom_flywheel = 10
+
 
 @enum.unique
 class CancoderIds(enum.IntEnum):
@@ -22,3 +25,8 @@ class CancoderIds(enum.IntEnum):
     swerve_2 = 2
     swerve_3 = 3
     swerve_4 = 4
+
+
+@enum.unique
+class SparkMaxIds(enum.IntEnum):
+    inject_flywheel = 1
