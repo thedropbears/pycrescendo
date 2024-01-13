@@ -414,7 +414,3 @@ class Chassis:
     @feedback
     def get_drive_current(self) -> float:
         return sum(abs(x.get_drive_current()) for x in self.modules)
-
-    @feedback
-    def may_be_stalled(self) -> bool:
-        return self.get_drive_current() > self.DRIVE_CURRENT_THRESHOLD
