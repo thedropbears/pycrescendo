@@ -21,6 +21,8 @@ from wpimath.kinematics import (
 from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.controller import SimpleMotorFeedforwardMeters
+from wpimath.trajectory import TrapezoidProfileRadians
+from wpimath.controller import ProfiledPIDControllerRadians
 
 from magicbot import feedback
 
@@ -290,6 +292,17 @@ class Chassis:
     def drive_local(self, vx: float, vy: float, omega: float) -> None:
         """Robot oriented drive commands"""
         self.chassis_speeds = ChassisSpeeds(vx, vy, omega)
+
+    def align_to_setpoint(self, setpoint: Pose2d) -> float:
+        """return omega velocity for alignment to the given setpoint"""
+        cur_pose = self.estimator.getEstimatedPosition()
+        heading_diff = setpoint.relativeTo(cur_pose).rotation().radians()
+        heading_controller = ProfiledPIDControllerRadians(
+            1, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
+        )
+        heading_controller.enableContinuousInput(-math.pi, math.pi)
+        omega = heading_controller.calculate(heading_diff)
+        return omega
 
     def execute(self) -> None:
         # rotate desired velocity to compensate for skew caused by discretization
