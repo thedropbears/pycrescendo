@@ -2,31 +2,36 @@ from __future__ import annotations
 
 import math
 import typing
+import phoenix6
+import phoenix6.unmanaged
 import phoenix5
+import wpilib
 
 from pyfrc.physics.core import PhysicsInterface
 from wpimath.kinematics import SwerveDrive4Kinematics
 from wpilib.simulation import SimDeviceSim
 
 from components.chassis import SwerveModule
-from utilities.ctre import FALCON_CPR, VERSA_ENCODER_CPR
+from utilities.ctre import VERSA_ENCODER_CPR
 
 if typing.TYPE_CHECKING:
     from robot import MyRobot
 
 
 class SimpleTalonFXMotorSim:
-    def __init__(self, motor: phoenix5.TalonFX, kV: float, rev_per_unit: float) -> None:
-        self.sim_collection = motor.getSimCollection()
+    def __init__(
+        self, motor: phoenix6.hardware.TalonFX, kV: float, rev_per_unit: float
+    ) -> None:
+        self.sim_state = motor.sim_state
         self.kV = kV  # volt seconds per unit
         self.rev_per_unit = rev_per_unit
 
     def update(self, dt: float) -> None:
-        voltage = self.sim_collection.getMotorOutputLeadVoltage()
+        voltage = self.sim_state.motor_voltage
         velocity = voltage / self.kV  # units per second
-        velocity_cps = velocity * self.rev_per_unit * FALCON_CPR
-        self.sim_collection.setIntegratedSensorVelocity(int(velocity_cps / 10))
-        self.sim_collection.addIntegratedSensorPosition(int(velocity_cps * dt))
+        velocity_cps = velocity * self.rev_per_unit * 10
+        self.sim_state.set_rotor_velocity(int(velocity_cps))
+        self.sim_state.add_rotor_position(int(velocity_cps * dt))
 
 
 class SimpleTalonSRXMotorSim:
@@ -55,7 +60,9 @@ class PhysicsEngine:
         # Motors
         self.wheels = [
             SimpleTalonFXMotorSim(
-                module.drive, module.drive_ff.kV, 1 / module.DRIVE_MOTOR_REV_TO_METRES
+                module.drive,
+                module.drive_ff.kV,
+                1 / module.DRIVE_MOTOR_REV_TO_METRES,
             )
             for module in robot.chassis.modules
         ]
@@ -72,6 +79,11 @@ class PhysicsEngine:
         self.imu_yaw = self.imu.getDouble("Yaw")
 
     def update_sim(self, now: float, tm_diff: float) -> None:
+        # Enable the Phoenix6 simulated devices
+        # TODO: delete when phoenix6 integrates with wpilib
+        if wpilib.DriverStation.isEnabled():
+            phoenix6.unmanaged.feed_enable(0.1)
+
         for wheel in self.wheels:
             wheel.update(tm_diff)
         for steer in self.steer:

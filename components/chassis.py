@@ -1,8 +1,14 @@
 from logging import Logger
 import math
-
-import phoenix5
-import phoenix5.sensors
+from phoenix6.hardware import TalonFX, CANcoder
+from phoenix6.controls import VoltageOut, VelocityVoltage, PositionDutyCycle
+from phoenix6.signals import NeutralModeValue
+from phoenix6.configs import (
+    config_groups,
+    MotorOutputConfigs,
+    FeedbackConfigs,
+    Slot0Configs,
+)
 import magicbot
 import navx
 import wpilib
@@ -19,7 +25,7 @@ from wpimath.controller import SimpleMotorFeedforwardMeters
 from magicbot import feedback
 
 from utilities.functions import constrain_angle, rate_limit_module
-from utilities.ctre import FALCON_CPR, FALCON_FREE_RPS
+from utilities.ctre import FALCON_FREE_RPS
 from ids import CancoderIds, TalonIds
 
 
@@ -29,14 +35,7 @@ class SwerveModule:
     WHEEL_CIRCUMFERENCE = 4 * 2.54 / 100 * math.pi
 
     DRIVE_MOTOR_REV_TO_METRES = WHEEL_CIRCUMFERENCE * DRIVE_GEAR_RATIO
-    METRES_TO_DRIVE_COUNTS = FALCON_CPR / DRIVE_MOTOR_REV_TO_METRES
-    DRIVE_COUNTS_TO_METRES = DRIVE_MOTOR_REV_TO_METRES / FALCON_CPR
-
     STEER_MOTOR_REV_TO_RAD = math.tau * STEER_GEAR_RATIO
-    STEER_COUNTS_TO_RAD = STEER_MOTOR_REV_TO_RAD / FALCON_CPR
-    STEER_RAD_TO_COUNTS = FALCON_CPR / STEER_MOTOR_REV_TO_RAD
-
-    MAX_DRIVE_VOLTS = 11.5
 
     # limit the acceleration of the commanded speeds of the robot to what is actually
     # achiveable without the wheels slipping. This is done to improve odometry
@@ -50,7 +49,7 @@ class SwerveModule:
         steer_id: int,
         encoder_id: int,
         steer_reversed=True,
-        drive_reversed=False,
+        drive_reversed=True,
     ):
         """
         x, y: where the module is relative to the center of the robot
@@ -60,68 +59,93 @@ class SwerveModule:
         self.state = SwerveModuleState(0, Rotation2d(0))
         self.do_smooth = True
 
+        if drive_reversed:
+            drive_reversed = config_groups.InvertedValue.CLOCKWISE_POSITIVE
+        else:
+            drive_reversed = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+
+        if steer_reversed:
+            steer_reversed = config_groups.InvertedValue.CLOCKWISE_POSITIVE
+        else:
+            steer_reversed = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+
         # Create Motor and encoder objects
-        self.steer = phoenix5.WPI_TalonFX(steer_id)
-        self.drive = phoenix5.WPI_TalonFX(drive_id)
+        self.steer = TalonFX(steer_id)
+        self.drive = TalonFX(drive_id)
         self.drive_id = drive_id
-        self.encoder = phoenix5.sensors.CANCoder(encoder_id)
+        self.encoder = CANcoder(encoder_id)
 
         # Reduce CAN status frame rates before configuring
-        self.steer.setStatusFramePeriod(
-            phoenix5.StatusFrameEnhanced.Status_1_General, 250, 10
+        self.steer.get_fault_field().set_update_frequency(
+            frequency_hz=4, timeout_seconds=0.01
         )
-        self.drive.setStatusFramePeriod(
-            phoenix5.StatusFrameEnhanced.Status_1_General, 250, 10
+        self.drive.get_fault_field().set_update_frequency(
+            frequency_hz=4, timeout_seconds=0.01
         )
 
         # Configure steer motor
-        self.steer.setNeutralMode(phoenix5.NeutralMode.Brake)
-        self.steer.setInverted(steer_reversed)
-        self.steer.config_kP(0, 0.15035, 10)
-        self.steer.config_kI(0, 0, 10)
-        self.steer.config_kD(0, 5.6805, 10)
-        self.steer.configAllowableClosedloopError(
-            0, self.STEER_RAD_TO_COUNTS * math.radians(4)
-        )
-        self.steer.configSelectedFeedbackSensor(
-            phoenix5.FeedbackDevice.IntegratedSensor, 0, 10
+        steer_config = self.steer.configurator
+
+        steer_motor_config = MotorOutputConfigs()
+        steer_motor_config.neutral_mode = NeutralModeValue.BRAKE
+        steer_motor_config.inverted = steer_reversed
+
+        steer_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
+            1 / self.STEER_GEAR_RATIO
         )
 
+        # configuration for motor pid
+        steer_pid = Slot0Configs().with_k_p(0.3409939393939394).with_k_i(0).with_k_d(0)
+
+        steer_config.apply(steer_motor_config)
+        steer_config.apply(steer_pid, 0.01)
+        steer_config.apply(steer_gear_ratio_config)
+
         # Configure drive motor
-        self.drive.setNeutralMode(phoenix5.NeutralMode.Brake)
-        self.drive.setInverted(drive_reversed)
-        self.drive.configVoltageCompSaturation(self.MAX_DRIVE_VOLTS, timeoutMs=10)
-        self.drive.enableVoltageCompensation(True)
-        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
-        self.drive.configVelocityMeasurementPeriod(
-            phoenix5.sensors.SensorVelocityMeasPeriod.Period_5Ms
+        drive_config = self.drive.configurator
+
+        drive_motor_config = MotorOutputConfigs()
+        drive_motor_config.neutral_mode = NeutralModeValue.BRAKE
+        drive_motor_config.inverted = drive_reversed
+
+        drive_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
+            1 / self.DRIVE_GEAR_RATIO
         )
-        self.drive.configVelocityMeasurementWindow(8)
-        self.drive.config_kP(0, 0.011489, 10)
-        self.drive.config_kI(0, 0, 10)
-        self.drive.config_kD(0, 0, 10)
+
+        # configuration for motor pid and feedforward
+        self.drive_pid = (
+            Slot0Configs().with_k_p(0.026450530596285438).with_k_i(0).with_k_d(0)
+        )
+        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
+
+        drive_config.apply(drive_motor_config)
+        drive_config.apply(self.drive_pid, 0.01)
+        drive_config.apply(drive_gear_ratio_config)
 
         self.central_angle = math.atan2(x, y)
         self.module_locked = False
 
     def get_angle_absolute(self) -> float:
-        """Gets steer angle (radians) from absolute encoder"""
-        return math.radians(self.encoder.getAbsolutePosition())
+        """Gets steer angle (rot) from absolute encoder"""
+        return self.encoder.get_absolute_position().value
 
     def get_angle_integrated(self) -> float:
         """Gets steer angle from motor's integrated relative encoder"""
-        return self.steer.getSelectedSensorPosition() * self.STEER_COUNTS_TO_RAD
+        return self.steer.get_position().value * math.tau
 
     def get_rotation(self) -> Rotation2d:
         """Get the steer angle as a Rotation2d"""
         return Rotation2d(self.get_angle_integrated())
 
+    def get_drive_current(self) -> float:
+        return self.drive.get_stator_current().value
+
     def get_speed(self) -> float:
-        # velocity is in counts / 100ms, return in m/s
-        return self.drive.getSelectedSensorVelocity() * self.DRIVE_COUNTS_TO_METRES * 10
+        # velocity is in rot/s, return in m/s
+        return self.drive.get_velocity().value * self.WHEEL_CIRCUMFERENCE
 
     def get_distance_traveled(self) -> float:
-        return self.drive.getSelectedSensorPosition() * self.DRIVE_COUNTS_TO_METRES
+        return self.drive.get_position().value * self.WHEEL_CIRCUMFERENCE
 
     def set(self, desired_state: SwerveModuleState):
         if self.module_locked:
@@ -134,9 +158,11 @@ class SwerveModule:
             self.state = desired_state
         self.state = SwerveModuleState.optimize(self.state, self.get_rotation())
 
+        self.drive_request = VelocityVoltage(0)
+        self.steer_request = VoltageOut(0)
         if abs(self.state.speed) < 0.01 and not self.module_locked:
-            self.drive.set(phoenix5.ControlMode.Velocity, 0)
-            self.steer.set(phoenix5.ControlMode.PercentOutput, 0)
+            self.drive.set_control(self.drive_request.with_velocity(0))
+            self.steer.set_control(self.steer_request)
             return
 
         current_angle = self.get_angle_integrated()
@@ -144,24 +170,23 @@ class SwerveModule:
             self.state.angle.radians() - current_angle
         )
         target_angle = target_displacement + current_angle
-        self.steer.set(
-            phoenix5.ControlMode.Position, target_angle * self.STEER_RAD_TO_COUNTS
-        )
+        self.steer_request = PositionDutyCycle(target_angle / math.tau)
+        self.steer.set_control(self.steer_request)
 
         # rescale the speed target based on how close we are to being correctly aligned
         target_speed = self.state.speed * math.cos(target_displacement) ** 2
         speed_volt = self.drive_ff.calculate(target_speed)
-        self.drive.set(
-            phoenix5.ControlMode.Velocity,
-            target_speed * self.METRES_TO_DRIVE_COUNTS / 10,
-            phoenix5.DemandType.ArbitraryFeedForward,
-            speed_volt / self.MAX_DRIVE_VOLTS,
+
+        # original position change/100ms, new m/s -> rot/s
+        self.drive.set_control(
+            self.drive_request.with_velocity(
+                target_speed / self.WHEEL_CIRCUMFERENCE
+            ).with_feed_forward(speed_volt)
         )
 
+    #
     def sync_steer_encoders(self) -> None:
-        self.steer.setSelectedSensorPosition(
-            self.get_angle_absolute() * self.STEER_RAD_TO_COUNTS
-        )
+        self.steer.set_position(self.get_angle_absolute())
 
     def get_position(self) -> SwerveModulePosition:
         return SwerveModulePosition(self.get_distance_traveled(), self.get_rotation())
@@ -172,9 +197,9 @@ class SwerveModule:
 
 class Chassis:
     # metres between centre of left and right wheels
-    TRACK_WIDTH = 0.54665
+    TRACK_WIDTH = 0.61
     # metres between centre of front and back wheels
-    WHEEL_BASE = 0.68665
+    WHEEL_BASE = 0.61
 
     # size including bumpers
     LENGTH = 1.0105
@@ -396,7 +421,7 @@ class Chassis:
 
     @feedback
     def get_drive_current(self) -> float:
-        return sum(abs(x.drive.getStatorCurrent()) for x in self.modules)
+        return sum(abs(x.get_drive_current()) for x in self.modules)
 
     @feedback
     def may_be_stalled(self) -> bool:

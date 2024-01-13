@@ -16,3 +16,15 @@ pythonpath = '.'
 select = ["E", "F", "B", "UP", "C4", "SIM"]
 ignore = ["E501"]
 target-version = "py39"
+
+[tool.robotpy]
+requires = [
+	"numpy~=1.25.2",
+	"phoenix6==24.1.0",
+	"robotpy-ctre==2024.1.0",
+	"robotpy-navx==2024.1.0",
+	"robotpy-rev==2024.2.0",
+	"robotpy-wpilib-utilities==2024.0.0",
+]
+robotpy_version = "2024.1.1.1"
+robotpy_extras = ["apriltag"]
