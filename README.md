@@ -20,11 +20,14 @@ After installing `pdm`, use it to create a virtual environment and install our d
 pdm install
 ```
 
-### Setup pre-commit
-Pre-commit is setup to automatically run formatters and linters when you commit. It is suggested to install pre-commit via pipx to keep it seperate from robot code dependencies. First [install pipx](https://pipx.pypa.io/stable/installation/).
+### pre-commit
 
+[pre-commit][] is configured to run our formatters and linters.
+These are enforced for all code committed to this project.
 
-Install pre-commit with pipx:
+You must install pre-commit outside of this project's virtual environment.
+Either use your system package manager, or use `pipx`:
+
 ```
 pipx install pre-commit
 ```
@@ -34,6 +37,7 @@ Setup the pre-commit hooks to run on commit:
 pre-commit install
 ```
 
+[pre-commit]: https://pre-commit.com
 
 ## Run
 
