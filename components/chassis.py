@@ -223,6 +223,11 @@ class Chassis:
 
     def setup(self) -> None:
         self.imu = navx.AHRS.create_spi()
+        self.heading_controller = ProfiledPIDControllerRadians(
+            1, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
+        )
+        self.heading_controller.enableContinuousInput(-math.pi, math.pi)
+        self.align_to_setpoint = False
 
         self.modules = [
             # Front Left
@@ -293,7 +298,7 @@ class Chassis:
         """Robot oriented drive commands"""
         self.chassis_speeds = ChassisSpeeds(vx, vy, omega)
 
-    def align_to_setpoint(self, setpoint: Pose2d) -> float:
+    def setpoint_rotation_diff(self, setpoint: Pose2d) -> float:
         """return omega velocity for alignment to the given setpoint"""
         cur_pose = self.estimator.getEstimatedPosition()
         pose_diff_y = setpoint.y - cur_pose.y
@@ -303,17 +308,20 @@ class Chassis:
             angle = angle + math.tau
 
         angle = math.pi / 2 - angle
-        heading_diff = angle - cur_pose.rotation().radians()
-        heading_controller = ProfiledPIDControllerRadians(
-            1, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
-        )
-        heading_controller.enableContinuousInput(-math.pi, math.pi)
-        omega = heading_controller.calculate(heading_diff)
-        return omega
+        self.heading_diff = angle - cur_pose.rotation().radians()
 
     def execute(self) -> None:
         # rotate desired velocity to compensate for skew caused by discretization
         # see https://www.chiefdelphi.com/t/field-relative-swervedrive-drift-even-with-simulated-perfect-modules/413892/
+
+        if self.align_to_setpoint:
+            self.chassis_speeds.omega = self.heading_controller.calculate(
+                self.heading_diff
+            )
+
+        if self.heading_controller.atGoal():
+            self.align_to_setpoint = False
+            self.heading_diff = 0
 
         if self.do_fudge:
             # in the sim i found using 5 instead of 0.5 did a lot better
