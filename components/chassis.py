@@ -59,16 +59,6 @@ class SwerveModule:
         self.state = SwerveModuleState(0, Rotation2d(0))
         self.do_smooth = True
 
-        if drive_reversed:
-            drive_reversed = config_groups.InvertedValue.CLOCKWISE_POSITIVE
-        else:
-            drive_reversed = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
-
-        if steer_reversed:
-            steer_reversed = config_groups.InvertedValue.CLOCKWISE_POSITIVE
-        else:
-            steer_reversed = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
-
         # Create Motor and encoder objects
         self.steer = TalonFX(steer_id)
         self.drive = TalonFX(drive_id)
@@ -88,7 +78,11 @@ class SwerveModule:
 
         steer_motor_config = MotorOutputConfigs()
         steer_motor_config.neutral_mode = NeutralModeValue.BRAKE
-        steer_motor_config.inverted = steer_reversed
+        steer_motor_config.inverted = (
+            config_groups.InvertedValue.CLOCKWISE_POSITIVE
+            if steer_reversed
+            else config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+        )
 
         steer_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
             1 / self.STEER_GEAR_RATIO
@@ -106,7 +100,11 @@ class SwerveModule:
 
         drive_motor_config = MotorOutputConfigs()
         drive_motor_config.neutral_mode = NeutralModeValue.BRAKE
-        drive_motor_config.inverted = drive_reversed
+        drive_motor_config.inverted = (
+            config_groups.InvertedValue.CLOCKWISE_POSITIVE
+            if drive_reversed
+            else config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+        )
 
         drive_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
             1 / self.DRIVE_GEAR_RATIO
