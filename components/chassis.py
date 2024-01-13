@@ -328,7 +328,11 @@ class Chassis:
         self.update_odometry()
 
     def on_enable(self) -> None:
-        # update the odometry so the pose estimator dosent have an empty buffer
+        """update the odometry so the pose estimator doesn't have an empty buffer
+
+        While we should be building the pose buffer while disabled,
+        this accounts for the edge case of crashing mid match and immediately enabling with an empty buffer
+        """
         self.update_odometry()
 
     @magicbot.feedback
