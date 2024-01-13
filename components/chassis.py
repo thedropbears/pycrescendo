@@ -186,7 +186,6 @@ class SwerveModule:
             ).with_feed_forward(speed_volt)
         )
 
-    #
     def sync_steer_encoder(self) -> None:
         self.steer.set_position(self.get_angle_absolute())
 
