@@ -68,7 +68,7 @@ dependencies = [
 
 [tool.robotpy]
 requires = [
-	"numpy~=1.25.2",
+	"numpy~=1.25",
 	"phoenix6==24.1.0",
 	"robotpy-ctre==2024.1.0",
 	"robotpy-navx==2024.1.0",
