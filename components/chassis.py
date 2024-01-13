@@ -2,9 +2,8 @@ from logging import Logger
 import math
 from phoenix6.hardware import TalonFX, CANcoder
 from phoenix6.controls import VoltageOut, VelocityVoltage, PositionDutyCycle
-from phoenix6.signals import AbsoluteSensorRangeValue, NeutralModeValue
+from phoenix6.signals import NeutralModeValue
 from phoenix6.configs import (
-    MagnetSensorConfigs,
     config_groups,
     MotorOutputConfigs,
     FeedbackConfigs,
@@ -65,19 +64,16 @@ class SwerveModule:
         else:
             drive_reversed = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
 
-
         if steer_reversed:
             steer_reversed = config_groups.InvertedValue.CLOCKWISE_POSITIVE
         else:
             steer_reversed = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
-
 
         # Create Motor and encoder objects
         self.steer = TalonFX(steer_id)
         self.drive = TalonFX(drive_id)
         self.drive_id = drive_id
         self.encoder = CANcoder(encoder_id)
-
 
         # Reduce CAN status frame rates before configuring
         self.steer.get_fault_field().set_update_frequency(
@@ -99,12 +95,7 @@ class SwerveModule:
         )
 
         # configuration for motor pid
-        steer_pid = (
-            Slot0Configs()
-            .with_k_p(0.3409939393939394)
-            .with_k_i(0)
-            .with_k_d(0)
-        )
+        steer_pid = Slot0Configs().with_k_p(0.3409939393939394).with_k_i(0).with_k_d(0)
 
         steer_config.apply(steer_motor_config)
         steer_config.apply(steer_pid, 0.01)
@@ -123,10 +114,7 @@ class SwerveModule:
 
         # configuration for motor pid and feedforward
         self.drive_pid = (
-            Slot0Configs()
-            .with_k_p(0.026450530596285438)
-            .with_k_i(0)
-            .with_k_d(0)
+            Slot0Configs().with_k_p(0.026450530596285438).with_k_i(0).with_k_d(0)
         )
         self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
 
