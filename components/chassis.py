@@ -125,6 +125,8 @@ class SwerveModule:
         self.central_angle = math.atan2(x, y)
         self.module_locked = False
 
+        self.sync_steer_encoder()
+
     def get_angle_absolute(self) -> float:
         """Gets steer angle (rot) from absolute encoder"""
         return self.encoder.get_absolute_position().value
