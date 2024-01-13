@@ -34,6 +34,7 @@ package-type = "application"
 
 [tool.pdm.scripts]
 deploy = "robotpy deploy"
+download = "robotpy sync --no-install"
 sim = "robotpy sim"
 test = "robotpy test"
 
