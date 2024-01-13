@@ -298,7 +298,7 @@ class Chassis:
         """Robot oriented drive commands"""
         self.chassis_speeds = ChassisSpeeds(vx, vy, omega)
 
-    def setpoint_rotation_diff(self, setpoint: Pose2d) -> float:
+    def setpoint_rotation_diff(self, setpoint: Pose2d) -> None:
         """return omega velocity for alignment to the given setpoint"""
         cur_pose = self.estimator.getEstimatedPosition()
         pose_diff_y = setpoint.y - cur_pose.y
