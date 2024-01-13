@@ -296,7 +296,14 @@ class Chassis:
     def align_to_setpoint(self, setpoint: Pose2d) -> float:
         """return omega velocity for alignment to the given setpoint"""
         cur_pose = self.estimator.getEstimatedPosition()
-        heading_diff = setpoint.relativeTo(cur_pose).rotation().radians()
+        pose_diff_y = setpoint.y - cur_pose.y
+        pose_diff_x = setpoint.x - cur_pose.x
+        angle = math.atan2(pose_diff_y, pose_diff_x)
+        if pose_diff_y < 0:
+            angle = angle + math.tau
+
+        angle = math.pi / 2 - angle
+        heading_diff = angle - cur_pose.rotation().radians()
         heading_controller = ProfiledPIDControllerRadians(
             1, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
         )
