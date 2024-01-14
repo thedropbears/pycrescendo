@@ -1,7 +1,0 @@
-numpy~=1.25.2
-phoenix6==24.1.0
-robotpy[apriltag,cscore]==2024.1.1.1
-robotpy-ctre==2024.1.0
-robotpy-navx==2024.1.0
-robotpy-rev==2024.2.0
-robotpy-wpilib-utilities==2024.0.0

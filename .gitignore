@@ -13,6 +13,16 @@ coverage.xml
 # pyenv
 .python-version
 
+# pdm
+.pdm-python
+#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
+#   in version control.
+#   https://pdm.fming.dev/#use-with-ide
+.pdm.toml
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+__pypackages__/
+
 # Environments
 .env
 .venv
@@ -32,6 +42,9 @@ dmypy.json
 
 # Pyre
 .pyre/
+
+# pytype static type analyzer
+.pytype/
 
 ### macOS ###
 *.DS_Store
