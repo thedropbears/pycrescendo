@@ -5,6 +5,7 @@ import wpilib.event
 import magicbot
 
 from components.chassis import Chassis
+import math
 
 from utilities.scalers import rescale_js
 
@@ -41,7 +42,7 @@ class MyRobot(magicbot.MagicRobot):
         self.rumble_for(0.8, 0.3)
 
     def teleopInit(self) -> None:
-        pass
+        self.dpad_angle = 0.0
 
     def teleopPeriodic(self) -> None:
         # Driving
@@ -55,6 +56,23 @@ class MyRobot(magicbot.MagicRobot):
             self.chassis.drive_local(*driver_inputs)
         else:
             self.chassis.drive_field(*driver_inputs)
+
+        # give rotational access to the driver
+        if drive_z != 0:
+            self.chassis.stop_snapping()
+
+        # testing rig for the snap to heading method
+        if self.gamepad.getPOV() != -1:
+            self.dpad_angle = self.gamepad.getPOV()
+
+        if self.gamepad.getAButtonPressed():
+            self.chassis.snap_to_heading(math.radians(self.dpad_angle))
+
+        if self.gamepad.getBButtonPressed():
+            self.chassis.lock_swerve()
+
+        if self.gamepad.getBButtonReleased():
+            self.chassis.unlock_swerve()
 
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):

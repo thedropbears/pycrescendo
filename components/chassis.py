@@ -21,6 +21,8 @@ from wpimath.kinematics import (
 from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.controller import SimpleMotorFeedforwardMeters
+from wpimath.trajectory import TrapezoidProfileRadians
+from wpimath.controller import ProfiledPIDControllerRadians
 
 from magicbot import feedback
 
@@ -220,6 +222,11 @@ class Chassis:
 
     def setup(self) -> None:
         self.imu = navx.AHRS.create_spi()
+        self.heading_controller = ProfiledPIDControllerRadians(
+            1, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
+        )
+        self.heading_controller.enableContinuousInput(-math.pi, math.pi)
+        self.snapping_to_heading = False
 
         self.modules = [
             # Front Left
@@ -290,9 +297,26 @@ class Chassis:
         """Robot oriented drive commands"""
         self.chassis_speeds = ChassisSpeeds(vx, vy, omega)
 
+    def snap_to_heading(self, heading: float) -> None:
+        """set a heading target for the heading controller"""
+        self.snapping_to_heading = True
+        self.heading_controller.setGoal(heading)
+
+    def stop_snapping(self) -> None:
+        """stops the heading_controller"""
+        self.snapping_to_heading = False
+
     def execute(self) -> None:
         # rotate desired velocity to compensate for skew caused by discretization
         # see https://www.chiefdelphi.com/t/field-relative-swervedrive-drift-even-with-simulated-perfect-modules/413892/
+
+        if self.snapping_to_heading:
+            self.chassis_speeds.omega = self.heading_controller.calculate(
+                self.get_rotation().radians()
+            )
+
+        if self.heading_controller.atGoal():
+            self.stop_snapping()
 
         if self.do_fudge:
             # in the sim i found using 5 instead of 0.5 did a lot better
