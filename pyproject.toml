@@ -25,9 +25,24 @@ ignore_missing_imports = true
 pythonpath = '.'
 
 [tool.ruff]
-select = ["E", "F", "B", "UP", "C4", "SIM"]
-ignore = ["E501"]
 target-version = "py39"
+
+[tool.ruff.lint]
+select = [
+	# pycodestyle
+	"E",
+	# pyflakes
+	"F",
+	# flake8-bugbear
+	"B",
+	# pyupgrade
+	"UP",
+	# flake8-comprehensions
+	"C4",
+	# flake8-simplify
+	"SIM",
+]
+ignore = ["E501"]
 
 [tool.pdm]
 package-type = "application"
