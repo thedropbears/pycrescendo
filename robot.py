@@ -5,7 +5,7 @@ import wpilib.event
 import magicbot
 
 from components.chassis import Chassis
-from wpimath.geometry import Pose2d
+import math
 
 from utilities.scalers import rescale_js
 
@@ -42,6 +42,7 @@ class MyRobot(magicbot.MagicRobot):
         self.rumble_for(0.8, 0.3)
 
     def teleopInit(self) -> None:
+        self.angle = 0
         pass
 
     def teleopPeriodic(self) -> None:
@@ -59,9 +60,13 @@ class MyRobot(magicbot.MagicRobot):
         else:
             self.chassis.drive_field(*driver_inputs)
 
+        if self.gamepad.getXButtonPressed():
+            self.angle = self.angle + math.pi / 4
+            print(self.angle)
+
         if self.gamepad.getAButtonPressed():
             self.chassis.align_to_setpoint = True
-            self.chassis.setpoint_rotation_diff(Pose2d(10, 10, 0))
+            self.chassis.setpoint_rotation_diff(self.angle)
 
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):

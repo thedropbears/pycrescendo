@@ -298,17 +298,19 @@ class Chassis:
         """Robot oriented drive commands"""
         self.chassis_speeds = ChassisSpeeds(vx, vy, omega)
 
-    def setpoint_rotation_diff(self, setpoint: Pose2d) -> None:
-        """return omega velocity for alignment to the given setpoint"""
-        cur_pose = self.estimator.getEstimatedPosition()
-        pose_diff_y = setpoint.y - cur_pose.y
-        pose_diff_x = setpoint.x - cur_pose.x
-        angle = math.atan2(pose_diff_y, pose_diff_x)
-        if pose_diff_y < 0:
-            angle = angle + math.tau
+    # def setpoint_rotation_diff(self, setpoint: Pose2d) -> None:
+    #     """return omega velocity for alignment to the given setpoint"""
+    #     cur_pose = self.estimator.getEstimatedPosition()
+    #     pose_diff_y = setpoint.y - cur_pose.y
+    #     pose_diff_x = setpoint.x - cur_pose.x
+    #     angle = math.atan2(pose_diff_y, pose_diff_x)
+    #     if pose_diff_y < 0:
+    #         angle = angle + math.tau
 
-        angle = math.pi / 2 - angle
-        self.heading_diff = angle - cur_pose.rotation().radians()
+    #     self.wanted_angle = math.pi / 2 - angle
+
+    def setpoint_rotation_diff(self, heading: float) -> None:
+        self.wanted_angle = heading
 
     def execute(self) -> None:
         # rotate desired velocity to compensate for skew caused by discretization
@@ -316,12 +318,11 @@ class Chassis:
 
         if self.align_to_setpoint:
             self.chassis_speeds.omega = self.heading_controller.calculate(
-                self.heading_diff
+                self.wanted_angle
             )
 
         if self.heading_controller.atGoal():
             self.align_to_setpoint = False
-            self.heading_diff = 0
 
         if self.do_fudge:
             # in the sim i found using 5 instead of 0.5 did a lot better
