@@ -59,16 +59,6 @@ class SwerveModule:
         self.state = SwerveModuleState(0, Rotation2d(0))
         self.do_smooth = True
 
-        if drive_reversed:
-            drive_reversed = config_groups.InvertedValue.CLOCKWISE_POSITIVE
-        else:
-            drive_reversed = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
-
-        if steer_reversed:
-            steer_reversed = config_groups.InvertedValue.CLOCKWISE_POSITIVE
-        else:
-            steer_reversed = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
-
         # Create Motor and encoder objects
         self.steer = TalonFX(steer_id)
         self.drive = TalonFX(drive_id)
@@ -88,7 +78,11 @@ class SwerveModule:
 
         steer_motor_config = MotorOutputConfigs()
         steer_motor_config.neutral_mode = NeutralModeValue.BRAKE
-        steer_motor_config.inverted = steer_reversed
+        steer_motor_config.inverted = (
+            config_groups.InvertedValue.CLOCKWISE_POSITIVE
+            if steer_reversed
+            else config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+        )
 
         steer_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
             1 / self.STEER_GEAR_RATIO
@@ -106,7 +100,11 @@ class SwerveModule:
 
         drive_motor_config = MotorOutputConfigs()
         drive_motor_config.neutral_mode = NeutralModeValue.BRAKE
-        drive_motor_config.inverted = drive_reversed
+        drive_motor_config.inverted = (
+            config_groups.InvertedValue.CLOCKWISE_POSITIVE
+            if drive_reversed
+            else config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+        )
 
         drive_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
             1 / self.DRIVE_GEAR_RATIO
@@ -124,6 +122,8 @@ class SwerveModule:
 
         self.central_angle = math.atan2(x, y)
         self.module_locked = False
+
+        self.sync_steer_encoder()
 
     def get_angle_absolute(self) -> float:
         """Gets steer angle (rot) from absolute encoder"""
@@ -184,8 +184,7 @@ class SwerveModule:
             ).with_feed_forward(speed_volt)
         )
 
-    #
-    def sync_steer_encoders(self) -> None:
+    def sync_steer_encoder(self) -> None:
         self.steer.set_position(self.get_angle_absolute())
 
     def get_position(self) -> SwerveModulePosition:
@@ -270,7 +269,7 @@ class Chassis:
             self.kinematics,
             self.imu.getRotation2d(),
             self.get_module_positions(),
-            Pose2d(3, 0, 0),
+            Pose2d(0, 0, 0),
             stateStdDevs=(0.05, 0.05, 0.01),
             visionMeasurementStdDevs=(0.4, 0.4, math.inf),
         )
@@ -278,7 +277,7 @@ class Chassis:
         self.module_objs: list[wpilib.FieldObject2d] = []
         for idx, _module in enumerate(self.modules):
             self.module_objs.append(self.field.getObject("s_module_" + str(idx)))
-        self.set_pose(Pose2d(4, 3.5, Rotation2d.fromDegrees(180)))
+        self.set_pose(Pose2d(0, 0, 0))
 
     def drive_field(self, vx: float, vy: float, omega: float) -> None:
         """Field oriented drive commands"""
@@ -326,7 +325,11 @@ class Chassis:
         self.update_odometry()
 
     def on_enable(self) -> None:
-        # update the odometry so the pose estimator dosent have an empty buffer
+        """update the odometry so the pose estimator doesn't have an empty buffer
+
+        While we should be building the pose buffer while disabled,
+        this accounts for the edge case of crashing mid match and immediately enabling with an empty buffer
+        """
         self.update_odometry()
 
     @magicbot.feedback
@@ -370,7 +373,7 @@ class Chassis:
 
     def sync_all(self) -> None:
         for m in self.modules:
-            m.sync_steer_encoders()
+            m.sync_steer_encoder()
 
     def set_pose(self, pose: Pose2d) -> None:
         self.estimator.resetPosition(
@@ -412,17 +415,5 @@ class Chassis:
         return self.get_pose().rotation()
 
     @feedback
-    def get_tilt(self) -> float:
-        return math.radians(self.imu.getRoll())
-
-    @feedback
-    def get_tilt_rate(self) -> float:
-        return math.radians(self.imu.getRawGyroY())
-
-    @feedback
     def get_drive_current(self) -> float:
         return sum(abs(x.get_drive_current()) for x in self.modules)
-
-    @feedback
-    def may_be_stalled(self) -> bool:
-        return self.get_drive_current() > self.DRIVE_CURRENT_THRESHOLD
