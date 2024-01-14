@@ -42,7 +42,7 @@ class MyRobot(magicbot.MagicRobot):
         self.rumble_for(0.8, 0.3)
 
     def teleopInit(self) -> None:
-        pass
+        self.dpad_angle = 0.0
 
     def teleopPeriodic(self) -> None:
         # Driving
@@ -57,29 +57,9 @@ class MyRobot(magicbot.MagicRobot):
         else:
             self.chassis.drive_field(*driver_inputs)
 
-        # stop rumble after time
-        if self.rumble_timer.hasElapsed(self.rumble_duration):
-            self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
-
-    def testInit(self) -> None:
-        self.dpad_angle = 0.0
-
-    def testPeriodic(self) -> None:
-        spin_rate = 4
-        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * self.max_speed
-        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * self.max_speed
-        drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
-        local_driving = self.gamepad.getBButton()
-
         # give rotational access to the driver
         if drive_z != 0:
             self.chassis.stop_snapping()
-
-        driver_inputs = (drive_x, drive_y, drive_z)
-        if local_driving:
-            self.chassis.drive_local(*driver_inputs)
-        else:
-            self.chassis.drive_field(*driver_inputs)
 
         # testing rig for the snap to heading method
         if self.gamepad.getPOV() != -1:
@@ -88,6 +68,20 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getAButtonPressed():
             self.chassis.snap_to_heading(math.radians(self.dpad_angle))
 
+        if self.gamepad.getBButtonPressed():
+            self.chassis.lock_swerve()
+
+        if self.gamepad.getBButtonReleased():
+            self.chassis.unlock_swerve()
+
+        # stop rumble after time
+        if self.rumble_timer.hasElapsed(self.rumble_duration):
+            self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
+
+    def testInit(self) -> None:
+        pass
+
+    def testPeriodic(self) -> None:
         # Cancel any running controllers
         if self.gamepad.getBackButtonPressed():
             self.cancel_controllers()
