@@ -42,7 +42,6 @@ class MyRobot(magicbot.MagicRobot):
         self.rumble_for(0.8, 0.3)
 
     def teleopInit(self) -> None:
-        self.angle = 0
         pass
 
     def teleopPeriodic(self) -> None:
@@ -52,30 +51,43 @@ class MyRobot(magicbot.MagicRobot):
         drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * self.max_speed
         drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
         local_driving = self.gamepad.getBButton()
-        if drive_z != 0:
-            self.chassis.align_to_setpoint = False
         driver_inputs = (drive_x, drive_y, drive_z)
         if local_driving:
             self.chassis.drive_local(*driver_inputs)
         else:
             self.chassis.drive_field(*driver_inputs)
 
-        if self.gamepad.getXButtonPressed():
-            self.angle = self.angle + math.pi / 4
-            print(self.angle)
-
-        if self.gamepad.getAButtonPressed():
-            self.chassis.align_to_setpoint = True
-            self.chassis.setpoint_rotation_diff(self.angle)
-
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):
             self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
 
     def testInit(self) -> None:
-        pass
+        self.dpad_angle = 0.0
 
     def testPeriodic(self) -> None:
+        spin_rate = 4
+        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * self.max_speed
+        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * self.max_speed
+        drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
+        local_driving = self.gamepad.getBButton()
+
+        # give rotational access to the driver
+        if drive_z != 0:
+            self.chassis.stop_snapping()
+
+        driver_inputs = (drive_x, drive_y, drive_z)
+        if local_driving:
+            self.chassis.drive_local(*driver_inputs)
+        else:
+            self.chassis.drive_field(*driver_inputs)
+
+        # testing rig for the snap to heading method
+        if self.gamepad.getPOV() != -1:
+            self.dpad_angle = self.gamepad.getPOV()
+
+        if self.gamepad.getAButtonPressed():
+            self.chassis.snap_to_heading(math.radians(self.dpad_angle))
+
         # Cancel any running controllers
         if self.gamepad.getBackButtonPressed():
             self.cancel_controllers()

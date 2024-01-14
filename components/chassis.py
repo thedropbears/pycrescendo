@@ -227,7 +227,7 @@ class Chassis:
             1, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
         )
         self.heading_controller.enableContinuousInput(-math.pi, math.pi)
-        self.align_to_setpoint = False
+        self.snapping_to_heading = False
 
         self.modules = [
             # Front Left
@@ -298,31 +298,26 @@ class Chassis:
         """Robot oriented drive commands"""
         self.chassis_speeds = ChassisSpeeds(vx, vy, omega)
 
-    # def setpoint_rotation_diff(self, setpoint: Pose2d) -> None:
-    #     """return omega velocity for alignment to the given setpoint"""
-    #     cur_pose = self.estimator.getEstimatedPosition()
-    #     pose_diff_y = setpoint.y - cur_pose.y
-    #     pose_diff_x = setpoint.x - cur_pose.x
-    #     angle = math.atan2(pose_diff_y, pose_diff_x)
-    #     if pose_diff_y < 0:
-    #         angle = angle + math.tau
+    def snap_to_heading(self, heading: float) -> None:
+        """set a heading target for the heading controller"""
+        self.snapping_to_heading = True
+        self.heading_controller.setGoal(heading)
 
-    #     self.wanted_angle = math.pi / 2 - angle
-
-    def setpoint_rotation_diff(self, heading: float) -> None:
-        self.wanted_angle = heading
+    def stop_snapping(self) -> None:
+        """stops the heading_controller"""
+        self.snapping_to_heading = False
 
     def execute(self) -> None:
         # rotate desired velocity to compensate for skew caused by discretization
         # see https://www.chiefdelphi.com/t/field-relative-swervedrive-drift-even-with-simulated-perfect-modules/413892/
 
-        if self.align_to_setpoint:
+        if self.snapping_to_heading:
             self.chassis_speeds.omega = self.heading_controller.calculate(
-                self.wanted_angle
+                self.get_rotation().radians()
             )
 
         if self.heading_controller.atGoal():
-            self.align_to_setpoint = False
+            self.stop_snapping()
 
         if self.do_fudge:
             # in the sim i found using 5 instead of 0.5 did a lot better
