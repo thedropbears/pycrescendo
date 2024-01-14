@@ -5,6 +5,7 @@ import wpilib.event
 import magicbot
 
 from components.chassis import Chassis
+from wpimath.geometry import Pose2d
 
 from utilities.scalers import rescale_js
 
@@ -50,11 +51,17 @@ class MyRobot(magicbot.MagicRobot):
         drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * self.max_speed
         drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
         local_driving = self.gamepad.getBButton()
+        if drive_z != 0:
+            self.chassis.align_to_setpoint = False
         driver_inputs = (drive_x, drive_y, drive_z)
         if local_driving:
             self.chassis.drive_local(*driver_inputs)
         else:
             self.chassis.drive_field(*driver_inputs)
+
+        if self.gamepad.getAButtonPressed():
+            self.chassis.align_to_setpoint = True
+            self.chassis.setpoint_rotation_diff(Pose2d(10, 10, 0))
 
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):
