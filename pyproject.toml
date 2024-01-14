@@ -43,6 +43,8 @@ select = [
 	"SIM",
 	# flake8-print
 	"T20",
+	# perflint
+	"PERF",
 ]
 ignore = ["E501"]
 
