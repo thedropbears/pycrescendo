@@ -5,6 +5,7 @@ import wpilib.event
 import magicbot
 
 from components.chassis import Chassis
+from components.shooter import Shooter
 import math
 
 from utilities.scalers import rescale_js
@@ -15,6 +16,7 @@ class MyRobot(magicbot.MagicRobot):
 
     # Components
     chassis: Chassis
+    shooter: Shooter
 
     max_speed = magicbot.tunable(Chassis.max_wheel_speed * 0.95)
 
@@ -77,6 +79,10 @@ class MyRobot(magicbot.MagicRobot):
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):
             self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
+
+        # injecting
+        if self.gamepad.getBButton():
+            self.shooter.shoot()
 
     def testInit(self) -> None:
         pass
