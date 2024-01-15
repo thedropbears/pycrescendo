@@ -39,6 +39,8 @@ select = [
 	"UP",
 	# flake8-comprehensions
 	"C4",
+	# flake8-logging-format
+	"G",
 	# flake8-simplify
 	"SIM",
 	# flake8-print
