@@ -13,17 +13,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
+      - uses: pdm-project/setup-pdm@v3
         with:
-          python-version: "3.11"
-          cache: pip
+          cache: true
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-          pip install coverage pytest-github-actions-annotate-failures
-      - run: python -m robotpy coverage test -- -v
+          pdm install
+          pdm run python -m ensurepip
+          pdm run python -m pip install coverage pytest-github-actions-annotate-failures
+      - run: pdm run robotpy coverage test -- -v
       - uses: codecov/codecov-action@v3
 
   mypy:
@@ -31,17 +29,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
+      - uses: pdm-project/setup-pdm@v3
         with:
-          python-version: "3.11"
-          cache: pip
+          cache: true
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install mypy -r requirements-dev.txt
+          pdm install
+          pdm run python -m ensurepip
+          pdm run python -m pip install mypy
       - name: mypy
         uses: liskin/gh-problem-matcher-wrap@v2
         with:
           linters: mypy
-          run: mypy --show-column-numbers .
+          run: pdm run mypy --show-column-numbers .
