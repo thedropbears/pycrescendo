@@ -31,3 +31,6 @@ class Shooter(StateMachine):
     def shooting(self) -> None:
         # commence shooting action
         self.done()
+
+    def shoot(self) -> None:
+        self.engage()
