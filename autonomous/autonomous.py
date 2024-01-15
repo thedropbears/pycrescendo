@@ -1,7 +1,7 @@
 from magicbot.state_machine import AutonomousStateMachine, state
 
-from components.climb import Climber
 from components.chassis import Chassis
+from components.climb import Climber
 from components.intake import Intake
 from components.shooter import Shooter
 
@@ -28,7 +28,7 @@ class Autonomous(AutonomousStateMachine):
         pass
 
     @state
-    def approach_target(self) -> None:
+    def driveto_target(self) -> None:
         pass
 
     @state
