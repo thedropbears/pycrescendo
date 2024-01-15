@@ -15,7 +15,8 @@ class Shooter(StateMachine):
         # set to appropriate heading
 
         # progress state machine if within tolerance
-        pass
+        if self.chassis.at_desired_heading():
+            self.next_state("shooting")
 
     @state(must_finish=True)
     def shooting(self) -> None:

@@ -206,6 +206,9 @@ class Chassis:
     LENGTH = 1.0105
     WIDTH = 0.8705
     DRIVE_CURRENT_THRESHOLD = 35
+
+    HEADING_TOLERANCE = math.radians(5)
+
     # maxiumum speed for any wheel
     max_wheel_speed = FALCON_FREE_RPS * SwerveModule.DRIVE_MOTOR_REV_TO_METRES
 
@@ -227,6 +230,7 @@ class Chassis:
         )
         self.heading_controller.enableContinuousInput(-math.pi, math.pi)
         self.snapping_to_heading = False
+        self.heading_controller.setTolerance(self.HEADING_TOLERANCE)
 
         self.modules = [
             # Front Left
@@ -441,3 +445,7 @@ class Chassis:
     @feedback
     def get_drive_current(self) -> float:
         return sum(abs(x.get_drive_current()) for x in self.modules)
+
+    @feedback
+    def at_desired_heading(self) -> bool:
+        return self.heading_controller.atGoal()
