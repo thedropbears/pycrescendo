@@ -29,9 +29,47 @@ select = ["E", "F", "B", "UP", "C4", "SIM"]
 ignore = ["E501"]
 target-version = "py39"
 
+[tool.pdm]
+package-type = "application"
+
+[tool.pdm.scripts]
+deploy = "robotpy deploy"
+download = "robotpy sync --no-install"
+sim = "robotpy sim"
+test = "robotpy test"
+
+[tool.pdm.dev-dependencies]
+dev = [
+	"hypothesis",
+	"pytest>=7.2.0",
+]
+
+[project]
+name = "pycrescendo"
+version = "0.0.0"
+description = "The Drop Bears' FRC 2024 robot code"
+authors = [
+	{name = "The Drop Bears", email = "enquiries@thedropbears.org.au"},
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10,<3.13"
+
+dependencies = [
+	"numpy~=1.25",
+	"phoenix6==24.1.0",
+	# robotpy[apriltag] pins numpy to a version that doesn't build cleanly on Python 3.12.
+	"robotpy==2024.1.1.1",
+	"robotpy-apriltag==2024.1.1.1",
+	"robotpy-ctre==2024.1.0",
+	"robotpy-navx==2024.1.0",
+	"robotpy-rev==2024.2.0",
+	"robotpy-wpilib-utilities==2024.0.0",
+]
+
 [tool.robotpy]
 requires = [
-	"numpy~=1.25.2",
+	"numpy~=1.25",
 	"phoenix6==24.1.0",
 	"robotpy-ctre==2024.1.0",
 	"robotpy-navx==2024.1.0",
