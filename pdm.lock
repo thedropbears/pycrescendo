@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:99893ec204d14bf517f242285b3417de944ef77d2d792660484acf604b31450c"
+content_hash = "sha256:7694c924e279360762cdd415f583c2cbd0426010a333dc2375dd4d32aa498597"
 
 [[package]]
 name = "attrs"
@@ -462,7 +462,7 @@ files = [
 
 [[package]]
 name = "robotpy-ctre"
-version = "2024.1.0"
+version = "2024.1.1"
 requires_python = ">=3.8"
 summary = "Binary wrappers for the CTRE Phoenix library"
 groups = ["default"]
@@ -471,14 +471,16 @@ dependencies = [
     "wpilib<2025.0.0,>=2024.1.1",
 ]
 files = [
-    {file = "robotpy-ctre-2024.1.0.tar.gz", hash = "sha256:93bd4df5e0e303ee3c03da7741f8ace39eceb42a18f427e03fc71c1bd15749c0"},
-    {file = "robotpy_ctre-2024.1.0-cp311-cp311-macosx_11_0_universal2.whl", hash = "sha256:04b0cfedf8d9c84083da9f87aabdcd859c8411e9aa44772a8ce00187a7eb5260"},
-    {file = "robotpy_ctre-2024.1.0-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha256:aaedb8b75e9a9ed1f4b2efafc22a2583de37a218cccf231b620e7d708491f718"},
-    {file = "robotpy_ctre-2024.1.0-cp311-cp311-win_amd64.whl", hash = "sha256:9c9ddd98ad03e7704977f30db6e0d177c63d72bf040a5c6c1ea829ac9ae65b69"},
-    {file = "robotpy_ctre-2024.1.0-cp312-cp312-linux_roborio.whl", hash = "sha256:54f9b323607b60cdd941f3eb7367c2cb8427622df2386e06a6f129378287d8a7"},
-    {file = "robotpy_ctre-2024.1.0-cp312-cp312-macosx_11_0_universal2.whl", hash = "sha256:4ce76f35d2fb7a3c3bf89ffa5680de8193f4701ee02f1a210ecb4645b2f03703"},
-    {file = "robotpy_ctre-2024.1.0-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha256:91cba75fdbabfaa4b299c7967683c9c4d20ef6a7352d2c982f764a97164e0e9d"},
-    {file = "robotpy_ctre-2024.1.0-cp312-cp312-win_amd64.whl", hash = "sha256:30661cec31164f15e9b669d41405d563f87ca737b36271b48bd4a25eb27ceca8"},
+    {file = "robotpy-ctre-2024.1.1.tar.gz", hash = "sha256:ec33c5a2777b15a29880a98e31de5c28f7b264afe3fccaaf983dd3853d632de6"},
+    {file = "robotpy_ctre-2024.1.1-cp310-cp310-macosx_10_16_x86_64.whl", hash = "sha256:ab8aac6f88b6bbfe83d42c91e52bd33d99bbb46e975c3f2a943029efcd93c9f9"},
+    {file = "robotpy_ctre-2024.1.1-cp310-cp310-manylinux_2_35_x86_64.whl", hash = "sha256:5d3ad9ec4ea8a7dba71979b496e9363994843e93ac4913bf80b98d9719db8d78"},
+    {file = "robotpy_ctre-2024.1.1-cp310-cp310-win_amd64.whl", hash = "sha256:8a7bdeb2fcebf45abc3f50b9be22b0aeef70122eda1732e37e495a530bfa87aa"},
+    {file = "robotpy_ctre-2024.1.1-cp311-cp311-macosx_11_0_universal2.whl", hash = "sha256:bd65c83ad620fc6ced2dd0111a86548ef0a0709248d40d9ca3eb524f0b366f90"},
+    {file = "robotpy_ctre-2024.1.1-cp311-cp311-manylinux_2_35_x86_64.whl", hash = "sha256:92bb052508a1d65bdad5274a9bc9dc48ab001b2b65345b6e78e5689969d10678"},
+    {file = "robotpy_ctre-2024.1.1-cp311-cp311-win_amd64.whl", hash = "sha256:7e084cd2e7fc76269c3a1d4bfb671eb6c21de535698252acc879f429fa0b0ab6"},
+    {file = "robotpy_ctre-2024.1.1-cp312-cp312-macosx_11_0_universal2.whl", hash = "sha256:c27f4f300df0ce2ed79bd65dff32da3b7712053572893add24a6333b89d87414"},
+    {file = "robotpy_ctre-2024.1.1-cp312-cp312-manylinux_2_35_x86_64.whl", hash = "sha256:ac3c76f65f11b4826f62815080bc7c14eaccf989790057a05980a4cca4c3d84d"},
+    {file = "robotpy_ctre-2024.1.1-cp312-cp312-win_amd64.whl", hash = "sha256:056e978d2d58aa842c69472063e21e89b0615dc6df70438ee86b4b3ea8825293"},
 ]
 
 [[package]]
