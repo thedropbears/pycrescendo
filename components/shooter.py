@@ -15,7 +15,6 @@ class Shooter:
     inject_speed = tunable(0.0)
 
     def __init__(self):
-        self.deployed = False
         self.top_flywheel = phoenix6.hardware.TalonFX(TalonIds.top_flywheel)
         self.bottom_flywheel = phoenix6.hardware.TalonFX(TalonIds.bottom_flywheel)
         self.inject_flywheel = CANSparkMax(
@@ -34,10 +33,6 @@ class Shooter:
         self.should_inject = False
 
     def shoot(self):
-        """causes shooter motors to spin"""
-        self.deployed = True
-
-    def inject(self):
         self.should_inject = True
 
     def is_ready(self):

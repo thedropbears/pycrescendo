@@ -82,7 +82,7 @@ class MyRobot(magicbot.MagicRobot):
 
         # injecting
         if self.gamepad.getBButton():
-            self.shooter.inject()
+            self.shooter.shoot()
 
     def testInit(self) -> None:
         pass
