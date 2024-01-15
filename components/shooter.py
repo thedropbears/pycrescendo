@@ -10,7 +10,7 @@ from phoenix6.controls import VoltageOut
 import phoenix6.hardware
 
 
-class Shooter:
+class ShooterComponent:
     flywheel_speed = tunable(0.0)
     inject_speed = tunable(0.0)
 
