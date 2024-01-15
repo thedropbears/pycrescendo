@@ -1,4 +1,4 @@
-from magicbot import tunable, feedback
+from magicbot import tunable
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds
 import phoenix6
@@ -42,11 +42,6 @@ class Shooter:
 
     def is_ready(self):
         return True
-
-    @feedback
-    def motor_speeds(self) -> float:
-        # return the current speed of both flywheel and inject motors
-        return self.flywheel_speed, self.inject_speed
 
     def execute(self):
         """This gets called at the end of the control loop"""
