@@ -40,12 +40,12 @@ class Shooter:
 
     def execute(self):
         """This gets called at the end of the control loop"""
-        voltsge_request = VoltageOut(12.0 * self.flywheel_speed)
+        flywheel_request = VoltageOut(12.0 * self.flywheel_speed)
         if self.should_inject:
             self.inject_flywheel.set(self.inject_speed)
         else:
             self.inject_flywheel.set(0.0)
 
-        self.top_flywheel.set_control(voltsge_request)
-        self.bottom_flywheel.set_control(voltsge_request)
+        self.top_flywheel.set_control(flywheel_request)
+        self.bottom_flywheel.set_control(flywheel_request)
         self.should_inject = False
