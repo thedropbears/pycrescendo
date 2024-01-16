@@ -4,7 +4,6 @@ import math
 import typing
 import phoenix6
 import phoenix6.unmanaged
-import phoenix5
 import wpilib
 
 from pyfrc.physics.core import PhysicsInterface
@@ -12,7 +11,6 @@ from wpimath.kinematics import SwerveDrive4Kinematics
 from wpilib.simulation import SimDeviceSim
 
 from components.chassis import SwerveModule
-from utilities.ctre import VERSA_ENCODER_CPR
 
 if typing.TYPE_CHECKING:
     from robot import MyRobot
@@ -32,22 +30,6 @@ class SimpleTalonFXMotorSim:
         velocity_cps = velocity * self.rev_per_unit * 10
         self.sim_state.set_rotor_velocity(int(velocity_cps))
         self.sim_state.add_rotor_position(int(velocity_cps * dt))
-
-
-class SimpleTalonSRXMotorSim:
-    def __init__(
-        self, motor: phoenix5.TalonSRX, kV: float, rev_per_unit: float
-    ) -> None:
-        self.sim_collection = motor.getSimCollection()
-        self.kV = kV  # volt seconds per unit
-        self.rev_per_unit = rev_per_unit
-
-    def update(self, dt: float) -> None:
-        voltage = self.sim_collection.getMotorOutputLeadVoltage()
-        velocity = voltage / self.kV  # units per second
-        velocity_cps = velocity * self.rev_per_unit * VERSA_ENCODER_CPR
-        self.sim_collection.setQuadratureVelocity(int(velocity_cps / 10))
-        self.sim_collection.addQuadraturePosition(int(velocity_cps * dt))
 
 
 class PhysicsEngine:
