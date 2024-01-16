@@ -21,6 +21,7 @@ class SimpleTalonFXMotorSim:
         self, motor: phoenix6.hardware.TalonFX, kV: float, rev_per_unit: float
     ) -> None:
         self.sim_state = motor.sim_state
+        self.sim_state.set_supply_voltage(12.0)
         self.kV = kV  # volt seconds per unit
         self.rev_per_unit = rev_per_unit
 
