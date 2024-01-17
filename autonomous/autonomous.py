@@ -20,15 +20,15 @@ class Autonomous(AutonomousStateMachine):
         pass
 
     @state
-    def driveto_note(self) -> None:
+    def drive_to_note(self) -> None:
         pass
 
     @state
-    def pickup_note(self) -> None:
+    def pick_up_note(self) -> None:
         pass
 
     @state
-    def driveto_target(self) -> None:
+    def drive_to_target(self) -> None:
         pass
 
     @state
