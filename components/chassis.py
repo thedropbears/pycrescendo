@@ -27,6 +27,7 @@ from wpimath.controller import ProfiledPIDControllerRadians
 from magicbot import feedback
 
 from utilities.functions import constrain_angle, rate_limit_module
+from utilities.game import is_red
 from utilities.ctre import FALCON_FREE_RPS
 from ids import CancoderIds, TalonIds
 
@@ -223,6 +224,9 @@ class Chassis:
     do_smooth = magicbot.tunable(True)
     swerve_lock = magicbot.tunable(False)
 
+    RED_TEST_POSE = Pose2d(13.6, 5.5, 0)
+    BLUE_TEST_POSE = Pose2d(2.6, 5.5, math.pi)
+
     def setup(self) -> None:
         self.imu = navx.AHRS.create_spi()
         self.heading_controller = ProfiledPIDControllerRadians(
@@ -231,6 +235,8 @@ class Chassis:
         self.heading_controller.enableContinuousInput(-math.pi, math.pi)
         self.snapping_to_heading = False
         self.heading_controller.setTolerance(self.HEADING_TOLERANCE)
+
+        self.on_red_alliance = False
 
         self.modules = [
             # Front Left
@@ -276,11 +282,13 @@ class Chassis:
         self.sync_all()
         self.imu.zeroYaw()
         self.imu.resetDisplacement()
+
+        initial_pose = Chassis.RED_TEST_POSE if is_red() else Chassis.BLUE_TEST_POSE
         self.estimator = SwerveDrive4PoseEstimator(
             self.kinematics,
             self.imu.getRotation2d(),
             self.get_module_positions(),
-            Pose2d(0, 0, 0),
+            initial_pose,
             stateStdDevs=(0.05, 0.05, 0.01),
             visionMeasurementStdDevs=(0.4, 0.4, math.inf),
         )
@@ -288,7 +296,7 @@ class Chassis:
         self.module_objs: list[wpilib.FieldObject2d] = []
         for idx, _module in enumerate(self.modules):
             self.module_objs.append(self.field.getObject("s_module_" + str(idx)))
-        self.set_pose(Pose2d(0, 0, 0))
+        self.set_pose(initial_pose)
 
     def drive_field(self, vx: float, vy: float, omega: float) -> None:
         """Field oriented drive commands"""
@@ -385,6 +393,15 @@ class Chassis:
         )
 
     def update_odometry(self) -> None:
+        # Check whether our alliance has "changed"
+        # If so, it means we have an update from the FMS and need to re-init the odom
+        if is_red() != self.on_red_alliance:
+            self.on_red_alliance = is_red()
+            if self.on_red_alliance:
+                self.set_pose(Chassis.RED_TEST_POSE)
+            else:
+                self.set_pose(Chassis.BLUE_TEST_POSE)
+
         self.estimator.update(self.imu.getRotation2d(), self.get_module_positions())
         self.field_obj.setPose(self.get_pose())
         if self.send_modules:
