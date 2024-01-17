@@ -43,6 +43,8 @@ pre-commit install
 
 ### Simulation
 
+Before your first run, copy the `*.json.orig` files to the main directory and remove the `.orig` extension.
+
 ```
 pdm run robotpy sim
 ```
