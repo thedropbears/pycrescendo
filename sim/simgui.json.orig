@@ -7,8 +7,7 @@
     },
     "windows": {
       "/SmartDashboard/Field": {
-        "bottom": 544,
-        "builtin": "2024 Crescendo",
+        "bottom": 1476,
         "fused_pose": {
           "color": [
             0.0588231086730957,
@@ -18,9 +17,10 @@
           ]
         },
         "height": 8.013679504394531,
-        "left": 46,
-        "right": 1088,
-        "top": 36,
+        "image": "./sim/2024-field.png",
+        "left": 150,
+        "right": 2962,
+        "top": 77,
         "width": 16.541748046875,
         "window": {
           "visible": true
