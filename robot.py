@@ -6,6 +6,7 @@ import magicbot
 
 from components.chassis import Chassis
 from components.shooter import ShooterComponent
+from components.intake import Intake
 
 from controllers.shooter import Shooter
 
@@ -21,6 +22,7 @@ class MyRobot(magicbot.MagicRobot):
     # Components
     chassis: Chassis
     shooter_component: ShooterComponent
+    intake: Intake
 
     max_speed = magicbot.tunable(Chassis.max_wheel_speed * 0.95)
 
@@ -81,6 +83,9 @@ class MyRobot(magicbot.MagicRobot):
         # injecting
         if self.gamepad.getBButton():
             self.shooter.shoot()
+
+        if self.gamepad.getXButton():
+            self.intake.intake()
 
     def testInit(self) -> None:
         pass
