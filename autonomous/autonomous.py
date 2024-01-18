@@ -29,8 +29,8 @@ from dataclasses import dataclass
 
 @dataclass
 class NotePaths:
-    pick_up_path: tuple[Pose2d, ...]
-    shoot_path: tuple[Pose2d, ...]
+    pick_up_path: list[Pose2d]
+    shoot_path: list[Pose2d]
 
 
 class AutoBase(AutonomousStateMachine):
