@@ -164,7 +164,7 @@ class AutoBase(AutonomousStateMachine):
         # Generating a trajectory when the robot is very close to the goal is unnecesary, so this
         # return an empty trajectory that starts at the end point so the robot won't move.
         distance_to_goal = (self.goal - pose.translation()).norm()
-        if distance_to_goal <= 0.01:
+        if distance_to_goal <= self.POSITION_TOLERANCE:
             return Trajectory([Trajectory.State(0, 0, 0, pose)])
 
         next_pos = waypoints[0] if waypoints else self.goal
