@@ -17,6 +17,7 @@ from wpilib import Field2d
 from wpimath.spline import Spline3
 from components.chassis import Chassis
 from components.intake import Intake
+from controllers.shooter import Shooter
 
 import utilities.game as game
 
@@ -45,8 +46,8 @@ class NotePaths:
 class AutoBase(AutonomousStateMachine):
     chassis: Chassis
     intake: Intake
+    shooter: Shooter
     field: Field2d
-    # Add controllers for intake and shooter when available
 
     POSITION_TOLERANCE = 0.025
     ANGLE_TOLERANCE = math.radians(2)
@@ -86,7 +87,7 @@ class AutoBase(AutonomousStateMachine):
             pass
 
         if True:
-            # This needs to check if the state machine has finished firing
+            # TODO This needs to check if the state machine has finished firing
             if len(self.note_paths_working_copy) == 0:
                 # Just shot the last note
                 self.done()
