@@ -51,12 +51,10 @@ class AutoBase(AutonomousStateMachine):
 
     def __init__(self) -> None:
         self.note_paths: list[NotePaths] = []
-        self.has_initial_note: bool = True
 
     @state(first=True)
     def initialise(self) -> None:
         # We always start ready to shoot, so fire straight away
-        self.has_initial_note = True
         self.next_state("shoot_note")
 
         x_controller = PIDController(2.5, 0, 0)
