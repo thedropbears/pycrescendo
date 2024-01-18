@@ -5,7 +5,10 @@ import wpilib.event
 import magicbot
 
 from components.chassis import Chassis
-from components.shooter import Shooter
+from components.shooter import ShooterComponent
+
+from controllers.shooter import Shooter
+
 import math
 
 from utilities.scalers import rescale_js
@@ -13,10 +16,11 @@ from utilities.scalers import rescale_js
 
 class MyRobot(magicbot.MagicRobot):
     # Controllers
+    shooter: Shooter
 
     # Components
     chassis: Chassis
-    shooter: Shooter
+    shooter_component: ShooterComponent
 
     max_speed = magicbot.tunable(Chassis.max_wheel_speed * 0.95)
 
@@ -52,7 +56,7 @@ class MyRobot(magicbot.MagicRobot):
         drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * self.max_speed
         drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * self.max_speed
         drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
-        local_driving = self.gamepad.getBButton()
+        local_driving = self.gamepad.getYButton()
         driver_inputs = (drive_x, drive_y, drive_z)
         if local_driving:
             self.chassis.drive_local(*driver_inputs)
