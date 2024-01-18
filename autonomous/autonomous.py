@@ -152,11 +152,8 @@ class AutoBase(AutonomousStateMachine):
         if distance_to_goal <= 0.01:
             return Trajectory([Trajectory.State(0, 0, 0, pose)])
 
-        # Since robot is stationary from one action to another, point the control vector at the goal to avoid the robot taking unnecessary turns before moving towards the goal
-        kD = 0.3
-
-        spline_start_momentum_x = translation.x * kD
-        spline_start_momentum_y = translation.y * kD
+        spline_start_momentum_x = translation.x * self.kD
+        spline_start_momentum_y = translation.y * self.kD
 
         goal_spline = Spline3.ControlVector(
             (self.goal.X(), self.goal.rotation().cos() * self.END_CONTROL_SCALER),
