@@ -195,12 +195,11 @@ class AutoBase(AutonomousStateMachine):
         return trajectory
 
     def is_at_goal(self) -> bool:
-        real_at_goal = (
+        return (
             self.goal.translation() - self.chassis.get_pose().translation()
         ).norm() < self.POSITION_TOLERANCE and abs(
             (self.goal.rotation() - self.chassis.get_rotation()).radians()
         ) < self.ANGLE_TOLERANCE
-        return real_at_goal
 
 
 class PreloadOnly(AutoBase):
