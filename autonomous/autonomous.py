@@ -148,20 +148,18 @@ class AutoBase(AutonomousStateMachine):
     def calculate_trajectory(self, path: Path) -> Trajectory:
         pose = self.chassis.get_pose()
 
-        waypoints: list[Translation2d] = [
-            waypoint if game.is_red() else game.field_flip_translation2d(waypoint)
-            for waypoint in path.waypoints[:-1]
-        ]
-        self.goal = (
-            path.waypoints[-1]
-            if game.is_red()
-            else game.field_flip_translation2d(path.waypoints[-1])
-        )
-        self.goal_heading = (
-            path.final_heading
-            if game.is_red()
-            else game.field_flip_rotation2d(path.final_heading)
-        )
+        waypoints: list[Translation2d]
+        if game.is_red():
+            waypoints = path.waypoints[:-1]
+            self.goal = path.waypoints[-1]
+            self.goal_heading = path.final_heading
+        else:
+            waypoints = [
+                game.field_flip_translation2d(waypoint)
+                for waypoint in path.waypoints[:-1]
+            ]
+            self.goal = game.field_flip_translation2d(path.waypoints[-1])
+            self.goal_heading = game.field_flip_rotation2d(path.final_heading)
 
         traj_config = TrajectoryConfig(
             maxVelocity=self.MAX_VEL, maxAcceleration=self.MAX_ACCEL
