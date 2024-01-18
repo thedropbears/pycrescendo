@@ -89,10 +89,30 @@ class AutoBase(AutonomousStateMachine):
     @state
     def drive_to_pick_up(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
-            # self.trajectory = self.calculate_trajectory(self.note_paths[0].pick_up_path)
             self.trajectory = self.calculate_trajectory(self.note_paths[0].pick_up_path)
             # Also deploy the intake
 
+        # Do some driving...
+        self.drive_on_trajectory(state_tm)
+
+        if self.is_at_goal():
+            # Check if we have a note collected
+            self.next_state("drive_to_shoot")
+
+    @state
+    def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
+        if initial_call:
+            self.trajectory = self.calculate_trajectory(self.note_paths[0].shoot_path)
+
+        # Do some driving...
+        self.drive_on_trajectory(state_tm)
+
+        if self.is_at_goal():
+            # If we are in position, remove this note from the list and shoot it
+            self.note_paths.pop(0)
+            self.next_state("shoot_note")
+
+    def drive_on_trajectory(self, state_tm: float):
         target_state = self.trajectory.sample(
             state_tm
         )  # Grabbing the target position at the current point in time from the trajectory.
@@ -108,21 +128,6 @@ class AutoBase(AutonomousStateMachine):
             chassis_speed.vy,
             chassis_speed.omega,
         )
-
-        if self.is_at_goal():
-            # Check if we have a note collected
-            self.next_state("drive_to_shoot")
-
-    @state
-    def drive_to_shoot(self, initial_call) -> None:
-        if initial_call:
-            self.calculate_trajectory(self.note_paths[0].shoot_path)
-        # Do some driving...
-
-        if True:
-            # If we are in position, remove this note from the list and shoot it
-            self.note_paths.pop(0)
-            self.next_state("shoot_note")
 
     def calculate_trajectory(self, path: list[Pose2d]) -> Trajectory:
         waypoints: list[Translation2d] = []
