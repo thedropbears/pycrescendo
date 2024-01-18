@@ -35,7 +35,7 @@ class Intake:
     def intake(self) -> None:
         self.direction = self.Direction.FORWARD
 
-    def outake(self) -> None:
+    def outtake(self) -> None:
         self.direction = self.Direction.BACKWARD
 
     @feedback
