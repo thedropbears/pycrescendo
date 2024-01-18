@@ -128,10 +128,9 @@ class AutoBase(AutonomousStateMachine):
             self.note_paths_working_copy.pop(0)
             self.next_state("shoot_note")
 
-    def drive_on_trajectory(self, state_tm: float):
-        target_state = self.trajectory.sample(
-            state_tm
-        )  # Grabbing the target position at the current point in time from the trajectory.
+    def drive_on_trajectory(self, trajectory_tm: float):
+        # Grabbing the target position at the current point in time from the trajectory.
+        target_state = self.trajectory.sample(trajectory_tm)
 
         # Calculating the speeds required to get to the target position.
         chassis_speed = self.drive_controller.calculate(
