@@ -18,6 +18,8 @@ class TalonIds(enum.IntEnum):
     top_flywheel = 9
     bottom_flywheel = 10
 
+    intake = 11
+
 
 @enum.unique
 class CancoderIds(enum.IntEnum):

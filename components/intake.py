@@ -1,11 +1,30 @@
+from enum import Enum
+
 from magicbot import tunable, feedback
+from phoenix6.configs import MotorOutputConfigs, config_groups
+from phoenix6.controls import VoltageOut
+from phoenix6.hardware import TalonFX
+
+from ids import TalonIds
 
 
 class Intake:
-    intake_speed = tunable(1.0)
+    motor_speed = tunable(1.0)
+
+    class Direction(Enum):
+        BACKWARD = -1
+        STOPPED = 0
+        FORWARD = 1
 
     def __init__(self) -> None:
-        pass
+        self.motor = TalonFX(TalonIds.intake)
+        self.direction = self.Direction.STOPPED
+
+        motor_configurator = self.motor.configurator
+        motor_config = MotorOutputConfigs()
+        motor_config.inverted = config_groups.InvertedValue.CLOCKWISE_POSITIVE
+
+        motor_configurator.apply(motor_config)
 
     def deploy(self) -> None:
         pass
@@ -13,8 +32,11 @@ class Intake:
     def retract(self) -> None:
         pass
 
-    def run_backwards(self) -> None:
-        pass
+    def intake(self) -> None:
+        self.direction = self.Direction.FORWARD
+
+    def outtake(self) -> None:
+        self.direction = self.Direction.BACKWARD
 
     @feedback
     def is_note_present(self) -> bool:
@@ -29,4 +51,7 @@ class Intake:
         return True
 
     def execute(self) -> None:
-        pass
+        intake_request = VoltageOut(self.direction.value * self.motor_speed * 12.0)
+
+        self.motor.set_control(intake_request)
+        self.direction = self.Direction.STOPPED
