@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:7694c924e279360762cdd415f583c2cbd0426010a333dc2375dd4d32aa498597"
+content_hash = "sha256:aee613a083a5ddf7c3af9641381b2586da0af9e044dfd522f7ae597a9a98e8fa"
 
 [[package]]
 name = "attrs"
@@ -268,6 +268,21 @@ files = [
     {file = "phoenix6-24.1.0-cp39-abi3-manylinux_2_35_armv7l.whl", hash = "sha256:48f79760706515157512d4596a2964c327235da53dd7b4cadbc50c4bd61b3b65"},
     {file = "phoenix6-24.1.0-cp39-abi3-manylinux_2_35_x86_64.whl", hash = "sha256:4aa88861786861aa647193052da0df0d8f26a91cabfa5e84d85fa71af0de649b"},
     {file = "phoenix6-24.1.0-cp39-abi3-win_amd64.whl", hash = "sha256:c70dce1831afd224e10705483d1e383817bd58ff604cf139d64ba7bb8f9f5df8"},
+]
+
+[[package]]
+name = "photonlibpy"
+version = "2024.2.0"
+summary = "Pure-python implementation of PhotonLib for interfacing with PhotonVision on coprocessors."
+groups = ["default"]
+dependencies = [
+    "pyntcore<2025,>=2024.0.0b2",
+    "robotpy-wpimath<2025,>=2024.0.0b2",
+    "wpilib<2025,>=2024.0.0b2",
+]
+files = [
+    {file = "photonlibpy-2024.2.0-py3-none-any.whl", hash = "sha256:900f24dc8b9f4a0374674031bc2dc762e6661659888274bc6f19a7f7790aca9e"},
+    {file = "photonlibpy-2024.2.0.tar.gz", hash = "sha256:e6bd851fbbc975223489f695303a36cb64711c8d41c1b5c3ec329ea715d3b1b6"},
 ]
 
 [[package]]
