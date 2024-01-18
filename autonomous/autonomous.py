@@ -7,8 +7,6 @@ from wpimath.trajectory import (
 )
 from wpimath.trajectory.constraint import (
     CentripetalAccelerationConstraint,
-    RectangularRegionConstraint,
-    MaxVelocityConstraint,
 )
 from wpimath.controller import (
     HolonomicDriveController,
@@ -18,46 +16,46 @@ from wpimath.controller import (
 from wpilib import Field2d
 from wpimath.spline import Spline3
 from components.chassis import Chassis
+from components.intake import Intake
+from controllers.shooter import Shooter
+
+import utilities.game as game
 
 # Add controllers for intake and shooter when available
 
-from wpimath.geometry import Pose2d, Translation2d
+from wpimath.geometry import Rotation2d, Translation2d
 import math
 
 from dataclasses import dataclass
 
 
 @dataclass
+class Path:
+    waypoints: list[Translation2d]
+    final_heading: Rotation2d
+
+
+@dataclass
 class NotePaths:
-    pick_up_path: list[Pose2d]
-    shoot_path: list[Pose2d]
+    # All paths assume RED alliance
+    # They will automatically be flipped if we are blue
+    pick_up_path: Path
+    shoot_path: Path
 
 
 class AutoBase(AutonomousStateMachine):
     chassis: Chassis
+    intake: Intake
+    shooter: Shooter
     field: Field2d
-    # Add controllers for intake and shooter when available
 
     POSITION_TOLERANCE = 0.025
-
-    # If the robot is close to the goal but still not enough, making the robot reverse to
-    # approach the control vector is unnecessary; this constant scales the derivative of
-    # the goal derivative according to the translation distance.
-    # The closer the robot gets to the goal, the small the derivative is.
-    END_CONTROL_SCALER = 1
     ANGLE_TOLERANCE = math.radians(2)
     MAX_VEL = 1
     MAX_ACCEL = 0.5
 
     def __init__(self) -> None:
         self.note_paths: list[NotePaths] = []
-        self.has_initial_note: bool = True
-
-    @state(first=True)
-    def initialise(self) -> None:
-        # We always start ready to shoot, so fire straight away
-        self.has_initial_note = True
-        self.next_state("shoot_note")
 
         x_controller = PIDController(2.5, 0, 0)
         y_controller = PIDController(2.5, 0, 0)
@@ -72,15 +70,25 @@ class AutoBase(AutonomousStateMachine):
         # Since robot is stationary from one action to another, point the control vector at the goal to avoid the robot taking unnecessary turns before moving towards the goal
         self.kD = 0.3
 
+    @state(first=True)
+    def initialise(self) -> None:
+        # Make a working copy of the NotePaths so that we can pop
+        # This isn't necessary but makes testing better because we can re-run auto routines
+        self.note_paths_working_copy = list(self.note_paths)
+
+        # We always start ready to shoot, so fire straight away
+        self.next_state("shoot_note")
+
     @state
     def shoot_note(self, initial_call: bool) -> None:
         if initial_call:
-            # Call the shooter state machine
+            # TODO Call the shooter state machine
+            # TODO Also get intake out at this time??
             pass
 
         if True:
-            # This needs to check if the state machine has finished firing
-            if len(self.note_paths) == 0:
+            # TODO This needs to check if the state machine has finished firing
+            if len(self.note_paths_working_copy) == 0:
                 # Just shot the last note
                 self.done()
             else:
@@ -89,19 +97,42 @@ class AutoBase(AutonomousStateMachine):
     @state
     def drive_to_pick_up(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
-            # self.trajectory = self.calculate_trajectory(self.note_paths[0].pick_up_path)
-            self.trajectory = self.calculate_trajectory(self.note_paths[0].pick_up_path)
-            # Also deploy the intake
+            self.trajectory = self.calculate_trajectory(
+                self.note_paths_working_copy[0].pick_up_path
+            )
+            # TODO Also deploy the intake
 
-        target_state = self.trajectory.sample(
-            state_tm
-        )  # Grabbing the target position at the current point in time from the trajectory.
+        # Do some driving...
+        self.drive_on_trajectory(state_tm)
+
+        if self.is_at_goal() or self.intake.is_note_present():
+            # Check if we have a note collected
+            self.next_state("drive_to_shoot")
+
+    @state
+    def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
+        if initial_call:
+            self.trajectory = self.calculate_trajectory(
+                self.note_paths_working_copy[0].shoot_path
+            )
+
+        # Do some driving...
+        self.drive_on_trajectory(state_tm)
+
+        if self.is_at_goal():
+            # If we are in position, remove this note from the list and shoot it
+            self.note_paths_working_copy.pop(0)
+            self.next_state("shoot_note")
+
+    def drive_on_trajectory(self, trajectory_tm: float):
+        # Grabbing the target position at the current point in time from the trajectory.
+        target_state = self.trajectory.sample(trajectory_tm)
 
         # Calculating the speeds required to get to the target position.
         chassis_speed = self.drive_controller.calculate(
             self.chassis.get_pose(),
             target_state,
-            self.goal.rotation(),
+            self.goal_heading,
         )
         self.chassis.drive_local(
             chassis_speed.vx,
@@ -109,70 +140,59 @@ class AutoBase(AutonomousStateMachine):
             chassis_speed.omega,
         )
 
-        if self.is_at_goal():
-            # Check if we have a note collected
-            self.next_state("drive_to_shoot")
+    def calculate_trajectory(self, path: Path) -> Trajectory:
+        pose = self.chassis.get_pose()
 
-    @state
-    def drive_to_shoot(self, initial_call) -> None:
-        if initial_call:
-            self.calculate_trajectory(self.note_paths[0].shoot_path)
-        # Do some driving...
-
-        if True:
-            # If we are in position, remove this note from the list and shoot it
-            self.note_paths.pop(0)
-            self.next_state("shoot_note")
-
-    def calculate_trajectory(self, path: list[Pose2d]) -> Trajectory:
-        waypoints: list[Translation2d] = []
-        waypoints = [waypoint.translation() for waypoint in path[0:-1]]
-        self.goal = path[-1]
+        waypoints: list[Translation2d]
+        if game.is_red():
+            waypoints = path.waypoints[:-1]
+            self.goal = path.waypoints[-1]
+            self.goal_heading = path.final_heading
+        else:
+            waypoints = [
+                game.field_flip_translation2d(waypoint)
+                for waypoint in path.waypoints[:-1]
+            ]
+            self.goal = game.field_flip_translation2d(path.waypoints[-1])
+            self.goal_heading = game.field_flip_rotation2d(path.final_heading)
 
         traj_config = TrajectoryConfig(
             maxVelocity=self.MAX_VEL, maxAcceleration=self.MAX_ACCEL
         )
         traj_config.addConstraint(CentripetalAccelerationConstraint(5.0))
-        topRight = Translation2d(self.goal.X() + 0.5, self.goal.Y() + 0.5)
-        bottomLeft = Translation2d(self.goal.X() - 0.5, self.goal.Y() - 0.5)
-        traj_config.addConstraint(
-            RectangularRegionConstraint(
-                bottomLeft, topRight, MaxVelocityConstraint(0.5)
-            )
-        )
-
-        pose = self.chassis.get_pose()
-
-        next_pos = waypoints[0] if waypoints else self.goal.translation()
-        translation = next_pos - pose.translation()
 
         # Generating a trajectory when the robot is very close to the goal is unnecesary, so this
         # return an empty trajectory that starts at the end point so the robot won't move.
-        distance_to_goal = (self.goal.translation() - pose.translation()).norm()
-        if distance_to_goal <= 0.01:
+        distance_to_goal = (self.goal - pose.translation()).norm()
+        if distance_to_goal <= self.POSITION_TOLERANCE:
             return Trajectory([Trajectory.State(0, 0, 0, pose)])
+
+        next_pos = waypoints[0] if waypoints else self.goal
+        translation = next_pos - pose.translation()
 
         spline_start_momentum_x = translation.x * self.kD
         spline_start_momentum_y = translation.y * self.kD
-
-        goal_spline = Spline3.ControlVector(
-            (self.goal.X(), self.goal.rotation().cos() * self.END_CONTROL_SCALER),
-            (self.goal.Y(), self.goal.rotation().sin() * self.END_CONTROL_SCALER),
-        )
-
         start_point_spline = Spline3.ControlVector(
             (pose.x, spline_start_momentum_x),
             (pose.y, spline_start_momentum_y),
         )
 
-        chassis_velocity = self.chassis.get_velocity()
-        chassis_speed = math.hypot(chassis_velocity.vx, chassis_velocity.vy)
-        traj_config.setStartVelocity(chassis_speed)
+        prev_pos = waypoints[-1] if waypoints else pose.translation()
+        translation = self.goal - prev_pos
+
+        spline_goal_momentum_x = translation.x * self.kD
+        spline_goal_momentum_y = translation.y * self.kD
+        goal_spline = Spline3.ControlVector(
+            (self.goal.X(), spline_goal_momentum_x),
+            (self.goal.Y(), spline_goal_momentum_y),
+        )
+
+        traj_config.setStartVelocity(0.0)
         try:
             trajectory = TrajectoryGenerator.generateTrajectory(
                 start_point_spline, waypoints, goal_spline, traj_config
             )
-        except RuntimeError:
+        except Exception:
             return Trajectory([Trajectory.State(0, 0, 0, pose)])
 
         self.robot_object = self.field.getObject("auto_trajectory")
@@ -181,10 +201,15 @@ class AutoBase(AutonomousStateMachine):
 
     def is_at_goal(self) -> bool:
         return (
-            self.goal.translation() - self.chassis.get_pose().translation()
+            self.goal - self.chassis.get_pose().translation()
         ).norm() < self.POSITION_TOLERANCE and abs(
-            (self.goal.rotation() - self.chassis.get_rotation()).radians()
+            (self.goal_heading - self.chassis.get_rotation()).radians()
         ) < self.ANGLE_TOLERANCE
+
+
+def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
+    t: Translation2d = game.RED_SPEAKER_POSE.toPose2d().translation() - position
+    return Rotation2d(math.atan2(t.y, t.x))
 
 
 class PreloadOnly(AutoBase):
@@ -197,12 +222,18 @@ class Front2Note(AutoBase):
     def setup(self) -> None:
         self.note_paths = [
             NotePaths(
-                pick_up_path=[
-                    Pose2d(3.6, 5.5, math.radians(135)),
-                    Pose2d(2.6, 5.5, math.radians(135)),
-                ],
-                shoot_path=[
-                    Pose2d(5.0, 1.0, 0.0),
-                ],
+                pick_up_path=Path(
+                    [
+                        Translation2d(14.8, 5.5),
+                        Translation2d(14.3, 5.5),
+                    ],
+                    Rotation2d(0.0),
+                ),
+                shoot_path=Path(
+                    [
+                        Translation2d(14.8, 5.5),
+                    ],
+                    rotation_to_red_speaker(Translation2d(14.8, 5.5)),
+                ),
             )
         ]

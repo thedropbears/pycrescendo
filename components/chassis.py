@@ -27,7 +27,7 @@ from wpimath.controller import ProfiledPIDControllerRadians
 from magicbot import feedback
 
 from utilities.functions import constrain_angle, rate_limit_module
-from utilities.game import is_red
+from utilities.game import is_red, field_flip_pose2d
 from utilities.ctre import FALCON_FREE_RPS
 from ids import CancoderIds, TalonIds
 
@@ -224,8 +224,8 @@ class Chassis:
     do_smooth = magicbot.tunable(True)
     swerve_lock = magicbot.tunable(False)
 
-    RED_TEST_POSE = Pose2d(13.6, 5.5, 0)
-    BLUE_TEST_POSE = Pose2d(2.6, 5.5, math.pi)
+    RED_TEST_POSE = Pose2d(15.1, 5.5, 0)
+    BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
 
     def setup(self) -> None:
         self.imu = navx.AHRS.create_spi()
