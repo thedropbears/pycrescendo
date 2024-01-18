@@ -49,11 +49,6 @@ class AutoBase(AutonomousStateMachine):
     # Add controllers for intake and shooter when available
 
     POSITION_TOLERANCE = 0.025
-
-    # If the robot is close to the goal but still not enough, making the robot reverse to
-    # approach the control vector is unnecessary; this constant scales the derivative of
-    # the goal derivative according to the translation distance.
-    # The closer the robot gets to the goal, the small the derivative is.
     ANGLE_TOLERANCE = math.radians(2)
     MAX_VEL = 1
     MAX_ACCEL = 0.5
