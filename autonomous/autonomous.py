@@ -59,6 +59,19 @@ class AutoBase(AutonomousStateMachine):
         self.has_initial_note = True
         self.next_state("shoot_note")
 
+        x_controller = PIDController(2.5, 0, 0)
+        y_controller = PIDController(2.5, 0, 0)
+        heading_controller = ProfiledPIDControllerRadians(
+            3, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
+        )
+        heading_controller.enableContinuousInput(math.pi, -math.pi)
+
+        self.drive_controller = HolonomicDriveController(
+            x_controller, y_controller, heading_controller
+        )
+        # Since robot is stationary from one action to another, point the control vector at the goal to avoid the robot taking unnecessary turns before moving towards the goal
+        self.kD = 0.3
+
     @state
     def shoot_note(self, initial_call: bool) -> None:
         if initial_call:
