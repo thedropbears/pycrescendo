@@ -214,6 +214,11 @@ class AutoBase(AutonomousStateMachine):
         ) < self.ANGLE_TOLERANCE
 
 
+def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
+    t: Translation2d = game.RED_SPEAKER_POSE.toPose2d().translation() - position
+    return Rotation2d(math.atan2(t.y, t.x))
+
+
 class PreloadOnly(AutoBase):
     MODE_NAME = "Preload only"
 
@@ -235,7 +240,7 @@ class Front2Note(AutoBase):
                     [
                         Translation2d(14.8, 5.5),
                     ],
-                    Rotation2d(0.0),
+                    rotation_to_red_speaker(Translation2d(14.8, 5.5)),
                 ),
             )
         ]
