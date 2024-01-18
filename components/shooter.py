@@ -2,10 +2,6 @@ from magicbot import tunable
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds
 import phoenix6
-from phoenix6.configs import (
-    config_groups,
-    MotorOutputConfigs,
-)
 from phoenix6.controls import VoltageOut
 import phoenix6.hardware
 
@@ -15,20 +11,11 @@ class ShooterComponent:
     inject_speed = tunable(0.0)
 
     def __init__(self):
-        self.top_flywheel = phoenix6.hardware.TalonFX(TalonIds.top_flywheel)
-        self.bottom_flywheel = phoenix6.hardware.TalonFX(TalonIds.bottom_flywheel)
-        self.inject_flywheel = CANSparkMax(
-            SparkMaxIds.inject_flywheel, CANSparkMax.MotorType.kBrushless
+        self.flywheel = phoenix6.hardware.TalonFX(TalonIds.shooter_flywheel)
+        self.injector = CANSparkMax(
+            SparkMaxIds.shooter_injector, CANSparkMax.MotorType.kBrushless
         )
-
-        # Configure bottom flywheel motor
-        bottom_config = self.bottom_flywheel.configurator
-        bottom_flywheel_config = MotorOutputConfigs()
-        bottom_flywheel_config.inverted = config_groups.InvertedValue.CLOCKWISE_POSITIVE
-
-        bottom_config.apply(bottom_flywheel_config)
-
-        self.inject_flywheel.setInverted(True)
+        self.injector.setInverted(True)
 
         self.should_inject = False
 
@@ -42,10 +29,9 @@ class ShooterComponent:
         """This gets called at the end of the control loop"""
         flywheel_request = VoltageOut(12.0 * self.flywheel_speed)
         if self.should_inject:
-            self.inject_flywheel.set(self.inject_speed)
+            self.injector.set(self.inject_speed)
         else:
-            self.inject_flywheel.set(0.0)
+            self.injector.set(0.0)
 
-        self.top_flywheel.set_control(flywheel_request)
-        self.bottom_flywheel.set_control(flywheel_request)
+        self.flywheel.set_control(flywheel_request)
         self.should_inject = False
