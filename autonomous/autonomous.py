@@ -141,20 +141,6 @@ class AutoBase(AutonomousStateMachine):
             )
         )
 
-        """Generates a trajectory to self.goal and displays it"""
-        x_controller = PIDController(2.5, 0, 0)
-        y_controller = PIDController(2.5, 0, 0)
-        heading_controller = ProfiledPIDControllerRadians(
-            3, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
-        )
-        heading_controller.enableContinuousInput(math.pi, -math.pi)
-
-        self.drive_controller = HolonomicDriveController(
-            x_controller, y_controller, heading_controller
-        )
-
-        chassis_velocity = self.chassis.get_velocity()
-        chassis_speed = math.hypot(chassis_velocity.vx, chassis_velocity.vy)
         pose = self.chassis.get_pose()
 
         next_pos = waypoints[0] if waypoints else self.goal.translation()
@@ -182,6 +168,8 @@ class AutoBase(AutonomousStateMachine):
             (pose.y, spline_start_momentum_y),
         )
 
+        chassis_velocity = self.chassis.get_velocity()
+        chassis_speed = math.hypot(chassis_velocity.vx, chassis_velocity.vy)
         traj_config.setStartVelocity(chassis_speed)
         try:
             trajectory = TrajectoryGenerator.generateTrajectory(
