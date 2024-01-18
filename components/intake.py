@@ -40,7 +40,7 @@ class Intake:
 
     @feedback
     def is_note_present(self) -> bool:
-        return True
+        return False
 
     @feedback
     def is_fully_retracted(self) -> bool:
