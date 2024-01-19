@@ -5,7 +5,10 @@ from phoenix6.configs import MotorOutputConfigs, config_groups
 from phoenix6.controls import VoltageOut
 from phoenix6.hardware import TalonFX
 
-from ids import TalonIds
+from rev import CANSparkMax
+
+
+from ids import TalonIds, SparkMaxIds
 
 
 class IntakeComponent:
@@ -20,6 +23,10 @@ class IntakeComponent:
         self.intake_motor = TalonFX(TalonIds.intake)
         self.direction = self.Direction.STOPPED
 
+        self.handover_motor = CANSparkMax(
+            SparkMaxIds.intake_handover, CANSparkMax.MotorType.kBrushless
+        )
+
         intake_motor_configurator = self.intake_motor.configurator
         intake_motor_config = MotorOutputConfigs()
         intake_motor_config.inverted = (
@@ -27,6 +34,8 @@ class IntakeComponent:
         )
 
         intake_motor_configurator.apply(intake_motor_config)
+
+        self.handover_motor.setInverted(True)
 
     def deploy(self) -> None:
         pass
@@ -58,4 +67,5 @@ class IntakeComponent:
         )
 
         self.intake_motor.set_control(intake_request)
+        self.handover_motor.set(self.direction.value * self.intake_motor_speed)
         self.direction = self.Direction.STOPPED
