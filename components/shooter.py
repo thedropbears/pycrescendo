@@ -16,15 +16,20 @@ class ShooterComponent:
     inject_speed = tunable(0.0)
 
     # TODO Figure that out
-    MAX_INCLINE_ANGLE = 60
-    MIN_INCLINE_ANGLE = 25
+    MAX_INCLINE_ANGLE = math.radians(25)
+    MIN_INCLINE_ANGLE = math.radians(0)
     INCLINATOR_TOLERANCE = math.radians(5)
+
+    INCLINATOR_OFFSET = 0.6632
 
     def __init__(self) -> None:
         self.inclinator = CANSparkMax(
             SparkMaxIds.shooter_inclinator, CANSparkMax.MotorType.kBrushless
         )
         self.inclinator_encoder = DutyCycleEncoder(DioChannels.inclinator_encoder)
+        self.inclinator_encoder.setPositionOffset(self.INCLINATOR_OFFSET)
+        # invert encoder and map to radians
+        self.inclinator_encoder.setDistancePerRotation(-math.tau)
         self.flywheel = phoenix6.hardware.TalonFX(TalonIds.shooter_flywheel)
         self.injector = CANSparkMax(
             SparkMaxIds.shooter_injector, CANSparkMax.MotorType.kBrushless
@@ -60,7 +65,7 @@ class ShooterComponent:
 
     @feedback
     def inclination_angle(self) -> float:
-        return self.inclinator_encoder.getAbsolutePosition()
+        return self.inclinator_encoder.getDistance()
 
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
