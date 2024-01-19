@@ -59,6 +59,7 @@ NoteCentre2 = NodePosition(Translation2d(8.270875, 5.68445), Rotation2d(0))
 NoteCentre3 = NodePosition(Translation2d(8.270875, 4.00805), Rotation2d(0))
 NoteCentre4 = NodePosition(Translation2d(8.270875, 2.33165), Rotation2d(0))
 NoteCentre5 = NodePosition(Translation2d(8.270875, 0.65525), Rotation2d(0))
+ShootPos1 = NodePosition(Translation2d(10, 5.45585), Rotation2d(0))
 
 
 class AutoBase(AutonomousStateMachine):
@@ -243,15 +244,13 @@ class Front2Note(AutoBase):
                 pick_up_path=Path(
                     [
                         Translation2d(14.8, 5.5),
-                        Translation2d(14.3, 5.5),
+                        NoteStage2.translation,
                     ],
-                    Rotation2d(0.0),
+                    NoteStage2.heading,
                 ),
                 shoot_path=Path(
-                    [
-                        Translation2d(14.8, 5.5),
-                    ],
-                    rotation_to_red_speaker(Translation2d(14.8, 5.5)),
+                    [ShootPos1.translation],
+                    rotation_to_red_speaker(ShootPos1.translation),
                 ),
             )
         ]
