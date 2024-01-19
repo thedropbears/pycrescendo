@@ -2,10 +2,13 @@
 
 import wpilib
 import wpilib.event
+from wpimath.geometry import Rotation3d, Translation3d
 import magicbot
 from magicbot import tunable
 
 from components.chassis import ChassisComponent
+from components.vision import VisualLocalizer
+
 from components.shooter import ShooterComponent
 from components.intake import IntakeComponent
 from components.climber import ClimberComponent
@@ -33,6 +36,7 @@ class MyRobot(magicbot.MagicRobot):
 
     max_speed = magicbot.tunable(ChassisComponent.max_wheel_speed * 0.95)
     inclination_angle = tunable(0.0)
+    vision: VisualLocalizer
 
     def createObjects(self) -> None:
         self.data_log = wpilib.DataLogManager.getLog()
@@ -47,6 +51,9 @@ class MyRobot(magicbot.MagicRobot):
         wpilib.SmartDashboard.putData(self.field)
 
         self.lights_strip_length = 144  # TODO Change to correct length
+        self.vision_name = "ardu_cam_port"
+        self.vision_pos = Translation3d(0.1, 0.24, 0.273)
+        self.vision_rot = Rotation3d(0, 0, 0)
 
     def rumble_for(self, intensity: float, duration: float):
         self.rumble_duration = duration
@@ -132,9 +139,12 @@ class MyRobot(magicbot.MagicRobot):
 
     def disabledPeriodic(self) -> None:
         self.chassis.update_odometry()
+        
         self.lights.execute()
+        self.vision.execute()
 
     def autonomousInit(self) -> None:
+        self.vision.on_enable()
         pass
 
 
