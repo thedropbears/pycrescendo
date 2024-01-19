@@ -3,6 +3,7 @@
 import wpilib
 import wpilib.event
 import magicbot
+from magicbot import tunable
 
 from components.chassis import ChassisComponent
 from components.shooter import ShooterComponent
@@ -25,6 +26,7 @@ class MyRobot(magicbot.MagicRobot):
     intake: IntakeComponent
 
     max_speed = magicbot.tunable(ChassisComponent.max_wheel_speed * 0.95)
+    inclination_angle = tunable(0.0)
 
     def createObjects(self) -> None:
         self.data_log = wpilib.DataLogManager.getLog()
@@ -86,6 +88,9 @@ class MyRobot(magicbot.MagicRobot):
 
         if self.gamepad.getXButton():
             self.intake.intake()
+
+        if self.gamepad.getAButton():
+            self.shooter_component.set_inclination(self.inclination_angle)
 
         # Cancel any running controllers
         if self.gamepad.getBackButtonPressed():

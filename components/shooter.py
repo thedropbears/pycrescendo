@@ -58,6 +58,10 @@ class ShooterComponent:
     def at_inclination(self) -> bool:
         return self.inclinator_controller.atGoal()
 
+    @feedback
+    def inclination_angle(self) -> float:
+        return self.inclinator_encoder.getAbsolutePosition()
+
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
         flywheel_request = VoltageOut(12.0 * self.flywheel_speed)
