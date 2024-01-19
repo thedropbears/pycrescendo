@@ -9,7 +9,7 @@ from ids import TalonIds
 
 
 class IntakeComponent:
-    motor_speed = tunable(0.4)
+    intake_motor_speed = tunable(0.4)
 
     class Direction(Enum):
         BACKWARD = -1
@@ -17,14 +17,16 @@ class IntakeComponent:
         FORWARD = 1
 
     def __init__(self) -> None:
-        self.motor = TalonFX(TalonIds.intake)
+        self.intake_motor = TalonFX(TalonIds.intake)
         self.direction = self.Direction.STOPPED
 
-        motor_configurator = self.motor.configurator
-        motor_config = MotorOutputConfigs()
-        motor_config.inverted = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+        intake_motor_configurator = self.intake_motor.configurator
+        intake_motor_config = MotorOutputConfigs()
+        intake_motor_config.inverted = (
+            config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+        )
 
-        motor_configurator.apply(motor_config)
+        intake_motor_configurator.apply(intake_motor_config)
 
     def deploy(self) -> None:
         pass
@@ -51,7 +53,9 @@ class IntakeComponent:
         return True
 
     def execute(self) -> None:
-        intake_request = VoltageOut(self.direction.value * self.motor_speed * 12.0)
+        intake_request = VoltageOut(
+            self.direction.value * self.intake_motor_speed * 12.0
+        )
 
-        self.motor.set_control(intake_request)
+        self.intake_motor.set_control(intake_request)
         self.direction = self.Direction.STOPPED
