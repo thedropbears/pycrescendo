@@ -69,10 +69,6 @@ class MyRobot(magicbot.MagicRobot):
         if drive_z != 0:
             self.chassis.stop_snapping()
 
-        # testing rig for the snap to heading method
-        if self.gamepad.getPOV() != -1:
-            self.dpad_angle = self.gamepad.getPOV()
-
         if self.gamepad.getAButtonPressed():
             self.chassis.snap_to_heading(math.radians(self.dpad_angle))
 
@@ -80,6 +76,10 @@ class MyRobot(magicbot.MagicRobot):
         if self.rumble_timer.hasElapsed(self.rumble_duration):
             self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
 
+    def testInit(self) -> None:
+        pass
+
+    def testPeriodic(self) -> None:
         # injecting
         if self.gamepad.getBButton():
             self.shooter.shoot()
@@ -87,13 +87,12 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getXButton():
             self.intake.intake()
 
-    def testInit(self) -> None:
-        pass
-
-    def testPeriodic(self) -> None:
         # Cancel any running controllers
         if self.gamepad.getBackButtonPressed():
             self.cancel_controllers()
+
+        self.intake.execute()
+        self.shooter.execute()
 
         self.chassis.update_odometry()
 
