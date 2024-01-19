@@ -12,7 +12,7 @@ from utilities.functions import clamp
 
 
 class ShooterComponent:
-    MAX_FLYWHEEL_SPEED = 6000  # TODO Change it to the correct max speed
+    MAX_FLYWHEEL_SPEED = 6380
     flywheel_speed = tunable(0.0)
     inject_speed = tunable(0.0)
 
