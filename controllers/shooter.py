@@ -1,5 +1,5 @@
 from magicbot import StateMachine, state
-from components.chassisComponent import ChassisComponent
+from components.chassis import ChassisComponent
 
 from utilities.game import get_goal_speaker_position
 

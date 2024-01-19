@@ -15,8 +15,8 @@ from wpimath.controller import (
 )
 from wpilib import Field2d
 from wpimath.spline import Spline3
-from components.chassisComponent import ChassisComponent
-from components.intakeComponent import IntakeComponent
+from components.chassis import ChassisComponent
+from components.intake import IntakeComponent
 from controllers.shooter import Shooter
 
 import utilities.game as game

@@ -4,9 +4,9 @@ import wpilib
 import wpilib.event
 import magicbot
 
-from components.chassisComponent import ChassisComponent
-from components.shooterComponent import ShooterComponent
-from components.intakeComponent import IntakeComponent
+from components.chassis import ChassisComponent
+from components.shooter import ShooterComponent
+from components.intake import IntakeComponent
 
 from controllers.shooter import Shooter
 

@@ -10,7 +10,7 @@ from pyfrc.physics.core import PhysicsInterface
 from wpimath.kinematics import SwerveDrive4Kinematics
 from wpilib.simulation import SimDeviceSim
 
-from components.chassisComponent import SwerveModule
+from components.chassis import SwerveModule
 
 if typing.TYPE_CHECKING:
     from robot import MyRobot
