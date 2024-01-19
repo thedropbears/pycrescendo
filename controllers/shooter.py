@@ -1,5 +1,5 @@
 from magicbot import StateMachine, state
-from components.chassis import Chassis
+from components.chassisComponent import ChassisComponent
 
 from utilities.game import get_goal_speaker_position
 
@@ -7,7 +7,7 @@ from math import atan2
 
 
 class Shooter(StateMachine):
-    chassis: Chassis
+    chassis: ChassisComponent
 
     def setup(self) -> None:
         pass

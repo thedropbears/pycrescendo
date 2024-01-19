@@ -15,8 +15,8 @@ from wpimath.controller import (
 )
 from wpilib import Field2d
 from wpimath.spline import Spline3
-from components.chassis import Chassis
-from components.intake import Intake
+from components.chassisComponent import ChassisComponent
+from components.intakeComponent import IntakeComponent
 from controllers.shooter import Shooter
 
 import utilities.game as game
@@ -44,8 +44,8 @@ class NotePaths:
 
 
 class AutoBase(AutonomousStateMachine):
-    chassis: Chassis
-    intake: Intake
+    chassis: ChassisComponent
+    intake: IntakeComponent
     shooter: Shooter
     field: Field2d
 

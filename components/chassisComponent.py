@@ -197,7 +197,7 @@ class SwerveModule:
         return SwerveModuleState(self.get_speed(), self.get_rotation())
 
 
-class Chassis:
+class ChassisComponent:
     # metres between centre of left and right wheels
     TRACK_WIDTH = 0.61
     # metres between centre of front and back wheels
@@ -283,7 +283,11 @@ class Chassis:
         self.imu.zeroYaw()
         self.imu.resetDisplacement()
 
-        initial_pose = Chassis.RED_TEST_POSE if is_red() else Chassis.BLUE_TEST_POSE
+        initial_pose = (
+            ChassisComponent.RED_TEST_POSE
+            if is_red()
+            else ChassisComponent.BLUE_TEST_POSE
+        )
         self.estimator = SwerveDrive4PoseEstimator(
             self.kinematics,
             self.imu.getRotation2d(),
@@ -398,9 +402,9 @@ class Chassis:
         if is_red() != self.on_red_alliance:
             self.on_red_alliance = is_red()
             if self.on_red_alliance:
-                self.set_pose(Chassis.RED_TEST_POSE)
+                self.set_pose(ChassisComponent.RED_TEST_POSE)
             else:
-                self.set_pose(Chassis.BLUE_TEST_POSE)
+                self.set_pose(ChassisComponent.BLUE_TEST_POSE)
 
         self.estimator.update(self.imu.getRotation2d(), self.get_module_positions())
         self.field_obj.setPose(self.get_pose())

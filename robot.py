@@ -4,9 +4,9 @@ import wpilib
 import wpilib.event
 import magicbot
 
-from components.chassis import Chassis
-from components.shooter import ShooterComponent
-from components.intake import Intake
+from components.chassisComponent import ChassisComponent
+from components.shooterComponent import ShooterComponent
+from components.intakeComponent import IntakeComponent
 
 from controllers.shooter import Shooter
 
@@ -20,11 +20,11 @@ class MyRobot(magicbot.MagicRobot):
     shooter: Shooter
 
     # Components
-    chassis: Chassis
+    chassis: ChassisComponent
     shooter_component: ShooterComponent
-    intake: Intake
+    intake: IntakeComponent
 
-    max_speed = magicbot.tunable(Chassis.max_wheel_speed * 0.95)
+    max_speed = magicbot.tunable(ChassisComponent.max_wheel_speed * 0.95)
 
     def createObjects(self) -> None:
         self.data_log = wpilib.DataLogManager.getLog()
