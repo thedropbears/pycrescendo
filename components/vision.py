@@ -7,12 +7,11 @@ import wpiutil.log
 from magicbot import tunable
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.photonTrackedTarget import PhotonTrackedTarget
-from wpimath.geometry import Pose2d, Rotation3d, Transform3d, Translation3d
+from photonlibpy.multiTargetPNPResult import PNPResult
+from wpimath.geometry import Pose2d, Rotation3d, Transform3d, Translation3d, Pose3d
 
 from components.chassis import Chassis
 from utilities.game import apriltag_layout
-from utilities.scalers import scale_value
-from utilities.functions import clamp
 
 
 class VisualLocalizer:
@@ -22,6 +21,7 @@ class VisualLocalizer:
     """
 
     add_to_estimator = tunable(False)
+    show_res_on_field = tunable(False)
     should_log = tunable(False)
 
     rejected_in_row = tunable(0.0)
@@ -39,12 +39,16 @@ class VisualLocalizer:
         data_log: wpiutil.log.DataLog,
         chassis: Chassis,
     ) -> None:
+        self.mid = 615
         self.camera = PhotonCamera(name)
         self.camera_to_robot = Transform3d(pos, rot).inverse()
         self.last_timestamp = -1
 
-        self.field_pos_obj = field.getObject("vision_pose")
-        self.pose_log_entry = wpiutil.log.DoubleArrayLogEntry(data_log, "vision_pose")
+        if self.show_res_on_field:
+            self.field_pos_obj = field.getObject("vision_pose")
+            self.pose_log_entry = wpiutil.log.DoubleArrayLogEntry(
+                data_log, "vision_pose"
+            )
 
         self.chassis = chassis
 
@@ -72,16 +76,68 @@ class VisualLocalizer:
         # if abs(wpilib.Timer.getFPGATimestamp() - timestamp) > 0.5:
         #    return # IT FAILS HERE
 
+        # cs = [i.x for i in target.getDetectedCorners()]
+        # mid = ((cs[0] + cs[1])/2+(cs[2]+cs[3])/2)/2
+        # self.mid = mid
+
+        if results.multiTagResult.estimatedPose.isPresent():
+            p = results.multiTagResult.estimatedPose
+            pose, reprojectionErr = choose_pose(
+                p, self.camera_to_robot, self.chassis.get_pose()
+            )
+
+            if self.show_res_on_field:
+                self.field_pos_obj.setPose(pose)
+
+            if self.add_to_estimator:
+                self.chassis.estimator.addVisionMeasurement(
+                    pose,
+                    timestamp,
+                    (reprojectionErr, reprojectionErr, reprojectionErr / 3),
+                )
+
+            if self.should_log:
+                ground_truth_pose = self.chassis.get_pose()
+                trans_error1: float = ground_truth_pose.translation().distance(
+                    p.best.translation()
+                )
+                trans_error2: float = ground_truth_pose.translation().distance(
+                    p.alt.translation()
+                )
+                rot_error1: float = (  # type: ignore
+                    ground_truth_pose.rotation() - p.best.rotation()
+                ).radians()
+                rot_error2: float = (  # type: ignore
+                    ground_truth_pose.rotation() - p.alt.rotation()
+                ).radians()
+
+                self.pose_log_entry.append(
+                    [
+                        p.best.x,
+                        p.best.y,
+                        typing.cast(float, p.best.rotation().radians()),
+                        trans_error1,  # error of main pose
+                        rot_error1,
+                        p.alt.x,
+                        p.alt.y,
+                        typing.cast(float, p.alt.rotation().radians()),
+                        trans_error2,
+                        rot_error2,
+                        ground_truth_pose.x,
+                        ground_truth_pose.y,
+                    ]
+                )
+
         for target in results.getTargets():
             poses = estimate_poses_from_apriltag(self.camera_to_robot, target)
-            distance_to_tag = target.getBestCameraToTarget().translation().norm()
             if poses is None:
                 # tag doesn't exist
                 continue
-            best_pose, alt_pose, self.last_pose_z = poses
+
+            p.best, p.alt, self.last_pose_z = poses
             pose = choose_pose(
-                best_pose,
-                alt_pose,
+                p.best,
+                p.alt,
                 self.chassis.get_pose(),
                 target.getPoseAmbiguity(),
             )
@@ -91,6 +147,7 @@ class VisualLocalizer:
                 continue
 
             self.field_pos_obj.setPose(pose)
+            self.chassis.estimator.addVisionMeasurement(pose, results.getTimestamp())
             change = self.chassis.get_pose().translation().distance(pose.translation())
             if change > 1.0:
                 self.rejected_in_row += 1
@@ -98,54 +155,6 @@ class VisualLocalizer:
                     continue
             else:
                 self.rejected_in_row //= 2
-
-            if self.add_to_estimator:
-                std_apriltag = clamp(
-                    scale_value(distance_to_tag, 3.0, 6.0, 0.5, 3.0), 0.5, 3
-                )
-                self.chassis.estimator.addVisionMeasurement(
-                    pose,
-                    timestamp,
-                    (std_apriltag, std_apriltag, std_apriltag / 3),
-                )
-
-            if self.should_log:
-                ground_truth_pose = self.chassis.get_pose()
-                trans_error1: float = ground_truth_pose.translation().distance(
-                    best_pose.translation()
-                )
-                trans_error2: float = ground_truth_pose.translation().distance(
-                    alt_pose.translation()
-                )
-                rot_error1: float = (  # type: ignore
-                    ground_truth_pose.rotation() - best_pose.rotation()
-                ).radians()
-                rot_error2: float = (  # type: ignore
-                    ground_truth_pose.rotation() - alt_pose.rotation()
-                ).radians()
-                skew = get_target_skew(target)
-
-                self.pose_log_entry.append(
-                    [
-                        best_pose.x,
-                        best_pose.y,
-                        typing.cast(float, best_pose.rotation().radians()),
-                        trans_error1,  # error of main pose
-                        rot_error1,
-                        alt_pose.x,
-                        alt_pose.y,
-                        typing.cast(float, alt_pose.rotation().radians()),
-                        trans_error2,
-                        rot_error2,
-                        ground_truth_pose.x,
-                        ground_truth_pose.y,
-                        target.getYaw(),
-                        skew,
-                        target.getPoseAmbiguity(),
-                        target.getArea(),
-                        target.getFiducialId(),
-                    ]
-                )
 
 
 def estimate_poses_from_apriltag(
@@ -173,16 +182,16 @@ def get_target_skew(target: PhotonTrackedTarget):
 
 
 def choose_pose(
-    best_pose: Pose2d, alternate_pose: Pose2d, cur_robot: Pose2d, ambiguity: float
-):
+    estimated_pose: PNPResult, cam_to_robot: Transform3d, cur_pos: Pose2d
+) -> tuple[Pose2d, float]:
     """Picks either the best or alternate pose estimate"""
-    best_dist = best_pose.translation().distance(cur_robot.translation())
+    p = (Pose3d() + estimated_pose.best + cam_to_robot).toPose2d()
+    best_dist = p.translation().distance(cur_pos.translation())
     best_preferance = 1.2
-    alternate_dist = (
-        alternate_pose.translation().distance(cur_robot.translation()) * best_preferance
-    )
+    p2 = (Pose3d() + estimated_pose.alt + cam_to_robot).toPose2d()
+    alt_dist = p2.translation().distance(cur_pos.translation()) * best_preferance
 
-    if best_dist < alternate_dist:
-        return best_pose
+    if best_dist < alt_dist:
+        return p, estimated_pose.bestReprojError
     else:
-        return alternate_pose
+        return p2, estimated_pose.altReprojError
