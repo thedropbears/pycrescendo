@@ -96,8 +96,10 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getBackButtonPressed():
             self.cancel_controllers()
 
-        self.intake.execute()
         self.shooter.execute()
+
+        self.intake.execute()
+        self.shooter_component.execute()
 
         self.chassis.update_odometry()
 
