@@ -5,6 +5,9 @@ import phoenix6
 from phoenix6.controls import VoltageOut
 import phoenix6.hardware
 from wpilib import DutyCycleEncoder
+from wpimath.controller import ProfiledPIDControllerRadians
+from wpimath.trajectory import TrapezoidProfileRadians
+import math
 
 
 class ShooterComponent:
@@ -14,6 +17,7 @@ class ShooterComponent:
     # TODO Figure that out
     MAX_INCLINE_ANGLE = 45
     MIN_INCLINE_ANGLE = 10
+    INCLINATOR_TOLERANCE = math.radians(5)
 
     def __init__(self) -> None:
         self.inclinator = CANSparkMax(
@@ -26,7 +30,20 @@ class ShooterComponent:
         )
         self.injector.setInverted(True)
 
+        self.inclinator_controller = ProfiledPIDControllerRadians(
+            1, 0, 0, TrapezoidProfileRadians(2, 2)
+        )
+        self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
+
         self.should_inject = False
+
+    def set_inclination(self, angle: float) -> None:
+        self.inclinator_controller.setGoal(
+            max(
+                min(angle, ShooterComponent.MAX_INCLINE_ANGLE),
+                ShooterComponent.MIN_INCLINE_ANGLE,
+            )
+        )
 
     def shoot(self) -> None:
         self.should_inject = True
@@ -37,7 +54,7 @@ class ShooterComponent:
 
     @feedback
     def at_inclination(self) -> bool:
-        pass
+        return self.inclinator_controller.atGoal()
 
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
