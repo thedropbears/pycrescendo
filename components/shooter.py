@@ -32,8 +32,17 @@ class ShooterComponent:
         # invert encoder and map to radians
         self.inclinator_encoder.setDistancePerRotation(-math.tau)
         self.flywheel = phoenix6.hardware.TalonFX(TalonIds.shooter_flywheel)
-        flywheel_config = phoenix6.configs.MotorOutputConfigs()
-        flywheel_config.neutral_mode = phoenix6.signals.NeutralModeValue.COAST
+
+        flywheel_config = self.flywheel.configurator
+        flywheel_motor_config = phoenix6.configs.MotorOutputConfigs()
+        flywheel_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.COAST
+
+        flywheel_pid = (
+            phoenix6.configs.Slot0Configs().with_k_p(0).with_k_i(0).with_k_d(0)
+        )
+
+        flywheel_config.apply(flywheel_motor_config)
+        flywheel_config.apply(flywheel_pid)
 
         self.injector = CANSparkMax(
             SparkMaxIds.shooter_injector, CANSparkMax.MotorType.kBrushless
