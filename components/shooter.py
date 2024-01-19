@@ -72,7 +72,7 @@ class ShooterComponent:
         """This gets called at the end of the control loop"""
         flywheel_request = VoltageOut(12.0 * self.flywheel_speed)
         inclinator_speed = self.inclinator_controller.calculate(
-            self.inclinator_encoder.get() * math.tau
+            self.inclination_angle()
         )
         self.inclinator.set(inclinator_speed)
 
