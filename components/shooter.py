@@ -8,6 +8,7 @@ from wpilib import DutyCycleEncoder
 from wpimath.controller import ProfiledPIDControllerRadians
 from wpimath.trajectory import TrapezoidProfileRadians
 import math
+from utilities.functions import clamp
 
 
 class ShooterComponent:
@@ -31,7 +32,7 @@ class ShooterComponent:
         self.injector.setInverted(True)
 
         self.inclinator_controller = ProfiledPIDControllerRadians(
-            1, 0, 0, TrapezoidProfileRadians(2, 2)
+            1, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
         )
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
 
@@ -39,9 +40,10 @@ class ShooterComponent:
 
     def set_inclination(self, angle: float) -> None:
         self.inclinator_controller.setGoal(
-            max(
-                min(angle, ShooterComponent.MAX_INCLINE_ANGLE),
+            clamp(
+                angle,
                 ShooterComponent.MIN_INCLINE_ANGLE,
+                ShooterComponent.MAX_INCLINE_ANGLE,
             )
         )
 
@@ -59,7 +61,12 @@ class ShooterComponent:
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
         flywheel_request = VoltageOut(12.0 * self.flywheel_speed)
-        if self.should_inject:
+        inclinator_speed = self.inclinator_controller.calculate(
+            self.inclinator_encoder.get() * math.tau
+        )
+        self.inclinator.set(inclinator_speed)
+
+        if self.should_inject and self.at_inclination():
             self.injector.set(self.inject_speed)
         else:
             self.injector.set(0.0)
