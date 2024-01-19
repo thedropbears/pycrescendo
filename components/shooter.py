@@ -26,6 +26,7 @@ class ShooterComponent:
         self.inclinator = CANSparkMax(
             SparkMaxIds.shooter_inclinator, CANSparkMax.MotorType.kBrushless
         )
+        self.inclinator.setInverted(True)
         self.inclinator_encoder = DutyCycleEncoder(DioChannels.inclinator_encoder)
         self.inclinator_encoder.setPositionOffset(self.INCLINATOR_OFFSET)
         # invert encoder and map to radians
