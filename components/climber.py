@@ -1,4 +1,4 @@
-class Climber:
+class ClimberComponent:
     def __init__(self) -> None:
         self.deployed = False
 

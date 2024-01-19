@@ -8,7 +8,7 @@ from phoenix6.hardware import TalonFX
 from ids import TalonIds
 
 
-class Intake:
+class IntakeComponent:
     motor_speed = tunable(1.0)
 
     class Direction(Enum):
