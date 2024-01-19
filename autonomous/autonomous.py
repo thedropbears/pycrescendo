@@ -43,6 +43,12 @@ class NotePaths:
     shoot_path: Path
 
 
+@dataclass
+class NodePosition:
+    translation: Translation2d
+    heading: Rotation2d
+
+
 class AutoBase(AutonomousStateMachine):
     chassis: ChassisComponent
     intake: IntakeComponent
