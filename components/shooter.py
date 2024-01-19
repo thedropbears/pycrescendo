@@ -2,7 +2,7 @@ from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
 import phoenix6
-from phoenix6.controls import VoltageOut
+from phoenix6.controls import VelocityDutyCycle
 import phoenix6.hardware
 from wpilib import DutyCycleEncoder
 from wpimath.controller import ProfiledPIDControllerRadians
@@ -12,6 +12,7 @@ from utilities.functions import clamp
 
 
 class ShooterComponent:
+    MAX_FLYWHEEL_SPEED = 6000  # TODO Change it to the correct max speed
     flywheel_speed = tunable(0.0)
     inject_speed = tunable(0.0)
 
@@ -82,7 +83,7 @@ class ShooterComponent:
 
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
-        flywheel_request = VoltageOut(12.0 * self.flywheel_speed)
+
         inclinator_speed = self.inclinator_controller.calculate(
             self.inclination_angle()
         )
@@ -92,6 +93,9 @@ class ShooterComponent:
             self.injector.set(self.inject_speed)
         else:
             self.injector.set(0.0)
-
+            
+        flywheel_request = VelocityDutyCycle(
+            self.flywheel_speed * ShooterComponent.MAX_FLYWHEEL_SPEED
+        )
         self.flywheel.set_control(flywheel_request)
         self.should_inject = False
