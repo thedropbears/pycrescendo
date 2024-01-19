@@ -38,6 +38,7 @@ class ShooterComponent:
         flywheel_motor_config = phoenix6.configs.MotorOutputConfigs()
         flywheel_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.COAST
 
+        # TODO Tune gains
         flywheel_pid = (
             phoenix6.configs.Slot0Configs().with_k_p(0).with_k_i(0).with_k_d(0)
         )
