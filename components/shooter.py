@@ -16,8 +16,8 @@ class ShooterComponent:
     inject_speed = tunable(0.0)
 
     # TODO Figure that out
-    MAX_INCLINE_ANGLE = 45
-    MIN_INCLINE_ANGLE = 10
+    MAX_INCLINE_ANGLE = 60
+    MIN_INCLINE_ANGLE = 25
     INCLINATOR_TOLERANCE = math.radians(5)
 
     def __init__(self) -> None:
