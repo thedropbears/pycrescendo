@@ -20,13 +20,13 @@ from components.intake import IntakeComponent
 from controllers.shooter import Shooter
 
 import utilities.game as game
+from dataclasses import dataclass
 
 # Add controllers for intake and shooter when available
 
 from wpimath.geometry import Rotation2d, Translation2d
 import math
-
-from dataclasses import dataclass
+from utilities.position import NotePositions, ShootingPositions
 
 
 @dataclass
@@ -225,15 +225,13 @@ class Front2Note(AutoBase):
                 pick_up_path=Path(
                     [
                         Translation2d(14.8, 5.5),
-                        Translation2d(14.3, 5.5),
+                        NotePositions.Stage2.translation,
                     ],
-                    Rotation2d(0.0),
+                    NotePositions.Stage2.heading,
                 ),
                 shoot_path=Path(
-                    [
-                        Translation2d(14.8, 5.5),
-                    ],
-                    rotation_to_red_speaker(Translation2d(14.8, 5.5)),
+                    [ShootingPositions.Pos1.translation],
+                    rotation_to_red_speaker(ShootingPositions.Pos1.translation),
                 ),
             )
         ]
