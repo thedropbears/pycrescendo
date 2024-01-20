@@ -1,17 +1,23 @@
 from magicbot import StateMachine, state
-from components.climb import Climber
+from components.climber import ClimberComponent
 
 
 class Climber(StateMachine):
-    climber_component: Climber
+    climber_component: ClimberComponent
 
     def setup(self) -> None:
         pass
 
-    @state(first=True)
-    def extend_hook(self) -> None:
-        self.next_state("retract_hook")
+    @state(must_finish=True, first=True)
+    def extend_hook(self, initial_call: bool) -> None:
+        if initial_call:
+            self.climber_component.deploy()
+        if self.climber_component.has_deploy_finished():
+            self.next_state("retract_hook")
 
     @state(must_finish=True)
-    def retract_hook(self) -> None:
-        self.done()
+    def retract_hook(self, initial_call: bool) -> None:
+        if initial_call:
+            self.climber_component.retract()
+        if self.climber_component.has_climbed_finished:
+            self.done()
