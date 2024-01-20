@@ -72,7 +72,7 @@ class ShooterComponent:
         """Set the angle of the mechanism in radians measured positive upwards from zero parellel to the ground."""
         self.desired_inclinator_angle = angle
 
-    def shoot(self) -> None:
+    def start_injection(self) -> None:
         self.should_inject = True
 
     def on_enable(self) -> None:
@@ -108,9 +108,15 @@ class ShooterComponent:
     def _flywheel_velocity(self) -> float:
         return self.flywheel.get_velocity().value
 
+    @feedback
+    def is_flywheel_at_speed(self) -> bool:
+        return (
+            abs(self.flywheel_target_speed - self.flywheel.get_velocity())
+            < self.FLYWHEEL_TOLERANCE
+        )
+
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
-
         inclinator_speed = self.inclinator_controller.calculate(
             self._inclination_angle(),
             clamp(
