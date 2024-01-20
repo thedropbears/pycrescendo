@@ -94,6 +94,12 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getAButton():
             self.shooter_component.set_inclination(math.radians(self.inclination_angle))
 
+        if self.gamepad.getLeftBumper():
+            self.climber_component.deploy()
+
+        if self.gamepad.getRightBumper():
+            self.climber_component.retract()
+
         # Cancel any running controllers
         if self.gamepad.getBackButtonPressed():
             self.cancel_controllers()
