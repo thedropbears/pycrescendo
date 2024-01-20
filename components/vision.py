@@ -139,7 +139,6 @@ class VisualLocalizer:
                 p.best,
                 p.alt,
                 self.chassis.get_pose(),
-                target.getPoseAmbiguity(),
             )
 
             # filter out likely bad targets
