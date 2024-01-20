@@ -20,13 +20,13 @@ from components.intake import IntakeComponent
 from controllers.shooter import Shooter
 
 import utilities.game as game
+from dataclasses import dataclass
 
 # Add controllers for intake and shooter when available
 
 from wpimath.geometry import Rotation2d, Translation2d
 import math
-
-from dataclasses import dataclass
+from utilities.position import NotePosition, ShootPosition
 
 
 @dataclass
@@ -41,25 +41,6 @@ class NotePaths:
     # They will automatically be flipped if we are blue
     pick_up_path: Path
     shoot_path: Path
-
-
-@dataclass
-class NodePosition:
-    translation: Translation2d
-    heading: Rotation2d
-
-
-# Order from the driver station 1-3
-# 1 is always the closest to the side of driver station 1
-NoteStage1 = NodePosition(Translation2d(13.69568, 6.90365), Rotation2d(0))
-NoteStage2 = NodePosition(Translation2d(13.69568, 5.45585), Rotation2d(0))
-NoteStage3 = NodePosition(Translation2d(13.69568, 4.00805), Rotation2d(0))
-NoteCentre1 = NodePosition(Translation2d(8.270875, 7.36085), Rotation2d(0))
-NoteCentre2 = NodePosition(Translation2d(8.270875, 5.68445), Rotation2d(0))
-NoteCentre3 = NodePosition(Translation2d(8.270875, 4.00805), Rotation2d(0))
-NoteCentre4 = NodePosition(Translation2d(8.270875, 2.33165), Rotation2d(0))
-NoteCentre5 = NodePosition(Translation2d(8.270875, 0.65525), Rotation2d(0))
-ShootPos1 = NodePosition(Translation2d(10, 5.45585), Rotation2d(0))
 
 
 class AutoBase(AutonomousStateMachine):
@@ -244,13 +225,13 @@ class Front2Note(AutoBase):
                 pick_up_path=Path(
                     [
                         Translation2d(14.8, 5.5),
-                        NoteStage2.translation,
+                        NotePosition.NoteStage2.translation,
                     ],
-                    NoteStage2.heading,
+                    NotePosition.NoteStage2.heading,
                 ),
                 shoot_path=Path(
-                    [ShootPos1.translation],
-                    rotation_to_red_speaker(ShootPos1.translation),
+                    [ShootPosition.ShootPos1.translation],
+                    rotation_to_red_speaker(ShootPosition.ShootPos1.translation),
                 ),
             )
         ]
