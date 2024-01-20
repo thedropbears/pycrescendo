@@ -31,7 +31,7 @@ class ClimberComponent:
     def deploy(self) -> None:
         self.deployed = True
 
-    def rectract(self) -> None:
+    def retract(self) -> None:
         self.deployed = False
 
     def execute(self) -> None:
