@@ -9,7 +9,7 @@ from ids import TalonIds
 
 
 class IntakeComponent:
-    motor_speed = tunable(1.0)
+    motor_speed = tunable(0.4)
 
     class Direction(Enum):
         BACKWARD = -1
@@ -22,7 +22,7 @@ class IntakeComponent:
 
         motor_configurator = self.motor.configurator
         motor_config = MotorOutputConfigs()
-        motor_config.inverted = config_groups.InvertedValue.CLOCKWISE_POSITIVE
+        motor_config.inverted = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
 
         motor_configurator.apply(motor_config)
 
