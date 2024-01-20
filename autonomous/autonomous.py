@@ -26,7 +26,7 @@ from dataclasses import dataclass
 
 from wpimath.geometry import Rotation2d, Translation2d
 import math
-from utilities.position import NotePosition, ShootPosition
+from utilities.position import NotePositions, ShootingPositions
 
 
 @dataclass
@@ -225,13 +225,13 @@ class Front2Note(AutoBase):
                 pick_up_path=Path(
                     [
                         Translation2d(14.8, 5.5),
-                        NotePosition.NoteStage2.translation,
+                        NotePositions.Stage2.translation,
                     ],
-                    NotePosition.NoteStage2.heading,
+                    NotePositions.Stage2.heading,
                 ),
                 shoot_path=Path(
-                    [ShootPosition.ShootPos1.translation],
-                    rotation_to_red_speaker(ShootPosition.ShootPos1.translation),
+                    [ShootingPositions.Pos1.translation],
+                    rotation_to_red_speaker(ShootingPositions.Pos1.translation),
                 ),
             )
         ]
