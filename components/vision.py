@@ -145,9 +145,11 @@ class VisualLocalizer:
             if target.getPoseAmbiguity() > 0.25:
                 continue
 
-            self.field_pos_obj.setPose(pose)
-            self.chassis.estimator.addVisionMeasurement(pose, results.getTimestamp())
-            change = self.chassis.get_pose().translation().distance(pose.translation())
+            self.field_pos_obj.setPose(pose[0])
+            self.chassis.estimator.addVisionMeasurement(pose[0], results.getTimestamp())
+            change = (
+                self.chassis.get_pose().translation().distance(pose[0].translation())
+            )
             if change > 1.0:
                 self.rejected_in_row += 1
                 if self.rejected_in_row < 10:
