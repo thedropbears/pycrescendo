@@ -21,7 +21,6 @@ class VisualLocalizer:
     """
 
     add_to_estimator = tunable(False)
-    show_res_on_field = tunable(False)
     should_log = tunable(False)
 
     rejected_in_row = tunable(0.0)
@@ -44,11 +43,8 @@ class VisualLocalizer:
         self.camera_to_robot = Transform3d(pos, rot).inverse()
         self.last_timestamp = -1
 
-        if self.show_res_on_field:
-            self.field_pos_obj = field.getObject("vision_pose")
-            self.pose_log_entry = wpiutil.log.DoubleArrayLogEntry(
-                data_log, "vision_pose"
-            )
+        self.field_pos_obj = field.getObject("vision_pose")
+        self.pose_log_entry = wpiutil.log.DoubleArrayLogEntry(data_log, "vision_pose")
 
         self.chassis = chassis
 
@@ -86,8 +82,7 @@ class VisualLocalizer:
                 p, self.camera_to_robot, self.chassis.get_pose()
             )
 
-            if self.show_res_on_field:
-                self.field_pos_obj.setPose(pose)
+            self.field_pos_obj.setPose(pose)
 
             if self.add_to_estimator:
                 self.chassis.estimator.addVisionMeasurement(
