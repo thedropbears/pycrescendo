@@ -1,5 +1,6 @@
-from rev import CANSparkMax, SparkLimitSwitch
-from ids import SparkMaxIds
+import wpilib
+from rev import CANSparkMax
+from ids import SparkMaxIds, DioChannels
 
 
 class ClimberComponent:
@@ -12,9 +13,8 @@ class ClimberComponent:
         self.climbing_motor = CANSparkMax(
             SparkMaxIds.climber, CANSparkMax.MotorType.kBrushless
         )
-        self.limit_switch = self.climbing_motor.getForwardLimitSwitch(
-            SparkLimitSwitch.Type.kNormallyOpen
-        )
+        # TODO determine if limit switch is normally open or closed.
+        self.limit_switch = wpilib.DigitalInput(DioChannels.climber_limit_switch)
         self.encoder = self.climbing_motor.getEncoder()
         self.encoder.setPositionConversionFactor(self.GEAR_RATIO)
         self.deployed = False
