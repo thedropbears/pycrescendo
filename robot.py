@@ -8,6 +8,7 @@ from magicbot import tunable
 from components.chassis import ChassisComponent
 from components.shooter import ShooterComponent
 from components.intake import IntakeComponent
+from components.climber import ClimberComponent
 
 from controllers.shooter import Shooter
 
@@ -24,6 +25,7 @@ class MyRobot(magicbot.MagicRobot):
     chassis: ChassisComponent
     shooter_component: ShooterComponent
     intake: IntakeComponent
+    climber_component: ClimberComponent
 
     max_speed = magicbot.tunable(ChassisComponent.max_wheel_speed * 0.95)
     inclination_angle = tunable(0.0)
