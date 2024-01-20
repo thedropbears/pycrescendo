@@ -40,7 +40,9 @@ class PatternState(IntEnum):
 class LightStrip:
     # QUESTION? Should lightstrip take channel as arg in init?
     #   or should this be delegated to a parent class of lightstrip and its init function
-    def __init__(self, strip_length: int, pwm_channel: PwmChannels) -> None:
+    def __init__(
+        self, strip_length: int, pwm_channel: PwmChannels = PwmChannels.led_strip
+    ) -> None:
         self.leds = wpilib.AddressableLED(pwm_channel)
         self.leds.setLength(strip_length)
         self.strip_length = strip_length
