@@ -27,5 +27,5 @@ class Climber(StateMachine):
     def retract_hook(self, initial_call: bool) -> None:
         if initial_call:
             self.climber_component.retract()
-        if self.climber_component.has_climb_finished:
+        if self.climber_component.has_climb_finished():
             self.done()
