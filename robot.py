@@ -12,6 +12,7 @@ from components.climber import ClimberComponent
 from components.led import LightStrip
 
 from controllers.shooter import Shooter
+from controllers.climber import Climber
 
 import math
 
@@ -21,6 +22,7 @@ from utilities.scalers import rescale_js
 class MyRobot(magicbot.MagicRobot):
     # Controllers
     shooter: Shooter
+    climber: Climber
 
     # Components
     chassis: ChassisComponent
@@ -83,6 +85,14 @@ class MyRobot(magicbot.MagicRobot):
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):
             self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
+
+        # Climbing arm controls
+
+        if self.gamepad.getLeftBumper():
+            self.climber.engage()
+
+        if self.gamepad.getRightBumper():
+            self.climber.climb()
 
     def testInit(self) -> None:
         pass
