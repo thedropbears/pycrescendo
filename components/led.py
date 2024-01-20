@@ -38,8 +38,10 @@ class PatternState(IntEnum):
 
 
 class LightStrip:
-    def __init__(self, strip_length: int) -> None:
-        self.leds = wpilib.AddressableLED(PwmChannels.led_strip)
+    # QUESTION? Should lightstrip take channel as arg in init?
+    #   or should this be delegated to a parent class of lightstrip and its init function
+    def __init__(self, strip_length: int, pwm_channel: PwmChannels) -> None:
+        self.leds = wpilib.AddressableLED(pwm_channel)
         self.leds.setLength(strip_length)
         self.strip_length = strip_length
 
@@ -63,6 +65,8 @@ class LightStrip:
 
     # TODO ADD FUNCTIONS TO CALL FROM ROBOT.PY
     #   Should only call set_state & set_colour
+    # Maybe should make parent of lightstrip called statuslights?
+    #   statuslights will only contain *public* function calls for robot.py to call
 
     def execute(self) -> None:
         if self.pattern_state in PATTERN_MAP:
@@ -81,7 +85,7 @@ class Pattern(ABC):
         self.speed = speed
 
     @abstractmethod
-    def update(self, colour: HSV, start_time) -> HSV:
+    def update(self, colour: HSV, start_time: float) -> HSV:
         return
 
 
@@ -89,7 +93,7 @@ class Pulse(Pattern):
     def __init__(self) -> None:
         super().__init__(PULSE_SPEED)
 
-    def update(self, colour: HSV, start_time) -> HSV:
+    def update(self, colour: HSV, start_time: float) -> HSV:
         elapsed_time = time.monotonic() - start_time
         brightness = math.cos(self.speed * elapsed_time * math.tau) >= 0
         return (colour[0], colour[1], round(MAX_BRIGHTNESS * brightness))
@@ -99,7 +103,7 @@ class Breathe(Pattern):
     def __init__(self) -> None:
         super().__init__(BREATHE_SPEED)
 
-    def update(self, colour: HSV, start_time) -> HSV:
+    def update(self, colour: HSV, start_time: float) -> HSV:
         elapsed_time = time.monotonic() - start_time
         brightness = (math.sin(self.speed * elapsed_time * math.tau) + 1) / 2
         return (colour[0], colour[1], round(MAX_BRIGHTNESS * brightness))
@@ -109,14 +113,14 @@ class Rainbow(Pattern):
     def __init__(self) -> None:
         super().__init__(RAINBOW_SPEED)
 
-    def update(self, colour: HSV, start_time) -> HSV:
+    def update(self, colour: HSV, start_time: float) -> HSV:
         elapsed_time = time.monotonic() - start_time
         hue = round(360 * (elapsed_time / self.speed % 1))
         return (hue, colour[1], MAX_BRIGHTNESS)
 
 
 class Morse(Pattern):
-    # NOTE Might be better to read this from a file?
+    # NOTE Might be better to read this data from a file?
     MESSAGES = (
         "KILL ALL HUMANS",
         "MORSE CODE IS FOR NERDS",
@@ -170,7 +174,7 @@ class Morse(Pattern):
         super().__init__(MORSE_SPEED)
         self.pick_new_message()
 
-    def update(self, colour: HSV, start_time) -> HSV:
+    def update(self, colour: HSV, start_time: float) -> HSV:
         elapsed_time = time.monotonic() - start_time
         if elapsed_time > self.message_time:
             return colour
@@ -192,10 +196,11 @@ class Morse(Pattern):
                 else:
                     return colour
 
-        # Default - should never be hit
-        return HsvColour.OFF
+        # Default (Should never be hit!)
+        return HsvColour.OFF.value
 
-    def pick_new_message(self):
+    def pick_new_message(self) -> None:
+        # QUESTION? Should functions take args or assume previous step already done
         self.message = self.random_message()
         self.morse_message = self.translate_message(self.message)
         self.message_length = self.calculate_message_length(self.morse_message)
@@ -229,6 +234,11 @@ class Morse(Pattern):
 
 
 # TODO Prefferably not at bottom of file :/
+#   Can I make more multiple scripts for the leds?
+#   Maybe in a folder?
+#   - led.py (main component)
+#   - led_constants.py (hsv colours, states, speeds)
+#   - led_patterns.py (stores pattern classes)
 PATTERN_MAP = {
     PatternState.PULSE: Pulse(),
     PatternState.BREATHE: Breathe(),
