@@ -9,7 +9,7 @@ from ids import TalonIds
 
 
 class IntakeComponent:
-    motor_speed = tunable(1.0)
+    motor_speed = tunable(0.4)
 
     class Direction(Enum):
         BACKWARD = -1
