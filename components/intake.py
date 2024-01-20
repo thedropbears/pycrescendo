@@ -22,7 +22,7 @@ class IntakeComponent:
 
         motor_configurator = self.motor.configurator
         motor_config = MotorOutputConfigs()
-        motor_config.inverted = config_groups.InvertedValue.CLOCKWISE_POSITIVE
+        motor_config.inverted = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
 
         motor_configurator.apply(motor_config)
 
