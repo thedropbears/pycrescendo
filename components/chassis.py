@@ -110,7 +110,7 @@ class SwerveModule:
         )
 
         drive_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
-            1 / self.DRIVE_GEAR_RATIO
+            self.DRIVE_MOTOR_REV_TO_METRES
         )
 
         # configuration for motor pid and feedforward
