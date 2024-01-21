@@ -49,8 +49,7 @@ class MyRobot(magicbot.MagicRobot):
     def rumble_for(self, intensity: float, duration: float):
         self.rumble_duration = duration
         self.rumble_timer.reset()
-        self.gamepad.setRumble(
-            wpilib.XboxController.RumbleType.kBothRumble, intensity)
+        self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, intensity)
 
     def short_rumble(self):
         self.rumble_for(0.4, 0.1)
@@ -66,8 +65,7 @@ class MyRobot(magicbot.MagicRobot):
         spin_rate = 4
         drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * self.max_speed
         drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * self.max_speed
-        drive_z = -rescale_js(self.gamepad.getRightX(),
-                              0.1, exponential=2) * spin_rate
+        drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
         local_driving = self.gamepad.getYButton()
         driver_inputs = (drive_x, drive_y, drive_z)
         if local_driving:
@@ -84,8 +82,7 @@ class MyRobot(magicbot.MagicRobot):
 
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):
-            self.gamepad.setRumble(
-                wpilib.XboxController.RumbleType.kBothRumble, 0)
+            self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
 
     def testInit(self) -> None:
         pass
@@ -99,8 +96,7 @@ class MyRobot(magicbot.MagicRobot):
             self.intake.intake()
 
         if self.gamepad.getAButton():
-            self.shooter_component.set_inclination(
-                math.radians(self.inclination_angle))
+            self.shooter_component.set_inclination(math.radians(self.inclination_angle))
 
         if self.gamepad.getLeftBumper():
             self.climber_component.deploy()
