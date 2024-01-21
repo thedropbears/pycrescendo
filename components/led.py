@@ -87,7 +87,7 @@ class Pattern(ABC):
 
     @abstractmethod
     def update(self, colour: HSV, start_time: float) -> HSV:
-        return
+        return colour
 
 
 class Pulse(Pattern):
