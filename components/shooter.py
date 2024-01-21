@@ -78,6 +78,12 @@ class ShooterComponent:
     def on_enable(self) -> None:
         self.inclinator_controller.reset()
 
+    def stop_injection(self) -> None:
+        self.should_inject = False
+
+    def set_flywheel_target(self, target_speed: float) -> None:
+        self.flywheel_target_speed = target_speed
+
     @feedback
     def is_ready(self) -> bool:
         """Is the shooter ready to fire?"""
@@ -111,7 +117,7 @@ class ShooterComponent:
     @feedback
     def is_flywheel_at_speed(self) -> bool:
         return (
-            abs(self.flywheel_target_speed - self.flywheel.get_velocity())
+            abs(self.flywheel_target_speed - self.flywheel.get_velocity().value)
             < self.FLYWHEEL_TOLERANCE
         )
 

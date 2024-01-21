@@ -65,7 +65,7 @@ class Shooter(StateMachine):
     def shooting(self) -> None:
         self.shooter_component.start_injection()
 
-    @state(first=True)
+    @state
     def resetting(self) -> None:
         self.shooter_component.stop_injection()
         self.done()
