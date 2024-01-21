@@ -10,7 +10,7 @@ from photonlibpy.photonTrackedTarget import PhotonTrackedTarget
 from photonlibpy.multiTargetPNPResult import PNPResult
 from wpimath.geometry import Pose2d, Rotation3d, Transform3d, Translation3d, Pose3d
 
-from components.chassis import Chassis
+from components.chassis import ChassisComponent
 from utilities.game import apriltag_layout
 
 
@@ -36,7 +36,7 @@ class VisualLocalizer:
         rot: Rotation3d,
         field: wpilib.Field2d,
         data_log: wpiutil.log.DataLog,
-        chassis: Chassis,
+        chassis: ChassisComponent,
     ) -> None:
         self.mid = 615
         self.camera = PhotonCamera(name)
