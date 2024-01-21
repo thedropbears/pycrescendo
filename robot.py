@@ -89,7 +89,7 @@ class MyRobot(magicbot.MagicRobot):
         # Climbing arm controls
 
         if self.gamepad.getLeftBumper():
-            self.climber.engage()
+            self.climber.deploy()
 
         if self.gamepad.getRightBumper():
             self.climber.climb()

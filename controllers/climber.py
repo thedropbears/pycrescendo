@@ -9,6 +9,9 @@ class Climber(StateMachine):
     def climb(self) -> None:
         self.button_pressed = True
 
+    def deploy(self) -> None:
+        self.engage()
+
     @state(must_finish=True, first=True)
     def extend_hook(self, initial_call: bool) -> None:
         if initial_call:
