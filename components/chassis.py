@@ -37,7 +37,7 @@ class SwerveModule:
     STEER_GEAR_RATIO = (14 / 50) * (10 / 60)
     WHEEL_CIRCUMFERENCE = 4 * 2.54 / 100 * math.pi
 
-    DRIVE_MOTOR_REV_TO_METRES = WHEEL_CIRCUMFERENCE * DRIVE_GEAR_RATIO
+    DRIVE_MOTOR_REV_TO_METRES = WHEEL_CIRCUMFERENCE * (1 / DRIVE_GEAR_RATIO)
     STEER_MOTOR_REV_TO_RAD = math.tau * STEER_GEAR_RATIO
 
     # limit the acceleration of the commanded speeds of the robot to what is actually
