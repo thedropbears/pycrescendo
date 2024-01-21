@@ -121,6 +121,10 @@ class VisualLocalizer:
                 )
 
         for target in results.getTargets():
+            # filter out likely bad targets
+            if target.getPoseAmbiguity() > 0.25:
+                continue
+
             poses = estimate_poses_from_apriltag(self.camera_to_robot, target)
             if poses is None:
                 # tag doesn't exist
@@ -132,10 +136,6 @@ class VisualLocalizer:
                 alt,
                 self.chassis.get_pose(),
             )
-
-            # filter out likely bad targets
-            if target.getPoseAmbiguity() > 0.25:
-                continue
 
             self.field_pos_obj.setPose(pose)
             self.chassis.estimator.addVisionMeasurement(pose, results.getTimestamp())
