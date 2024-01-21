@@ -38,7 +38,6 @@ class VisualLocalizer:
         data_log: wpiutil.log.DataLog,
         chassis: ChassisComponent,
     ) -> None:
-        self.mid = 615
         self.camera = PhotonCamera(name)
         self.camera_to_robot = Transform3d(pos, rot).inverse()
         self.last_timestamp = -1
@@ -68,13 +67,9 @@ class VisualLocalizer:
             return
         self.last_timestamp = timestamp
 
-        # old results cause pose estimator to crash and aren't very useful anyway
+        # TODO Figure out the latency issue
         # if abs(wpilib.Timer.getFPGATimestamp() - timestamp) > 0.5:
         #    return # IT FAILS HERE
-
-        # cs = [i.x for i in target.getDetectedCorners()]
-        # mid = ((cs[0] + cs[1])/2+(cs[2]+cs[3])/2)/2
-        # self.mid = mid
 
         if results.multiTagResult.estimatedPose.isPresent:
             p = results.multiTagResult.estimatedPose
@@ -170,7 +165,7 @@ def estimate_poses_from_apriltag(
     return best_pose.toPose2d(), alternate_pose, best_pose.z
 
 
-def get_target_skew(target: PhotonTrackedTarget):
+def get_target_skew(target: PhotonTrackedTarget) -> float:
     tag_to_cam = target.getBestCameraToTarget().inverse()
     return math.atan2(tag_to_cam.y, tag_to_cam.x)
 
@@ -191,7 +186,7 @@ def choose_pose_multi(
         return p2, estimated_pose.altReprojError
 
 
-def choose_pose(best_pose: Pose2d, alternate_pose: Pose2d, cur_robot: Pose2d):
+def choose_pose(best_pose: Pose2d, alternate_pose: Pose2d, cur_robot: Pose2d) -> Pose2d:
     """Picks either the best or alternate pose estimate"""
     best_dist = best_pose.translation().distance(cur_robot.translation())
     best_preferance = 1.2
