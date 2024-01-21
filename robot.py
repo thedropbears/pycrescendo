@@ -8,6 +8,7 @@ from magicbot import tunable
 from components.chassis import ChassisComponent
 from components.shooter import ShooterComponent
 from components.intake import IntakeComponent
+from components.climber import ClimberComponent
 
 from controllers.shooter import Shooter
 
@@ -24,6 +25,7 @@ class MyRobot(magicbot.MagicRobot):
     chassis: ChassisComponent
     shooter_component: ShooterComponent
     intake: IntakeComponent
+    climber_component: ClimberComponent
 
     max_speed = magicbot.tunable(ChassisComponent.max_wheel_speed * 0.95)
     inclination_angle = tunable(0.0)
@@ -92,6 +94,12 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getAButton():
             self.shooter_component.set_inclination(math.radians(self.inclination_angle))
 
+        if self.gamepad.getLeftBumper():
+            self.climber_component.deploy()
+
+        if self.gamepad.getRightBumper():
+            self.climber_component.retract()
+
         # Cancel any running controllers
         if self.gamepad.getBackButtonPressed():
             self.cancel_controllers()
@@ -100,11 +108,12 @@ class MyRobot(magicbot.MagicRobot):
 
         self.intake.execute()
         self.shooter_component.execute()
+        self.climber_component.execute()
 
         self.chassis.update_odometry()
 
     def cancel_controllers(self):
-        pass
+        self.climber_component.stop()
 
     def disabledPeriodic(self) -> None:
         self.chassis.update_odometry()
