@@ -58,7 +58,9 @@ class VisualLocalizer:
         if wpilib.RobotBase.isSimulation():
             return
         # if results didn't see any targets
-        if not (results := self.camera.getLatestResult()).getTargets():
+
+        results = self.camera.getLatestResult()
+        if not results.getTargets():
             return
 
         # if we have already processed these results
