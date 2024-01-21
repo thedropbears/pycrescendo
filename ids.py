@@ -38,4 +38,5 @@ class SparkMaxIds(enum.IntEnum):
 @enum.unique
 class DioChannels(enum.IntEnum):
     inclinator_encoder = 1  # TODO Change to the correct ID
-    climber_limit_switch = 2
+    climber_deploy_switch = 3
+    climber_retract_switch = 4

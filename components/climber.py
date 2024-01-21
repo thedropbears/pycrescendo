@@ -1,48 +1,61 @@
 import wpilib
+from magicbot import feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, DioChannels
 
 
 class ClimberComponent:
-    # TODO get real values
-    CURRENT_STALL_LEVELS = 10
-    CLIMB_COMPLETE_ROTATION = 20  # the number of rotations needed to complete the climb as measured on the shaft
-    GEAR_RATIO = 1  # using a Neo with 4:1 4:1 3:1 ratio (numbers havent been tuned)
+    GEAR_RATIO = (
+        1 / 48
+    )  # using a Neo with 4:1 4:1 3:1 ratio (numbers havent been tuned)
 
     def __init__(self) -> None:
         self.climbing_motor = CANSparkMax(
             SparkMaxIds.climber, CANSparkMax.MotorType.kBrushless
         )
-        # TODO determine if limit switch is normally open or closed.
-        self.limit_switch = wpilib.DigitalInput(DioChannels.climber_limit_switch)
+        self.deploy_limit_switch = wpilib.DigitalInput(
+            DioChannels.climber_deploy_switch
+        )
+        self.retract_limit_switch = wpilib.DigitalInput(
+            DioChannels.climber_retract_switch
+        )
+        self.last_limit_switch_state = self.deploy_limit_switch.get()
         self.encoder = self.climbing_motor.getEncoder()
-        self.encoder.setPositionConversionFactor(self.GEAR_RATIO)
+        self.encoder_offset = 0
         self.deployed = False
+        self.stopped = True
 
+    @feedback
     def has_climb_finished(self):
-        if self.encoder.getPosition() >= self.CLIMB_COMPLETE_ROTATION:
-            return self.climbing_motor.getOutputCurrent() >= self.CURRENT_STALL_LEVELS
-        else:
-            return False
+        return not self.retract_limit_switch.get()
 
+    @feedback
     def has_deploy_finished(self):
-        return self.limit_switch.get()
+        return not self.deploy_limit_switch.get()
+
+    def stop(self):
+        self.stopped = True
 
     def deploy(self) -> None:
         self.deployed = True
+        self.stopped = False
 
     def retract(self) -> None:
         self.deployed = False
+        self.stopped = False
 
     def execute(self) -> None:
-        if self.deployed:
-            # Deploy the climber
-            if self.has_deploy_finished():
-                self.climbing_motor.set(0)
-            else:
-                self.climbing_motor.set(0.5)
+        if self.stopped:
+            self.climbing_motor.set(0)
         else:
-            if self.has_climb_finished():
-                self.climbing_motor.set(0)
+            if self.deployed:
+                # Deploy the climber
+                if self.has_deploy_finished():
+                    self.climbing_motor.set(0)
+                else:
+                    self.climbing_motor.set(0.5)
             else:
-                self.climbing_motor.set(-0.5)
+                if self.has_climb_finished():
+                    self.climbing_motor.set(0)
+                else:
+                    self.climbing_motor.set(-0.5)
