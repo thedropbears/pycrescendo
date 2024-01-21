@@ -145,10 +145,10 @@ class SwerveModule:
 
     def get_speed(self) -> float:
         # velocity is in rot/s, return in m/s
-        return self.drive.get_velocity().value * self.WHEEL_CIRCUMFERENCE
+        return self.drive.get_velocity().value
 
     def get_distance_traveled(self) -> float:
-        return self.drive.get_position().value * self.WHEEL_CIRCUMFERENCE
+        return self.drive.get_position().value
 
     def set(self, desired_state: SwerveModuleState):
         if self.module_locked:
