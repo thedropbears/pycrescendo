@@ -6,13 +6,6 @@ class Climber(StateMachine):
     climber_component: ClimberComponent
     button_pressed = will_reset_to(False)
 
-    def setup(self) -> None:
-        pass
-
-    def __init__(self) -> None:
-        self.button_pressed = False
-        super().__init__()
-
     def climb(self) -> None:
         self.button_pressed = True
 
@@ -20,7 +13,7 @@ class Climber(StateMachine):
     def extend_hook(self, initial_call: bool) -> None:
         if initial_call:
             self.climber_component.deploy()
-        if self.climber_component.has_deploy_finished() & self.button_pressed:
+        if self.climber_component.has_deploy_finished() and self.button_pressed:
             self.next_state("retract_hook")
 
     @state(must_finish=True)
