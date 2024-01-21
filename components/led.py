@@ -40,10 +40,8 @@ class PatternState(IntEnum):
 class LightStrip:
     # QUESTION? Should lightstrip take channel as arg in init?
     #   or should this be delegated to a parent class of lightstrip and its init function
-    def __init__(
-        self, strip_length: int, pwm_channel: PwmChannels = PwmChannels.led_strip
-    ) -> None:
-        self.leds = wpilib.AddressableLED(pwm_channel)
+    def __init__(self, strip_length: int) -> None:
+        self.leds = wpilib.AddressableLED(PwmChannels.led_strip)
         self.leds.setLength(strip_length)
         self.strip_length = strip_length
 
@@ -62,7 +60,7 @@ class LightStrip:
         self.pattern_state = new_pattern
         self.pattern_start_time = time.monotonic()
 
-    def set_colour(self, new_colour: HsvColour) -> None:
+    def set_colour(self, new_colour: HSV) -> None:
         self.colour = new_colour
 
     # TODO ADD FUNCTIONS TO CALL FROM ROBOT.PY
@@ -80,6 +78,7 @@ class LightStrip:
 
         self.led_data.setHSV(*colour)
         self.leds.setData(self.strip_data)
+        return
 
 
 class Pattern(ABC):
@@ -182,7 +181,7 @@ class Morse(Pattern):
             return colour
 
         # TODO Might be better to store current token index and time?
-        running_total = 0
+        running_total = 0.0
         for token in self.morse_message:
             if token == ".":
                 running_total += self.DOT_LENGTH * self.speed
