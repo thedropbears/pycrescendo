@@ -98,7 +98,7 @@ class Pulse(Pattern):
     def update(self, colour: HSV, start_time: float) -> HSV:
         elapsed_time = time.monotonic() - start_time
         brightness = math.cos(self.speed * elapsed_time * math.tau) >= 0
-        return (colour[0], colour[1], round(MAX_BRIGHTNESS * brightness))
+        return (colour[0], colour[1], int(MAX_BRIGHTNESS * brightness))
 
 
 class Breathe(Pattern):
@@ -108,7 +108,7 @@ class Breathe(Pattern):
     def update(self, colour: HSV, start_time: float) -> HSV:
         elapsed_time = time.monotonic() - start_time
         brightness = (math.sin(self.speed * elapsed_time * math.tau) + 1) / 2
-        return (colour[0], colour[1], round(MAX_BRIGHTNESS * brightness))
+        return (colour[0], colour[1], int(MAX_BRIGHTNESS * brightness))
 
 
 class Rainbow(Pattern):
