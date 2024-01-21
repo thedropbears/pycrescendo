@@ -76,9 +76,9 @@ class VisualLocalizer:
         # mid = ((cs[0] + cs[1])/2+(cs[2]+cs[3])/2)/2
         # self.mid = mid
 
-        if results.multiTagResult.estimatedPose.isPresent():
+        if results.multiTagResult.estimatedPose.isPresent:
             p = results.multiTagResult.estimatedPose
-            pose, reprojectionErr = choose_pose(
+            pose, reprojectionErr = choose_pose_multi(
                 p, self.camera_to_robot, self.chassis.get_pose()
             )
 
@@ -129,10 +129,10 @@ class VisualLocalizer:
                 # tag doesn't exist
                 continue
 
-            p.best, p.alt, self.last_pose_z = poses
+            best, alt, self.last_pose_z = poses
             pose = choose_pose(
-                p.best,
-                p.alt,
+                best,
+                alt,
                 self.chassis.get_pose(),
             )
 
@@ -140,11 +140,9 @@ class VisualLocalizer:
             if target.getPoseAmbiguity() > 0.25:
                 continue
 
-            self.field_pos_obj.setPose(pose[0])
-            self.chassis.estimator.addVisionMeasurement(pose[0], results.getTimestamp())
-            change = (
-                self.chassis.get_pose().translation().distance(pose[0].translation())
-            )
+            self.field_pos_obj.setPose(pose)
+            self.chassis.estimator.addVisionMeasurement(pose, results.getTimestamp())
+            change = self.chassis.get_pose().translation().distance(pose.translation())
             if change > 1.0:
                 self.rejected_in_row += 1
                 if self.rejected_in_row < 10:
@@ -177,7 +175,7 @@ def get_target_skew(target: PhotonTrackedTarget):
     return math.atan2(tag_to_cam.y, tag_to_cam.x)
 
 
-def choose_pose(
+def choose_pose_multi(
     estimated_pose: PNPResult, cam_to_robot: Transform3d, cur_pos: Pose2d
 ) -> tuple[Pose2d, float]:
     """Picks either the best or alternate pose estimate"""
@@ -191,3 +189,17 @@ def choose_pose(
         return p, estimated_pose.bestReprojError
     else:
         return p2, estimated_pose.altReprojError
+
+
+def choose_pose(best_pose: Pose2d, alternate_pose: Pose2d, cur_robot: Pose2d):
+    """Picks either the best or alternate pose estimate"""
+    best_dist = best_pose.translation().distance(cur_robot.translation())
+    best_preferance = 1.2
+    alternate_dist = (
+        alternate_pose.translation().distance(cur_robot.translation()) * best_preferance
+    )
+
+    if best_dist < alternate_dist:
+        return best_pose
+    else:
+        return alternate_pose
