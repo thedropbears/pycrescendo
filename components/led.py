@@ -11,7 +11,7 @@ from ids import PwmChannels
 MAX_BRIGHTNESS = 50  # Integer value 0-255
 HSV = tuple[int, int, int]
 
-PULSE_SPEED = 2
+FLASH_SPEED = 2
 BREATHE_SPEED = 4
 RAINBOW_SPEED = 8
 MORSE_SPEED = 0.2
@@ -31,7 +31,7 @@ class HsvColour(Enum):
 
 class PatternState(IntEnum):
     SOLID = 1
-    PULSE = 2
+    FLASH = 2
     BREATHE = 3
     RAINBOW = 4
     MORSE = 5
@@ -68,6 +68,40 @@ class LightStrip:
     # Maybe should make parent of lightstrip called statuslights?
     #   statuslights will only contain *public* function calls for robot.py to call
 
+    def want_note(self) -> None:
+        self.set_colour(HsvColour.MAGENTA.value)
+        self.set_state(PatternState.FLASH)
+
+    def holding_note(self) -> None:
+        self.set_colour(HsvColour.GREEN.value)
+        self.set_state(PatternState.SOLID)
+
+    def shooting(self) -> None:
+        self.set_colour(HsvColour.ORANGE.value)
+        self.set_state(PatternState.SOLID)
+
+    def intaking(self) -> None:
+        self.set_colour(HsvColour.CYAN.value)
+        self.set_state(PatternState.SOLID)
+
+    def climbing(self) -> None:
+        self.set_colour(HsvColour.YELLOW.value)
+        self.set_state(PatternState.SOLID)
+
+    def morse(self) -> None:
+        self.set_colour(HsvColour.YELLOW.value)
+        self.set_state(PatternState.MORSE)
+
+    def idle(self) -> None:
+        self.set_colour(HsvColour.RED.value)
+        self.set_state(PatternState.RAINBOW)
+
+    def disabled(self) -> None:
+        self.set_colour(HsvColour.WHITE.value)
+        self.set_state(PatternState.SOLID)
+
+    # --------------------------------------------------------------------
+
     def execute(self) -> None:
         if self.pattern_state in PATTERN_MAP:
             colour = PATTERN_MAP[self.pattern_state].update(
@@ -90,9 +124,9 @@ class Pattern(ABC):
         return colour
 
 
-class Pulse(Pattern):
+class Flash(Pattern):
     def __init__(self) -> None:
-        super().__init__(PULSE_SPEED)
+        super().__init__(FLASH_SPEED)
 
     def update(self, colour: HSV, start_time: float) -> HSV:
         elapsed_time = time.monotonic() - start_time
@@ -241,7 +275,7 @@ class Morse(Pattern):
 #   - led_constants.py (hsv colours, states, speeds)
 #   - led_patterns.py (stores pattern classes)
 PATTERN_MAP = {
-    PatternState.PULSE: Pulse(),
+    PatternState.FLASH: Flash(),
     PatternState.BREATHE: Breathe(),
     PatternState.RAINBOW: Rainbow(),
     PatternState.MORSE: Morse(),
