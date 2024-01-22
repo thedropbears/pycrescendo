@@ -139,7 +139,7 @@ class MyRobot(magicbot.MagicRobot):
 
     def disabledPeriodic(self) -> None:
         self.chassis.update_odometry()
-        
+
         self.lights.execute()
         self.vision.execute()
 
