@@ -20,6 +20,10 @@ class VisualLocalizer:
     using information from a single PhotonVision camera.
     """
 
+    BEST_POSE_BIAS = (
+        1.2  # Give bias to the best pose by multiplying this const to the alt dist
+    )
+
     add_to_estimator = tunable(False)
     should_log = tunable(False)
 
@@ -167,9 +171,11 @@ def choose_pose_multi(
     """Picks either the best or alternate pose estimate"""
     p = (Pose3d() + estimated_pose.best + cam_to_robot).toPose2d()
     best_dist = p.translation().distance(cur_pos.translation())
-    best_preferance = 1.2
     p2 = (Pose3d() + estimated_pose.alt + cam_to_robot).toPose2d()
-    alt_dist = p2.translation().distance(cur_pos.translation()) * best_preferance
+    alt_dist = (
+        p2.translation().distance(cur_pos.translation())
+        * VisualLocalizer.BEST_POSE_BIAS
+    )
 
     if best_dist < alt_dist:
         return p, estimated_pose.bestReprojError
@@ -180,9 +186,9 @@ def choose_pose_multi(
 def choose_pose(best_pose: Pose2d, alternate_pose: Pose2d, cur_robot: Pose2d) -> Pose2d:
     """Picks either the best or alternate pose estimate"""
     best_dist = best_pose.translation().distance(cur_robot.translation())
-    best_preferance = 1.2
     alternate_dist = (
-        alternate_pose.translation().distance(cur_robot.translation()) * best_preferance
+        alternate_pose.translation().distance(cur_robot.translation())
+        * VisualLocalizer.BEST_POSE_BIAS
     )
 
     if best_dist < alternate_dist:
