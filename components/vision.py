@@ -138,7 +138,9 @@ class VisualLocalizer:
             )
 
             self.field_pos_obj.setPose(pose)
-            self.chassis.estimator.addVisionMeasurement(pose, results.getTimestamp())
+            self.chassis.estimator.addVisionMeasurement(
+                pose, results.getTimestamp() / 1e12
+            )
             change = self.chassis.get_pose().translation().distance(pose.translation())
             if change > 1.0:
                 self.rejected_in_row += 1
