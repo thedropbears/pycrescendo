@@ -5,9 +5,9 @@ from typing import Optional
 import wpilib
 import wpiutil.log
 from magicbot import tunable
-from photonlibpy.photonCamera import PhotonCamera
-from photonlibpy.photonTrackedTarget import PhotonTrackedTarget
-from photonlibpy.multiTargetPNPResult import PNPResult
+from photonlibpy.photonCamera import PhotonCamera  # type: ignore
+from photonlibpy.photonTrackedTarget import PhotonTrackedTarget  # type: ignore
+from photonlibpy.multiTargetPNPResult import PNPResult  # type: ignore
 from wpimath.geometry import Pose2d, Rotation3d, Transform3d, Translation3d, Pose3d
 
 from components.chassis import ChassisComponent
@@ -96,10 +96,10 @@ class VisualLocalizer:
                 trans_error2: float = ground_truth_pose.translation().distance(
                     p.alt.translation()
                 )
-                rot_error1: float = (  # type: ignore
+                rot_error1: float = (
                     ground_truth_pose.rotation() - p.best.rotation()
                 ).radians()
-                rot_error2: float = (  # type: ignore
+                rot_error2: float = (
                     ground_truth_pose.rotation() - p.alt.rotation()
                 ).radians()
 
