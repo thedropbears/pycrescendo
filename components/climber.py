@@ -5,9 +5,7 @@ from ids import SparkMaxIds, DioChannels
 
 
 class ClimberComponent:
-    GEAR_RATIO = (
-        1 / 48
-    )  # using a Neo with 4:1 4:1 3:1 ratio (numbers havent been tuned)
+    GEAR_RATIO = 1 / 48  # using a Neo with 4:1 4:1 3:1 ratio
 
     def __init__(self) -> None:
         self.climbing_motor = CANSparkMax(
@@ -19,9 +17,6 @@ class ClimberComponent:
         self.retract_limit_switch = wpilib.DigitalInput(
             DioChannels.climber_retract_switch
         )
-        self.last_limit_switch_state = self.deploy_limit_switch.get()
-        self.encoder = self.climbing_motor.getEncoder()
-        self.encoder_offset = 0
         self.deployed = False
         self.stopped = True
 
