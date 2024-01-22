@@ -118,27 +118,27 @@ class VisualLocalizer:
                         ground_truth_pose.y,
                     ]
                 )
+        else:
+            for target in results.getTargets():
+                # filter out likely bad targets
+                if target.getPoseAmbiguity() > 0.25:
+                    continue
 
-        for target in results.getTargets():
-            # filter out likely bad targets
-            if target.getPoseAmbiguity() > 0.25:
-                continue
+                poses = estimate_poses_from_apriltag(self.camera_to_robot, target)
+                if poses is None:
+                    # tag doesn't exist
+                    continue
 
-            poses = estimate_poses_from_apriltag(self.camera_to_robot, target)
-            if poses is None:
-                # tag doesn't exist
-                continue
+                best, alt, self.last_pose_z = poses
+                pose = choose_pose(
+                    best,
+                    alt,
+                    self.chassis.get_pose(),
+                )
 
-            best, alt, self.last_pose_z = poses
-            pose = choose_pose(
-                best,
-                alt,
-                self.chassis.get_pose(),
-            )
-
-            self.field_pos_obj.setPose(pose)
-            timestamp_sec = results.getTimestamp() / 1e12
-            self.chassis.estimator.addVisionMeasurement(pose, timestamp_sec)
+                self.field_pos_obj.setPose(pose)
+                timestamp_sec = results.getTimestamp() / 1e12
+                self.chassis.estimator.addVisionMeasurement(pose, timestamp_sec)
 
 
 def estimate_poses_from_apriltag(
