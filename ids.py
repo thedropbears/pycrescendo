@@ -40,3 +40,8 @@ class DioChannels(enum.IntEnum):
     inclinator_encoder = 1  # TODO Change to the correct ID
     climber_deploy_switch = 3
     climber_retract_switch = 4
+
+
+@enum.unique
+class PwmChannels(enum.IntEnum):
+    led_strip = 1  # TODO Change to the correct ID

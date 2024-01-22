@@ -9,6 +9,7 @@ from components.chassis import ChassisComponent
 from components.shooter import ShooterComponent
 from components.intake import IntakeComponent
 from components.climber import ClimberComponent
+from components.led import LightStrip
 
 from controllers.shooter import Shooter
 
@@ -26,6 +27,7 @@ class MyRobot(magicbot.MagicRobot):
     shooter_component: ShooterComponent
     intake: IntakeComponent
     climber_component: ClimberComponent
+    lights: LightStrip
 
     max_speed = magicbot.tunable(ChassisComponent.max_wheel_speed * 0.95)
     inclination_angle = tunable(0.0)
@@ -41,6 +43,8 @@ class MyRobot(magicbot.MagicRobot):
 
         self.field = wpilib.Field2d()
         wpilib.SmartDashboard.putData(self.field)
+
+        self.lights_strip_length = 144  # TODO Change to correct length
 
     def rumble_for(self, intensity: float, duration: float):
         self.rumble_duration = duration
@@ -117,6 +121,7 @@ class MyRobot(magicbot.MagicRobot):
 
     def disabledPeriodic(self) -> None:
         self.chassis.update_odometry()
+        self.lights.execute()
 
     def autonomousInit(self) -> None:
         pass
