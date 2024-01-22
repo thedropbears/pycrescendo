@@ -23,7 +23,6 @@ class VisualLocalizer:
     add_to_estimator = tunable(False)
     should_log = tunable(False)
 
-    rejected_in_row = tunable(0.0)
     last_pose_z = tunable(0.0, writeDefault=False)
 
     def __init__(
@@ -57,9 +56,9 @@ class VisualLocalizer:
         # stop warnings in simulation
         if wpilib.RobotBase.isSimulation():
             return
-        # if results didn't see any targets
 
         results = self.camera.getLatestResult()
+        # if results didn't see any targets
         if not results.getTargets():
             return
 
@@ -68,10 +67,6 @@ class VisualLocalizer:
         if timestamp == self.last_timestamp and wpilib.RobotBase.isReal():
             return
         self.last_timestamp = timestamp
-
-        # TODO Figure out the latency issue
-        # if abs(wpilib.Timer.getFPGATimestamp() - timestamp) > 0.5:
-        #    return # IT FAILS HERE
 
         if results.multiTagResult.estimatedPose.isPresent:
             p = results.multiTagResult.estimatedPose
@@ -138,16 +133,8 @@ class VisualLocalizer:
             )
 
             self.field_pos_obj.setPose(pose)
-            self.chassis.estimator.addVisionMeasurement(
-                pose, results.getTimestamp() / 1e12
-            )
-            change = self.chassis.get_pose().translation().distance(pose.translation())
-            if change > 1.0:
-                self.rejected_in_row += 1
-                if self.rejected_in_row < 10:
-                    continue
-            else:
-                self.rejected_in_row //= 2
+            timestamp_sec = results.getTimestamp() / 1e12
+            self.chassis.estimator.addVisionMeasurement(pose, timestamp_sec)
 
 
 def estimate_poses_from_apriltag(
