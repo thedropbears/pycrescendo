@@ -4,10 +4,10 @@ from components.climber import ClimberComponent
 
 class Climber(StateMachine):
     climber_component: ClimberComponent
-    button_pressed = will_reset_to(False)
+    should_climb = will_reset_to(False)
 
     def climb(self) -> None:
-        self.button_pressed = True
+        self.should_climb = True
 
     def deploy(self) -> None:
         self.engage()
