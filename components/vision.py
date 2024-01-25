@@ -45,7 +45,7 @@ class VisualLocalizer:
         self.last_timestamp = -1
 
         self.field_pos_obj = field.getObject("vision_pose")
-        self.pose_log_entry = wpiutil.log.DoubleArrayLogEntry(data_log, "vision_pose")
+        self.pose_log_entry = wpiutil.log.FloatArrayLogEntry(data_log, "vision_pose")
 
         self.chassis = chassis
 
