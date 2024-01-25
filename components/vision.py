@@ -6,7 +6,6 @@ import wpiutil.log
 from magicbot import tunable
 from photonlibpy.photonCamera import PhotonCamera  # type: ignore
 from photonlibpy.photonTrackedTarget import PhotonTrackedTarget  # type: ignore
-from photonlibpy.multiTargetPNPResult import PNPResult  # type: ignore
 from wpimath.geometry import Pose2d, Rotation3d, Transform3d, Translation3d, Pose3d
 
 from components.chassis import ChassisComponent
@@ -77,9 +76,8 @@ class VisualLocalizer:
 
         if results.multiTagResult.estimatedPose.isPresent:
             p = results.multiTagResult.estimatedPose
-            pose, reprojectionErr = choose_pose_multi(
-                p, self.camera_to_robot, self.chassis.get_pose()
-            )
+            pose = (Pose3d() + p.best + self.camera_to_robot).toPose2d()
+            reprojectionErr = p.bestReprojError
 
             self.field_pos_obj.setPose(pose)
 
@@ -170,24 +168,6 @@ def estimate_poses_from_apriltag(
 def get_target_skew(target: PhotonTrackedTarget) -> float:
     tag_to_cam = target.getBestCameraToTarget().inverse()
     return math.atan2(tag_to_cam.y, tag_to_cam.x)
-
-
-def choose_pose_multi(
-    estimated_pose: PNPResult, cam_to_robot: Transform3d, cur_pos: Pose2d
-) -> tuple[Pose2d, float]:
-    """Picks either the best or alternate pose estimate"""
-    p = (Pose3d() + estimated_pose.best + cam_to_robot).toPose2d()
-    best_dist = p.translation().distance(cur_pos.translation())
-    p2 = (Pose3d() + estimated_pose.alt + cam_to_robot).toPose2d()
-    alt_dist = (
-        p2.translation().distance(cur_pos.translation())
-        * VisualLocalizer.BEST_POSE_BIAS
-    )
-
-    if best_dist < alt_dist:
-        return p, estimated_pose.bestReprojError
-    else:
-        return p2, estimated_pose.altReprojError
 
 
 def choose_pose(best_pose: Pose2d, alternate_pose: Pose2d, cur_robot: Pose2d) -> Pose2d:
