@@ -38,7 +38,7 @@ class ClimberComponent:
     def retract(self) -> None:
         self.deployed = False
         if self.has_climb_finished():
-            self.speed = 0
+            self.speed = 0.0
         else:
             self.speed = -0.5
 
