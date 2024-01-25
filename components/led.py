@@ -48,10 +48,10 @@ class LightStrip:
         self.led_data = wpilib.AddressableLED.LEDData()
         self.strip_data = [self.led_data] * strip_length
 
-        self.pattern_state = PatternState.MORSE
+        self.pattern_state = PatternState.RAINBOW
         self.pattern_start_time = time.monotonic()
 
-        self.colour: HSV = HsvColour.BLUE.value
+        self.colour: HSV = HsvColour.MAGENTA.value
         self.led_data.setHSV(*self.colour)
         self.leds.setData(self.strip_data)
         self.leds.start()
