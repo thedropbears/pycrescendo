@@ -40,7 +40,7 @@ class PhysicsEngine:
         self.wheels = [
             SimpleTalonFXMotorSim(
                 module.drive,
-                kV=0.1,  # TODO: get from sysid logs
+                kV=2.7,
             )
             for module in robot.chassis.modules
         ]
