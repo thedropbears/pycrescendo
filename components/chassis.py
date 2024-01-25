@@ -134,7 +134,7 @@ class SwerveModule:
 
     def get_angle_integrated(self) -> float:
         """Gets steer angle from motor's integrated relative encoder"""
-        return self.steer.get_position().value * math.tau
+        return self.steer.get_position().value
 
     def get_rotation(self) -> Rotation2d:
         """Get the steer angle as a Rotation2d"""
@@ -182,9 +182,7 @@ class SwerveModule:
 
         # original position change/100ms, new m/s -> rot/s
         self.drive.set_control(
-            self.drive_request.with_velocity(
-                target_speed / self.WHEEL_CIRCUMFERENCE
-            ).with_feed_forward(speed_volt)
+            self.drive_request.with_velocity(target_speed).with_feed_forward(speed_volt)
         )
 
     def sync_steer_encoder(self) -> None:
