@@ -134,7 +134,7 @@ class SwerveModule:
 
     def get_angle_integrated(self) -> float:
         """Gets steer angle from motor's integrated relative encoder"""
-        return self.steer.get_position().value
+        return self.steer.get_position().value * math.tau
 
     def get_rotation(self) -> Rotation2d:
         """Get the steer angle as a Rotation2d"""
