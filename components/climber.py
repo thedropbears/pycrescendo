@@ -1,11 +1,12 @@
 import wpilib
-from magicbot import feedback
+from magicbot import feedback, will_reset_to
 from rev import CANSparkMax
 from ids import SparkMaxIds, DioChannels
 
 
 class ClimberComponent:
     GEAR_RATIO = 1 / 48  # using a Neo with 4:1 4:1 3:1 ratio
+    speed = will_reset_to(0)
 
     def __init__(self) -> None:
         self.climbing_motor = CANSparkMax(
@@ -18,7 +19,6 @@ class ClimberComponent:
             DioChannels.climber_retract_switch
         )
         self.deployed = False
-        self.stopped = True
 
     @feedback
     def has_climb_finished(self):
@@ -28,29 +28,19 @@ class ClimberComponent:
     def has_deploy_finished(self):
         return not self.deploy_limit_switch.get()
 
-    def stop(self):
-        self.stopped = True
-
     def deploy(self) -> None:
         self.deployed = True
-        self.stopped = False
+        if self.has_deploy_finished():
+            self.speed = 0
+        else:
+            self.speed = 0.5
 
     def retract(self) -> None:
         self.deployed = False
-        self.stopped = False
+        if self.has_climb_finished():
+            self.speed = 0
+        else:
+            self.speed = -0.5
 
     def execute(self) -> None:
-        if self.stopped:
-            self.climbing_motor.set(0)
-        else:
-            if self.deployed:
-                # Deploy the climber
-                if self.has_deploy_finished():
-                    self.climbing_motor.set(0)
-                else:
-                    self.climbing_motor.set(0.5)
-            else:
-                if self.has_climb_finished():
-                    self.climbing_motor.set(0)
-                else:
-                    self.climbing_motor.set(-0.5)
+        self.climbing_motor.set(self.speed)
