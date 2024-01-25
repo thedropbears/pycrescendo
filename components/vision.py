@@ -1,5 +1,4 @@
 import math
-import typing
 from typing import Optional
 
 import wpilib
@@ -88,34 +87,14 @@ class VisualLocalizer:
                 )
 
             if self.should_log:
-                ground_truth_pose = self.chassis.get_pose()
-                trans_error1: float = ground_truth_pose.translation().distance(
-                    p.best.translation()
-                )
-                trans_error2: float = ground_truth_pose.translation().distance(
-                    p.alt.translation()
-                )
-                rot_error1: float = (
-                    ground_truth_pose.rotation() - p.best.rotation()
-                ).radians()
-                rot_error2: float = (
-                    ground_truth_pose.rotation() - p.alt.rotation()
-                ).radians()
-
                 self.pose_log_entry.append(
                     [
                         p.best.x,
                         p.best.y,
-                        typing.cast(float, p.best.rotation().radians()),
-                        trans_error1,  # error of main pose
-                        rot_error1,
+                        p.best.rotation().toRotation2d().radians(),
                         p.alt.x,
                         p.alt.y,
-                        typing.cast(float, p.alt.rotation().radians()),
-                        trans_error2,
-                        rot_error2,
-                        ground_truth_pose.x,
-                        ground_truth_pose.y,
+                        p.alt.rotation().toRotation2d().radians(),
                     ]
                 )
         else:
