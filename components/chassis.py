@@ -114,10 +114,8 @@ class SwerveModule:
         )
 
         # configuration for motor pid and feedforward
-        self.drive_pid = (
-            Slot0Configs().with_k_p(0.026450530596285438).with_k_i(0).with_k_d(0)
-        )
-        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
+        self.drive_pid = Slot0Configs().with_k_p(0.046062).with_k_i(0).with_k_d(0)
+        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.14039, kV=2.7253, kA=0.09923)
 
         drive_config.apply(drive_motor_config)
         drive_config.apply(self.drive_pid, 0.01)
