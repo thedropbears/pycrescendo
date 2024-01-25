@@ -1,3 +1,4 @@
+import math
 from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
@@ -9,7 +10,6 @@ from phoenix6.signals import NeutralModeValue
 from wpilib import DigitalInput, DutyCycle, SmartDashboard
 from wpimath.controller import PIDController
 
-import math
 from utilities.functions import clamp
 
 

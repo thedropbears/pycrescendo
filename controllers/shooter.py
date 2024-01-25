@@ -1,10 +1,9 @@
+from math import atan2
 from magicbot import StateMachine, state, timed_state, default_state, will_reset_to
 from components.chassis import ChassisComponent
 from components.shooter import ShooterComponent
 
 from utilities.game import get_goal_speaker_position
-
-from math import atan2
 
 
 class Shooter(StateMachine):
@@ -13,8 +12,12 @@ class Shooter(StateMachine):
     button_pressed = will_reset_to(False)
     SHOOTING_TIME_DURATION = 3
 
-    def setup(self) -> None:
-        pass
+    FLYWHEEL_SPEED_MAP = {}
+    INCLINATION_ANGLE_MAP = {}
+
+    def shoot(self) -> None:
+        self.button_pressed = True
+        self.engage()
 
     def update_ranging(self) -> None:
         dist = (
@@ -36,19 +39,21 @@ class Shooter(StateMachine):
 
     @state(first=True)
     def acquiring(self) -> None:
-        # determine heading required for goal
+        # NOTE Turret can't rotate, instead we face the chassis towards the goal
+        # Determine heading required for goal
         translation_to_goal = (
             get_goal_speaker_position().toTranslation2d()
             - self.chassis.get_pose().translation()
         )
         bearing_to_speaker = atan2(translation_to_goal.y, translation_to_goal.x)
-        # set to appropriate heading
+
+        # Set to appropriate heading
         self.chassis.snap_to_heading(bearing_to_speaker)
 
         # Update ranging but don't check for tolerance yet
         self.update_ranging()
 
-        # progress state machine if within tolerance
+        # Progress state machine if within tolerance
         if self.chassis.at_desired_heading():
             self.next_state("ranging")
 
@@ -69,7 +74,3 @@ class Shooter(StateMachine):
     def resetting(self) -> None:
         self.shooter_component.stop_injection()
         self.done()
-
-    def shoot(self) -> None:
-        self.button_pressed = True
-        self.engage()
