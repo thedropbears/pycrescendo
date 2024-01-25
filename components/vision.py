@@ -45,6 +45,8 @@ class VisualLocalizer:
         self.last_timestamp = -1
 
         self.field_pos_obj = field.getObject("vision_pose")
+        self.single_best_log = field.getObject("single_best_log")
+        self.single_alt_log = field.getObject("single_alt_log")
         self.pose_log_entry = wpiutil.log.FloatArrayLogEntry(data_log, "vision_pose")
 
         self.chassis = chassis
@@ -120,15 +122,23 @@ class VisualLocalizer:
                 self.chassis.estimator.addVisionMeasurement(pose, timestamp_sec)
 
                 if self.should_log:
-                    self.pose_log_entry.append(
-                        [
-                            best.x,
-                            best.y,
-                            best.rotation().radians(),
-                            alt.x,
-                            alt.y,
-                            alt.rotation().radians(),
-                        ]
+                    self.single_best_log.setPose(
+                        Pose2d(
+                            target.bestCameraToTarget.x,
+                            target.bestCameraToTarget.y,
+                            target.bestCameraToTarget.rotation()
+                            .toRotation2d()
+                            .radians(),
+                        )
+                    )
+                    self.single_alt_log.setPose(
+                        Pose2d(
+                            target.altCameraToTarget.x,
+                            target.altCameraToTarget.y,
+                            target.altCameraToTarget.rotation()
+                            .toRotation2d()
+                            .radians(),
+                        )
                     )
 
 
