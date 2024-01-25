@@ -127,7 +127,6 @@ class MyRobot(magicbot.MagicRobot):
         self.chassis.update_odometry()
 
     def cancel_controllers(self):
-        self.climber_component.stop()
         self.climber.done()
 
     def disabledPeriodic(self) -> None:
