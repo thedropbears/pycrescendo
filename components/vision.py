@@ -44,9 +44,11 @@ class VisualLocalizer:
         self.camera_to_robot = Transform3d(pos, rot).inverse()
         self.last_timestamp = -1
 
-        self.field_pos_obj = field.getObject("vision_pose")
         self.single_best_log = field.getObject("single_best_log")
         self.single_alt_log = field.getObject("single_alt_log")
+        self.multi_best_log = field.getObject("multi_best_log")
+        self.multi_alt_log = field.getObject("multi_alt_log")
+        self.field_pos_obj = field.getObject("vision_pose")
         self.pose_log_entry = wpiutil.log.FloatArrayLogEntry(data_log, "vision_pose")
 
         self.chassis = chassis
@@ -89,15 +91,19 @@ class VisualLocalizer:
                 )
 
             if self.should_log:
-                self.pose_log_entry.append(
-                    [
+                self.multi_best_log.setPose(
+                    Pose2d(
                         p.best.x,
                         p.best.y,
                         p.best.rotation().toRotation2d().radians(),
+                    )
+                )
+                self.multi_alt_log.setPose(
+                    Pose2d(
                         p.alt.x,
                         p.alt.y,
                         p.alt.rotation().toRotation2d().radians(),
-                    ]
+                    )
                 )
         else:
             for target in results.getTargets():
