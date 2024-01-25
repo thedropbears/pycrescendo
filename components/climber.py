@@ -6,7 +6,7 @@ from ids import SparkMaxIds, DioChannels
 
 class ClimberComponent:
     GEAR_RATIO = 1 / 48  # using a Neo with 4:1 4:1 3:1 ratio
-    speed = will_reset_to(0)
+    speed = will_reset_to(0.0)
 
     def __init__(self) -> None:
         self.climbing_motor = CANSparkMax(
@@ -31,7 +31,7 @@ class ClimberComponent:
     def deploy(self) -> None:
         self.deployed = True
         if self.has_deploy_finished():
-            self.speed = 0
+            self.speed = 0.0
         else:
             self.speed = 0.5
 
