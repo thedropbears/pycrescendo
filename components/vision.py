@@ -119,6 +119,18 @@ class VisualLocalizer:
                 timestamp_sec = results.getTimestamp() / 1e12
                 self.chassis.estimator.addVisionMeasurement(pose, timestamp_sec)
 
+                if self.should_log:
+                    self.pose_log_entry.append(
+                        [
+                            best.x,
+                            best.y,
+                            best.rotation().radians(),
+                            alt.x,
+                            alt.y,
+                            alt.rotation().radians(),
+                        ]
+                    )
+
 
 def estimate_poses_from_apriltag(
     cam_to_robot: Transform3d, target: PhotonTrackedTarget
