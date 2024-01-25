@@ -2,7 +2,6 @@ from math import atan2
 from magicbot import StateMachine, state, timed_state, default_state, will_reset_to
 from components.chassis import ChassisComponent
 from components.shooter import ShooterComponent
-
 from utilities.game import get_goal_speaker_position
 
 
@@ -11,9 +10,6 @@ class Shooter(StateMachine):
     shooter_component: ShooterComponent
     button_pressed = will_reset_to(False)
     SHOOTING_TIME_DURATION = 3
-
-    FLYWHEEL_SPEED_MAP = {}
-    INCLINATION_ANGLE_MAP = {}
 
     def shoot(self) -> None:
         self.button_pressed = True
