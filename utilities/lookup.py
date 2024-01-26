@@ -32,16 +32,13 @@ class LookupTable:
 
             if len(val) != self.table_length:
                 raise IndexError(
-                    f"LookupTable: Length of row '{key}' does not match length of key row!"
+                    f"LookupTable: Length of row '\
+                        {key}' does not match length of key row!"
                 )
 
     def lookup(
         self, lookup_row: str, lookup_value: float, extrapolate: bool = False
     ) -> float:
-        # Row name not in table
-        if lookup_row not in self.rows:
-            return 0.0
-
         # Go through the key values until we pass value
         start_index = 0
         for i, value in enumerate(self.key_values):
@@ -66,12 +63,10 @@ class LookupTable:
             end_index = min(start_index + 1, self.table_length)
             higher_bound = self.key_values[end_index]
 
-        if lower_bound != higher_bound and lower_bound != lookup_value:
-            # Linear interpolation based on value between bounds
-            rise = lookup_value - lower_bound
-            run = higher_bound - lower_bound
-            m = rise / run
-            return self.rows[lookup_row][start_index] * m
-        else:
-            # At bound so just grab value
-            return self.rows[lookup_row][start_index]
+        # Linear interpolation based on value between bounds
+        start_value = self.rows[lookup_row][start_index]
+        end_value = self.rows[lookup_row][end_index]
+        rise = end_value - start_value
+        run = higher_bound - lower_bound
+        m = 0 if run == 0 else rise / run
+        return m * (lookup_value - lower_bound) + (start_value)
