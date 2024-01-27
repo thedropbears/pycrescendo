@@ -70,6 +70,7 @@ class VisualLocalizer:
 
         # if we have already processed these results
         timestamp = results.getTimestamp()
+        timestamp_sec = results.getTimestamp() / 1e12
         if timestamp == self.last_timestamp:
             return
         self.last_timestamp = timestamp
@@ -84,7 +85,7 @@ class VisualLocalizer:
             if self.add_to_estimator:
                 self.chassis.estimator.addVisionMeasurement(
                     pose,
-                    timestamp,
+                    timestamp_sec,
                     (reprojectionErr, reprojectionErr, reprojectionErr / 3),
                 )
 
@@ -122,7 +123,6 @@ class VisualLocalizer:
                 )
 
                 self.field_pos_obj.setPose(pose)
-                timestamp_sec = results.getTimestamp() / 1e12
                 self.chassis.estimator.addVisionMeasurement(pose, timestamp_sec)
 
                 if self.should_log:
