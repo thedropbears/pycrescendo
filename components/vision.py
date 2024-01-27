@@ -18,11 +18,10 @@ class VisualLocalizer:
     using information from a single PhotonVision camera.
     """
 
-    BEST_POSE_BIAS = (
-        1.2  # Give bias to the best pose by multiplying this const to the alt dist
-    )
+    # Give bias to the best pose by multiplying this const to the alt dist
+    BEST_POSE_BIAS = 1.2
 
-    add_to_estimator = tunable(False)
+    add_to_estimator = tunable(True)
     should_log = tunable(False)
 
     last_pose_z = tunable(0.0, writeDefault=False)
@@ -51,12 +50,6 @@ class VisualLocalizer:
         self.pose_log_entry = wpiutil.log.FloatArrayLogEntry(data_log, "vision_pose")
 
         self.chassis = chassis
-
-    def on_disable(self) -> None:
-        self.add_to_estimator = False
-
-    def on_enable(self) -> None:
-        self.add_to_estimator = True
 
     def execute(self) -> None:
         # stop warnings in simulation

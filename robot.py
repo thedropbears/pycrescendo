@@ -133,6 +133,8 @@ class MyRobot(magicbot.MagicRobot):
 
         self.chassis.update_odometry()
 
+        self.vision.execute()
+
     def cancel_controllers(self):
         self.climber_component.stop()
         self.climber.done()
@@ -144,7 +146,6 @@ class MyRobot(magicbot.MagicRobot):
         self.vision.execute()
 
     def autonomousInit(self) -> None:
-        self.vision.on_enable()
         pass
 
 
