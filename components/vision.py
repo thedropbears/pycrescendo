@@ -70,7 +70,7 @@ class VisualLocalizer:
 
         # if we have already processed these results
         timestamp = results.getTimestamp()
-        if timestamp == self.last_timestamp and wpilib.RobotBase.isReal():
+        if timestamp == self.last_timestamp:
             return
         self.last_timestamp = timestamp
 
