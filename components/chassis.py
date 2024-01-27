@@ -199,13 +199,14 @@ class SwerveModule:
 
 class ChassisComponent:
     # metres between centre of left and right wheels
-    TRACK_WIDTH = 0.61
+    TRACK_WIDTH = 0.467
     # metres between centre of front and back wheels
-    WHEEL_BASE = 0.61
+    WHEEL_BASE = 0.467
 
     # size including bumpers
-    LENGTH = 1.0105
-    WIDTH = 0.8705
+    LENGTH = 0.600 + 2 * 0.09
+    WIDTH = LENGTH
+
     DRIVE_CURRENT_THRESHOLD = 35
 
     HEADING_TOLERANCE = math.radians(5)
