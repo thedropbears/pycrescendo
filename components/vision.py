@@ -70,6 +70,8 @@ class VisualLocalizer:
 
         # if we have already processed these results
         timestamp = results.getTimestamp()
+
+        # photonvision timestamp is in tenth of a nanosecond, converted to proper second
         timestamp_sec = results.getTimestamp() / 1e12
         if timestamp == self.last_timestamp:
             return
