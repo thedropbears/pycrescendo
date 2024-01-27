@@ -1,8 +1,8 @@
-from typing import Union
+from utilities.functions import clamp
 
 
 class LookupTable:
-    def __init__(self, **kwargs: Union[list[float], tuple[float]]) -> None:
+    def __init__(self, **kwargs: list[float]) -> None:
         if len(kwargs.keys()) < 2:
             raise ValueError("LookupTable: Must have more than one row!")
 
@@ -37,37 +37,26 @@ class LookupTable:
                 )
 
     def lookup(
-        self, lookup_row: str, lookup_value: float, extrapolate: bool = False
+        self, lookup_row: str, lookup_value: float, linear_extrapolate: bool = False
     ) -> float:
-        # Go through the key values until we pass value
-        start_index = 0
-        for i, value in enumerate(self.key_values):
-            if value > lookup_value:
+        # Go through the key values until upper bound passes target value
+        for i in range(1, self.table_length):
+            i1 = i - 1
+            i2 = i
+            if self.key_values[i] > lookup_value:
                 break
-            start_index = i
 
-        if extrapolate:
-            # MIGHT BE IRRELEVANT. instead set value to min or max if not extrapolating
-            if lookup_value < self.key_values[0]:
-                # Extrapolate below
-                difference = self.key_values[1] - self.key_values[0]
-                higher_bound = self.key_values[0]
-                lower_bound = higher_bound - difference
+        # Linear interpolation based on bounds
+        x1 = self.key_values[i1]
+        x2 = self.key_values[i2]
+        y1 = self.rows[lookup_row][i1]
+        y2 = self.rows[lookup_row][i2]
+        rise = y2 - y1
+        run = x2 - x1
 
-            elif lookup_value > self.key_values[-1]:
-                # Extrapolate above
-                difference = self.key_values[-1] - self.key_values[-2]
-                lower_bound = self.key_values[-1]
-                higher_bound = lower_bound + difference
-        else:
-            lower_bound = self.key_values[start_index]
-            end_index = min(start_index + 1, self.table_length)
-            higher_bound = self.key_values[end_index]
-
-        # Linear interpolation based on value between bounds
-        start_value = self.rows[lookup_row][start_index]
-        end_value = self.rows[lookup_row][end_index]
-        rise = end_value - start_value
-        run = higher_bound - lower_bound
         m = 0 if run == 0 else rise / run
-        return m * (lookup_value - lower_bound) + (start_value)
+
+        if not linear_extrapolate:
+            lookup_value = clamp(lookup_value, x1, x2)
+
+        return m * (lookup_value - x1) + (y1)
