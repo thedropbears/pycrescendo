@@ -63,7 +63,7 @@ class ShooterComponent:
         self.injector.setInverted(False)
 
         self.inclinator_controller = ProfiledPIDControllerRadians(
-            0.8, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
+            3.0, 0, 0, TrapezoidProfileRadians.Constraints(math.pi, math.pi)
         )
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
 
