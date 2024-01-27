@@ -86,15 +86,12 @@ class ShooterComponent:
         return True
 
     @feedback
-    def encoder_raw(self):
-        return self.inclinator_encoder.getOutput()
-
-    @feedback
     def at_inclination(self) -> bool:
         return self.inclinator_controller.atGoal()
 
     @feedback
     def inclination_angle(self) -> float:
+        """Get the angle of the mechanism in radians measured positive upwards from zero parellel to the ground."""
         return (
             self.inclinator_encoder.getOutput() * self.INCLINATOR_SCALE_FACTOR
             - self.INCLINATOR_OFFSET
