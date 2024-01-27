@@ -32,8 +32,8 @@ class LookupTable:
 
             if len(val) != self.table_length:
                 raise IndexError(
-                    f"LookupTable: Length of row '\
-                        {key}' does not match length of key row!"
+                    f"LookupTable: Length of row\
+                    {key} does not match length of key row!"
                 )
 
     def lookup(
@@ -47,6 +47,7 @@ class LookupTable:
             start_index = i
 
         if extrapolate:
+            # MIGHT BE IRRELEVANT. instead set value to min or max if not extrapolating
             if lookup_value < self.key_values[0]:
                 # Extrapolate below
                 difference = self.key_values[1] - self.key_values[0]
