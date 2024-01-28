@@ -92,7 +92,7 @@ class ShooterComponent:
     def flywheels_at_speed(self) -> bool:
         """Are the flywheels close to thier target speed"""
         return (
-            abs(self.desired_flywheel_speed - self.flywheel.get_velocity())
+            abs(self.desired_flywheel_speed - self.flywheel.get_velocity().value)
             < self.FLYWHEEL_TOLERANCE
         )
 
