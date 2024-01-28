@@ -12,9 +12,8 @@ from utilities.functions import clamp
 
 
 class ShooterComponent:
-    MAX_FLYWHEEL_SPEED = 6380 / 60
     FLYWHEEL_GEAR_RATIO = 24.0 / 18.0
-    flywheel_speed = tunable(0.0)
+    desired_flywheel_speed = tunable(0.0)
     inject_speed = tunable(0.0)
 
     MAX_INCLINE_ANGLE = math.radians(25)
@@ -111,8 +110,6 @@ class ShooterComponent:
         else:
             self.injector.set(0.0)
 
-        flywheel_request = VelocityVoltage(
-            self.flywheel_speed * ShooterComponent.MAX_FLYWHEEL_SPEED
-        )
+        flywheel_request = VelocityVoltage(self.desired_flywheel_speed)
         self.flywheel.set_control(flywheel_request)
         self.should_inject = False
