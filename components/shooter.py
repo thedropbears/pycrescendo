@@ -21,7 +21,7 @@ class ShooterComponent:
     MAX_INCLINE_ANGLE = 0.973  # ~55 degrees
     MIN_INCLINE_ANGLE = math.radians(20)
     INCLINATOR_TOLERANCE = math.radians(1)
-    debug_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
+    desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
 
     INCLINATOR_OFFSET = 0.822 * math.tau - math.radians(20)
     INCLINATOR_SCALE_FACTOR = math.tau  # rev -> radians
@@ -68,7 +68,7 @@ class ShooterComponent:
         self.should_inject = False
 
     def set_inclination(self, angle: float) -> None:
-        self.debug_angle = angle
+        self.desired_inclinator_angle = angle
 
     def shoot(self) -> None:
         self.should_inject = True
@@ -85,7 +85,7 @@ class ShooterComponent:
         return self.inclinator_controller.atSetpoint()
 
     @feedback
-    def inclination_angle(self) -> float:
+    def _inclination_angle(self) -> float:
         """Get the angle of the mechanism in radians measured positive upwards from zero parellel to the ground."""
         return (
             self.inclinator_encoder.getOutput() * self.INCLINATOR_SCALE_FACTOR
@@ -93,7 +93,7 @@ class ShooterComponent:
         )
 
     @feedback
-    def actual_flywheel_speed(self) -> float:
+    def _flywheel_velocity(self) -> float:
         return self.flywheel.get_velocity().value
 
     def execute(self) -> None:
@@ -102,7 +102,7 @@ class ShooterComponent:
         inclinator_speed = self.inclinator_controller.calculate(
             self.inclination_angle(),
             clamp(
-                self.debug_angle,
+                self.desired_inclinator_angle,
                 ShooterComponent.MIN_INCLINE_ANGLE,
                 ShooterComponent.MAX_INCLINE_ANGLE,
             ),
