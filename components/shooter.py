@@ -1,9 +1,10 @@
 from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
-import phoenix6
 from phoenix6.controls import VelocityVoltage
-import phoenix6.hardware
+from phoenix6.hardware import TalonFX
+from phoenix6.configs import MotorOutputConfigs, Slot0Configs, FeedbackConfigs
+from phoenix6.signals import NeutralModeValue
 from wpilib import DutyCycleEncoder
 from wpimath.controller import ProfiledPIDControllerRadians
 from wpimath.trajectory import TrapezoidProfileRadians
@@ -31,15 +32,15 @@ class ShooterComponent:
         self.inclinator_encoder.setPositionOffset(self.INCLINATOR_OFFSET)
         # invert encoder and map to radians
         self.inclinator_encoder.setDistancePerRotation(-math.tau)
-        self.flywheel = phoenix6.hardware.TalonFX(TalonIds.shooter_flywheel)
+        self.flywheel = TalonFX(TalonIds.shooter_flywheel)
 
         flywheel_config = self.flywheel.configurator
-        flywheel_motor_config = phoenix6.configs.MotorOutputConfigs()
-        flywheel_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.COAST
+        flywheel_motor_config = MotorOutputConfigs()
+        flywheel_motor_config.neutral_mode = NeutralModeValue.COAST
 
         flywheel_pid = (
-            phoenix6.configs.Slot0Configs()
-            .with_k_p(3.516)
+            Slot0Configs()
+            .with_k_p(0.3514)
             .with_k_i(0)
             .with_k_d(0)
             .with_k_s(0.19469)
@@ -47,10 +48,8 @@ class ShooterComponent:
             .with_k_a(0.017639)
         )
 
-        flywheel_gear_ratio = (
-            phoenix6.configs.FeedbackConfigs().with_sensor_to_mechanism_ratio(
-                self.FLYWHEEL_GEAR_RATIO
-            )
+        flywheel_gear_ratio = FeedbackConfigs().with_sensor_to_mechanism_ratio(
+            self.FLYWHEEL_GEAR_RATIO
         )
 
         flywheel_config.apply(flywheel_motor_config)
