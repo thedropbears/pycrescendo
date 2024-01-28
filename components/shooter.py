@@ -1,9 +1,10 @@
 from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
-import phoenix6
-from phoenix6.controls import VoltageOut
-import phoenix6.hardware
+from phoenix6.controls import VelocityVoltage
+from phoenix6.hardware import TalonFX
+from phoenix6.configs import MotorOutputConfigs, Slot0Configs, FeedbackConfigs
+from phoenix6.signals import NeutralModeValue
 from wpilib import DutyCycleEncoder
 from wpimath.controller import ProfiledPIDControllerRadians
 from wpimath.trajectory import TrapezoidProfileRadians
@@ -12,10 +13,10 @@ from utilities.functions import clamp
 
 
 class ShooterComponent:
-    flywheel_speed = tunable(0.0)
+    FLYWHEEL_GEAR_RATIO = 24.0 / 18.0
+    desired_flywheel_speed = tunable(0.0)
     inject_speed = tunable(0.0)
 
-    # TODO Figure that out
     MAX_INCLINE_ANGLE = math.radians(25)
     MIN_INCLINE_ANGLE = math.radians(0)
     INCLINATOR_TOLERANCE = math.radians(5)
@@ -31,11 +32,34 @@ class ShooterComponent:
         self.inclinator_encoder.setPositionOffset(self.INCLINATOR_OFFSET)
         # invert encoder and map to radians
         self.inclinator_encoder.setDistancePerRotation(-math.tau)
-        self.flywheel = phoenix6.hardware.TalonFX(TalonIds.shooter_flywheel)
+        self.flywheel = TalonFX(TalonIds.shooter_flywheel)
+
+        flywheel_config = self.flywheel.configurator
+        flywheel_motor_config = MotorOutputConfigs()
+        flywheel_motor_config.neutral_mode = NeutralModeValue.COAST
+
+        flywheel_pid = (
+            Slot0Configs()
+            .with_k_p(0.3514)
+            .with_k_i(0)
+            .with_k_d(0)
+            .with_k_s(0.19469)
+            .with_k_v(0.15649)
+            .with_k_a(0.017639)
+        )
+
+        flywheel_gear_ratio = FeedbackConfigs().with_sensor_to_mechanism_ratio(
+            self.FLYWHEEL_GEAR_RATIO
+        )
+
+        flywheel_config.apply(flywheel_motor_config)
+        flywheel_config.apply(flywheel_pid)
+        flywheel_config.apply(flywheel_gear_ratio)
+
         self.injector = CANSparkMax(
             SparkMaxIds.shooter_injector, CANSparkMax.MotorType.kBrushless
         )
-        self.injector.setInverted(True)
+        self.injector.setInverted(False)
 
         self.inclinator_controller = ProfiledPIDControllerRadians(
             0.8, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
@@ -68,9 +92,13 @@ class ShooterComponent:
     def inclination_angle(self) -> float:
         return self.inclinator_encoder.getDistance()
 
+    @feedback
+    def actual_flywheel_speed(self) -> float:
+        return self.flywheel.get_velocity().value
+
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
-        flywheel_request = VoltageOut(12.0 * self.flywheel_speed)
+
         inclinator_speed = self.inclinator_controller.calculate(
             self.inclination_angle()
         )
@@ -81,5 +109,6 @@ class ShooterComponent:
         else:
             self.injector.set(0.0)
 
+        flywheel_request = VelocityVoltage(self.desired_flywheel_speed)
         self.flywheel.set_control(flywheel_request)
         self.should_inject = False
