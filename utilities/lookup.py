@@ -1,8 +1,9 @@
+from collections.abc import Sequence
 from utilities.functions import clamp
 
 
 class LookupTable:
-    def __init__(self, **kwargs: list[float]) -> None:
+    def __init__(self, **kwargs: Sequence[float]) -> None:
         if len(kwargs.keys()) < 2:
             raise ValueError("LookupTable: Must have more than one row!")
 
