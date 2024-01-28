@@ -94,6 +94,10 @@ class ShooterComponent:
     def inclination_angle(self) -> float:
         return self.inclinator_encoder.getDistance()
 
+    @feedback
+    def actual_flywheel_speed(self) -> float:
+        return self.flywheel.get_velocity().value
+
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
 
