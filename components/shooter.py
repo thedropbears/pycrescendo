@@ -2,7 +2,7 @@ from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
 import phoenix6
-from phoenix6.controls import VelocityDutyCycle
+from phoenix6.controls import VelocityVoltage
 import phoenix6.hardware
 from wpilib import DutyCycleEncoder
 from wpimath.controller import ProfiledPIDControllerRadians
@@ -13,10 +13,10 @@ from utilities.functions import clamp
 
 class ShooterComponent:
     MAX_FLYWHEEL_SPEED = 6380 / 60
+    FLYWHEEL_GEAR_RATIO = 24.0 / 18.0
     flywheel_speed = tunable(0.0)
     inject_speed = tunable(0.0)
 
-    # TODO Figure that out
     MAX_INCLINE_ANGLE = math.radians(25)
     MIN_INCLINE_ANGLE = math.radians(0)
     INCLINATOR_TOLERANCE = math.radians(5)
@@ -38,13 +38,25 @@ class ShooterComponent:
         flywheel_motor_config = phoenix6.configs.MotorOutputConfigs()
         flywheel_motor_config.neutral_mode = phoenix6.signals.NeutralModeValue.COAST
 
-        # TODO Tune gains
         flywheel_pid = (
-            phoenix6.configs.Slot0Configs().with_k_p(0).with_k_i(0).with_k_d(0)
+            phoenix6.configs.Slot0Configs()
+            .with_k_p(3.516)
+            .with_k_i(0)
+            .with_k_d(0)
+            .with_k_s(0.19469)
+            .with_k_v(0.15649)
+            .with_k_a(0.017639)
+        )
+
+        flywheel_gear_ratio = (
+            phoenix6.configs.FeedbackConfigs().with_sensor_to_mechanism_ratio(
+                self.FLYWHEEL_GEAR_RATIO
+            )
         )
 
         flywheel_config.apply(flywheel_motor_config)
         flywheel_config.apply(flywheel_pid)
+        flywheel_config.apply(flywheel_gear_ratio)
 
         self.injector = CANSparkMax(
             SparkMaxIds.shooter_injector, CANSparkMax.MotorType.kBrushless
@@ -94,8 +106,8 @@ class ShooterComponent:
             self.injector.set(self.inject_speed)
         else:
             self.injector.set(0.0)
-            
-        flywheel_request = VelocityDutyCycle(
+
+        flywheel_request = VelocityVoltage(
             self.flywheel_speed * ShooterComponent.MAX_FLYWHEEL_SPEED
         )
         self.flywheel.set_control(flywheel_request)
