@@ -113,7 +113,8 @@ class MyRobot(magicbot.MagicRobot):
             self.intake.intake()
 
         if self.gamepad.getAButton():
-            self.shooter_component.set_inclination(math.radians(self.inclination_angle))
+            # self.shooter_component.set_inclination(math.radians(self.inclination_angle))
+            self.shooter_component.shoot()
 
         if self.gamepad.getLeftBumper():
             self.climber_component.deploy()
