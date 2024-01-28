@@ -15,16 +15,17 @@ from utilities.functions import clamp
 
 class ShooterComponent:
     FLYWHEEL_GEAR_RATIO = 24.0 / 18.0
-    desired_flywheel_speed = tunable(0.0)
-    inject_speed = tunable(0.0)
+    FLYWHEEL_TOLERANCE = 1  # rps
 
     MAX_INCLINE_ANGLE = 0.973  # ~55 degrees
     MIN_INCLINE_ANGLE = math.radians(20)
     INCLINATOR_TOLERANCE = math.radians(1)
-    desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
-
     INCLINATOR_OFFSET = 0.822 * math.tau - math.radians(20)
-    INCLINATOR_SCALE_FACTOR = math.tau  # rev -> radians
+    INCLINATOR_SCALE_FACTOR = math.tau  # rps -> radians
+
+    desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
+    desired_flywheel_speed = tunable(0.0)
+    inject_speed = tunable(0.0)
 
     def __init__(self) -> None:
         self.inclinator = CANSparkMax(
@@ -68,6 +69,7 @@ class ShooterComponent:
         self.should_inject = False
 
     def set_inclination(self, angle: float) -> None:
+        """Set the angle of the mechanism in radians measured positive upwards from zero parellel to the ground."""
         self.desired_inclinator_angle = angle
 
     def shoot(self) -> None:
@@ -78,11 +80,21 @@ class ShooterComponent:
 
     @feedback
     def is_ready(self) -> bool:
-        return True
+        """Is the shooter ready to fire?"""
+        return self.at_inclination() and self.flywheels_at_speed()
 
     @feedback
     def at_inclination(self) -> bool:
+        """Is the inclinator close to the correct angle?"""
         return self.inclinator_controller.atSetpoint()
+
+    @feedback
+    def flywheels_at_speed(self) -> bool:
+        """Are the flywheels close to thier target speed"""
+        return (
+            abs(self.desired_flywheel_speed - self.flywheel.get_velocity())
+            < self.FLYWHEEL_TOLERANCE
+        )
 
     @feedback
     def _inclination_angle(self) -> float:
@@ -100,7 +112,7 @@ class ShooterComponent:
         """This gets called at the end of the control loop"""
 
         inclinator_speed = self.inclinator_controller.calculate(
-            self.inclination_angle(),
+            self._inclination_angle(),
             clamp(
                 self.desired_inclinator_angle,
                 ShooterComponent.MIN_INCLINE_ANGLE,
