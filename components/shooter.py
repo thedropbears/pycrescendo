@@ -82,7 +82,7 @@ class ShooterComponent:
         self.should_inject = False
 
     def set_flywheel_target(self, target_speed: float) -> None:
-        self.flywheel_target_speed = target_speed
+        self.desired_flywheel_speed = target_speed
 
     @feedback
     def is_ready(self) -> bool:
@@ -117,7 +117,7 @@ class ShooterComponent:
     @feedback
     def is_flywheel_at_speed(self) -> bool:
         return (
-            abs(self.flywheel_target_speed - self.flywheel.get_velocity().value)
+            abs(self.desired_flywheel_speed - self.flywheel.get_velocity().value)
             < self.FLYWHEEL_TOLERANCE
         )
 
