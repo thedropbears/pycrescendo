@@ -6,10 +6,9 @@ from phoenix6.controls import VelocityVoltage
 from phoenix6.hardware import TalonFX
 from phoenix6.configs import MotorOutputConfigs, Slot0Configs, FeedbackConfigs
 from phoenix6.signals import NeutralModeValue
-from wpilib import DigitalInput, DutyCycle
+from wpilib import DigitalInput, DutyCycle, SmartDashboard
+from wpimath.controller import PIDController
 
-from wpimath.controller import ProfiledPIDControllerRadians
-from wpimath.trajectory import TrapezoidProfileRadians
 import math
 from utilities.functions import clamp
 
@@ -22,6 +21,7 @@ class ShooterComponent:
     MAX_INCLINE_ANGLE = 0.973  # ~55 degrees
     MIN_INCLINE_ANGLE = math.radians(20)
     INCLINATOR_TOLERANCE = math.radians(1)
+    debug_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
 
     INCLINATOR_OFFSET = 0.822 * math.tau - math.radians(20)
     INCLINATOR_SCALE_FACTOR = math.tau  # rev -> radians
@@ -62,24 +62,19 @@ class ShooterComponent:
         )
         self.injector.setInverted(False)
 
-        self.inclinator_controller = ProfiledPIDControllerRadians(
-            3.0, 0, 0, TrapezoidProfileRadians.Constraints(math.pi, math.pi)
-        )
+        self.inclinator_controller = PIDController(3, 0, 0)
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
-
+        SmartDashboard.putData(self.inclinator_controller)
         self.should_inject = False
 
     def set_inclination(self, angle: float) -> None:
-        self.inclinator_controller.setGoal(
-            clamp(
-                angle,
-                ShooterComponent.MIN_INCLINE_ANGLE,
-                ShooterComponent.MAX_INCLINE_ANGLE,
-            )
-        )
+        self.debug_angle = angle
 
     def shoot(self) -> None:
         self.should_inject = True
+
+    def on_enable(self) -> None:
+        self.inclinator_controller.reset()
 
     @feedback
     def is_ready(self) -> bool:
@@ -87,7 +82,7 @@ class ShooterComponent:
 
     @feedback
     def at_inclination(self) -> bool:
-        return self.inclinator_controller.atGoal()
+        return self.inclinator_controller.atSetpoint()
 
     @feedback
     def inclination_angle(self) -> float:
@@ -105,7 +100,12 @@ class ShooterComponent:
         """This gets called at the end of the control loop"""
 
         inclinator_speed = self.inclinator_controller.calculate(
-            self.inclination_angle()
+            self.inclination_angle(),
+            clamp(
+                self.debug_angle,
+                ShooterComponent.MIN_INCLINE_ANGLE,
+                ShooterComponent.MAX_INCLINE_ANGLE,
+            ),
         )
         self.inclinator.set(inclinator_speed)
 
