@@ -61,7 +61,7 @@ class ShooterComponent:
         self.injector = CANSparkMax(
             SparkMaxIds.shooter_injector, CANSparkMax.MotorType.kBrushless
         )
-        self.injector.setInverted(True)
+        self.injector.setInverted(False)
 
         self.inclinator_controller = ProfiledPIDControllerRadians(
             0.8, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
