@@ -2,7 +2,7 @@
 
 import wpilib
 import wpilib.event
-from wpimath.geometry import Rotation3d, Translation3d
+from wpimath.geometry import Rotation3d, Translation3d, Pose2d
 import magicbot
 from magicbot import tunable
 
@@ -20,6 +20,7 @@ from controllers.climber import Climber
 import math
 
 from utilities.scalers import rescale_js
+from utilities.position import NotePositions, ShootingPositions
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -36,6 +37,7 @@ class MyRobot(magicbot.MagicRobot):
 
     max_speed = magicbot.tunable(ChassisComponent.max_wheel_speed * 0.95)
     inclination_angle = tunable(0.0)
+    show_note_positions = tunable(False)
     vision: VisualLocalizer
 
     def createObjects(self) -> None:
@@ -54,6 +56,19 @@ class MyRobot(magicbot.MagicRobot):
         self.vision_name = "ardu_cam_port"
         self.vision_pos = Translation3d(0.11, 0.24, 0.273)
         self.vision_rot = Rotation3d(0, -math.radians(20), 0)
+
+        self.allposs = {
+            "NotePositions." + i: getattr(NotePositions, i)
+            for i in dir(NotePositions)
+            if not i.startswith("__")
+        }
+        self.allposs.update(
+            {
+                "ShootingPositions." + i: getattr(ShootingPositions, i)
+                for i in dir(ShootingPositions)
+                if not i.startswith("__")
+            }
+        )
 
     def rumble_for(self, intensity: float, duration: float):
         self.rumble_duration = duration
@@ -105,6 +120,11 @@ class MyRobot(magicbot.MagicRobot):
         pass
 
     def testPeriodic(self) -> None:
+        if self.show_note_positions:
+            for i in self.allposs:
+                self.field.getObject(i).setPose(
+                    Pose2d(self.allposs[i].translation, self.allposs[i].heading)
+                )
         # injecting
         if self.gamepad.getBButton():
             self.shooter.shoot()
@@ -136,6 +156,9 @@ class MyRobot(magicbot.MagicRobot):
         self.climber.stop()
 
     def disabledPeriodic(self) -> None:
+        if self.show_note_positions:
+            for i in self.allposs:
+                self.field.getObject(i).setPoses([])
         self.chassis.update_odometry()
 
         self.lights.execute()
