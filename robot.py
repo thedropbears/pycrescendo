@@ -168,6 +168,8 @@ class MyRobot(magicbot.MagicRobot):
 
         self.lights.execute()
         self.vision.execute()
+        if self.gamepad.getBButtonPressed() and wpilib.RobotBase.isSimulation():
+            self.chassis.reset_estimator()
 
     def autonomousInit(self) -> None:
         pass

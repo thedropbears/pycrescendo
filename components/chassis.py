@@ -280,7 +280,7 @@ class ChassisComponent:
         self.imu.zeroYaw()
         self.imu.resetDisplacement()
 
-        initial_pose = (
+        self.initial_pose = (
             ChassisComponent.RED_TEST_POSE
             if is_red()
             else ChassisComponent.BLUE_TEST_POSE
@@ -289,7 +289,7 @@ class ChassisComponent:
             self.kinematics,
             self.imu.getRotation2d(),
             self.get_module_positions(),
-            initial_pose,
+            self.initial_pose,
             stateStdDevs=(0.05, 0.05, 0.01),
             visionMeasurementStdDevs=(0.25, 0.25, 50),
         )
@@ -297,7 +297,13 @@ class ChassisComponent:
         self.module_objs: list[wpilib.FieldObject2d] = []
         for idx, _module in enumerate(self.modules):
             self.module_objs.append(self.field.getObject("s_module_" + str(idx)))
-        self.set_pose(initial_pose)
+        self.set_pose(self.initial_pose)
+
+    def reset_estimator(self):
+        self.estimator.resetPosition(
+            self.imu.getRotation2d(), self.get_module_positions(), self.initial_pose
+        )
+        self.set_pose(self.initial_pose)
 
     def drive_field(self, vx: float, vy: float, omega: float) -> None:
         """Field oriented drive commands"""
