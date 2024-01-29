@@ -11,7 +11,14 @@ class Shooter(StateMachine):
     should_fire = will_reset_to(False)
     SHOOTING_TIME_DURATION = 3
 
+    def __init__(self) -> None:
+        self.just_fired = False
+
+    def has_just_fired(self) -> bool:
+        return self.just_fired
+
     def shoot(self) -> None:
+        """Engage the state machine to attempt a shot, needs to be called repeatedly"""
         self.should_fire = True
         self.engage()
 
@@ -30,6 +37,7 @@ class Shooter(StateMachine):
     @default_state
     def idle(self) -> None:
         """Run ranging whenever we are not doing anything else"""
+        self.just_fired = False
         self.update_ranging()
         if self.should_fire:
             self.next_state("acquiring")
@@ -69,5 +77,6 @@ class Shooter(StateMachine):
 
     @state
     def resetting(self) -> None:
+        self.just_fired = True
         self.shooter_component.stop_injection()
         self.done()
