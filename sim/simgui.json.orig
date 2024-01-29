@@ -24,6 +24,7 @@
         }
       },
       "/SmartDashboard/Field": {
+        "bottom": 1476,
         "auto_trajectory": {
           "arrowColor": [
             0.0,
@@ -41,7 +42,20 @@
           ],
           "style": "Track"
         },
-        "bottom": 1476,
+        "StageLegs": {
+          "color": [
+            0.0,
+            0.5,
+            1.0,
+            255.0
+          ],
+          "arrowColor": [
+            1.0,
+            0.0,
+            0.9,
+            255.0
+          ]
+        },
         "fused_pose": {
           "color": [
             0.0588231086730957,

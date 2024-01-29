@@ -20,7 +20,7 @@ from controllers.climber import Climber
 import math
 
 from utilities.scalers import rescale_js
-from utilities.position import NotePositions, ShootingPositions
+from utilities.position import NotePositions, ShootingPositions, StageLegs
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -69,6 +69,7 @@ class MyRobot(magicbot.MagicRobot):
                 if not i.startswith("__")
             }
         )
+        self.SLegs = self.field.getObject("StageLegs")
 
     def rumble_for(self, intensity: float, duration: float):
         self.rumble_duration = duration
@@ -126,6 +127,7 @@ class MyRobot(magicbot.MagicRobot):
 
     def testPeriodic(self) -> None:
         if self.show_note_positions:
+            self.SLegs.setPoses([Pose2d(i.translation, i.heading) for i in StageLegs])
             for i in self.allposs:
                 self.field.getObject(i).setPose(
                     Pose2d(self.allposs[i].translation, self.allposs[i].heading)
@@ -162,6 +164,7 @@ class MyRobot(magicbot.MagicRobot):
 
     def disabledPeriodic(self) -> None:
         if self.show_note_positions:
+            self.SLegs.setPoses([])
             for i in self.allposs:
                 self.field.getObject(i).setPoses([])
         self.chassis.update_odometry()
