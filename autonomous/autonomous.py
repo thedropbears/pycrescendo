@@ -228,14 +228,13 @@ class Front2Note(AutoBase):
             NotePaths(
                 pick_up_path=Path(
                     [
-                        Translation2d(14.8, 5.5),
                         NotePositions.Stage2.translation,
                     ],
                     NotePositions.Stage2.heading,
                 ),
                 shoot_path=Path(
-                    [ShootingPositions.Pos1.translation],
-                    rotation_to_red_speaker(ShootingPositions.Pos1.translation),
+                    [ShootingPositions.StagePos.translation],
+                    rotation_to_red_speaker(ShootingPositions.StagePos.translation),
                 ),
             )
         ]

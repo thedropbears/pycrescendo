@@ -23,3 +23,4 @@ class NotePositions:
 
 class ShootingPositions:
     Pos1 = NodePosition(Translation2d(10, 5.45585), Rotation2d(0))
+    StagePos = NodePosition(Translation2d(13.092, 4.063), Rotation2d(0))
