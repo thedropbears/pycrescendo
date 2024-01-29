@@ -24,6 +24,23 @@
         }
       },
       "/SmartDashboard/Field": {
+        "auto_trajectory": {
+          "arrowColor": [
+            0.0,
+            0.9803921580314636,
+            1.0,
+            255.0
+          ],
+          "arrowSize": 33,
+          "arrowWeight": 3.0,
+          "color": [
+            0.9803921580314636,
+            1.0,
+            0.0,
+            255.0
+          ],
+          "style": "Track"
+        },
         "bottom": 1476,
         "fused_pose": {
           "color": [
