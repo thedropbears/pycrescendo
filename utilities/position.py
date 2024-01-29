@@ -16,9 +16,9 @@ class NotePositions:
     Stage3 = NodePosition(Translation2d(13.69568, 4.00805), Rotation2d(0))
     Centre1 = NodePosition(Translation2d(8.270875, 7.36085), Rotation2d(0))
     Centre2 = NodePosition(Translation2d(8.270875, 5.68445), Rotation2d(0))
-    Centre3 = NodePosition(Translation2d(8.270875, 4.00805), Rotation2d(0))
-    Centre4 = NodePosition(Translation2d(8.270875, 2.33165), Rotation2d(0))
-    Centre5 = NodePosition(Translation2d(8.270875, 0.65525), Rotation2d(0))
+    Centre3 = NodePosition(Translation2d(8.270875, 4.1057), Rotation2d(0))
+    Centre4 = NodePosition(Translation2d(8.270875, 2.4293), Rotation2d(0))
+    Centre5 = NodePosition(Translation2d(8.270875, 0.75286), Rotation2d(0))
 
 
 class ShootingPositions:
