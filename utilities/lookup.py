@@ -25,6 +25,9 @@ class LookupTable:
                 if self.table_length < 2:
                     raise ValueError("LookupTable: Should have more than one value!")
 
+                if self.table_length != len(set(val)):
+                    raise ValueError("LookupTable: Should have duplicate value in key!")
+
                 key_found = True
                 continue
 
@@ -55,7 +58,8 @@ class LookupTable:
         rise = y2 - y1
         run = x2 - x1
 
-        m = 0 if run == 0 else rise / run
+        # Run guaranteed not to equal zero as keys are unique.
+        m = rise / run
 
         if not linear_extrapolate:
             lookup_value = clamp(lookup_value, x1, x2)
