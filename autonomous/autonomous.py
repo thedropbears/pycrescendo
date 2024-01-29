@@ -206,6 +206,10 @@ class AutoBase(AutonomousStateMachine):
             (self.goal_heading - self.chassis.get_rotation()).radians()
         ) < self.ANGLE_TOLERANCE
 
+    def done(self):
+        self.robot_object.setPoses([])
+        super().done()
+
 
 def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
     t: Translation2d = game.RED_SPEAKER_POSE.toPose2d().translation() - position
