@@ -20,27 +20,13 @@ from components.intake import IntakeComponent
 from controllers.shooter import Shooter
 
 import utilities.game as game
-from dataclasses import dataclass
 
 # Add controllers for intake and shooter when available
 
 from wpimath.geometry import Rotation2d, Translation2d
 import math
 from utilities.position import NotePositions, ShootingPositions
-
-
-@dataclass
-class Path:
-    waypoints: list[Translation2d]
-    final_heading: Rotation2d
-
-
-@dataclass
-class NotePaths:
-    # All paths assume RED alliance
-    # They will automatically be flipped if we are blue
-    pick_up_path: Path
-    shoot_path: Path
+from utilities.path import Path, Make_Path, NotePaths
 
 
 class AutoBase(AutonomousStateMachine):
@@ -226,15 +212,17 @@ class Front2Note(AutoBase):
     def setup(self) -> None:
         self.note_paths = [
             NotePaths(
-                pick_up_path=Path(
+                pick_up_path=Make_Path(
+                    self.chassis.get_pose(),
                     [
                         NotePositions.Stage2.translation,
                     ],
                     NotePositions.Stage2.heading,
                 ),
-                shoot_path=Path(
-                    [ShootingPositions.StagePos.translation],
-                    rotation_to_red_speaker(ShootingPositions.StagePos.translation),
+                shoot_path=Make_Path(
+                    NotePositions.Stage2.translation,
+                    [ShootingPositions.Pos1.translation],
+                    rotation_to_red_speaker(ShootingPositions.Pos1.translation),
                 ),
             )
         ]
