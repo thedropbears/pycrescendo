@@ -8,11 +8,11 @@ from utilities.game import get_goal_speaker_position
 class Shooter(StateMachine):
     chassis: ChassisComponent
     shooter_component: ShooterComponent
-    button_pressed = will_reset_to(False)
+    should_fire = will_reset_to(False)
     SHOOTING_TIME_DURATION = 3
 
     def shoot(self) -> None:
-        self.button_pressed = True
+        self.should_fire = True
         self.engage()
 
     def update_ranging(self) -> None:
@@ -29,8 +29,9 @@ class Shooter(StateMachine):
 
     @default_state
     def idle(self) -> None:
+        """Run ranging whenever we are not doing anything else"""
         self.update_ranging()
-        if self.button_pressed:
+        if self.should_fire:
             self.next_state("acquiring")
 
     @state(first=True)
