@@ -1,4 +1,3 @@
-from typing import Union
 from hypothesis import given
 from hypothesis.strategies import floats
 
@@ -77,9 +76,7 @@ def test_return_between_bounds(lookup_value):
     assert found_value >= search_row[i1] and found_value <= search_row[i2]
 
 
-def does_initialisation_triggers_error(
-    error_type: Union[ValueError, IndexError], **kwargs
-):
+def does_initialisation_triggers_error(error_type, **kwargs) -> bool:
     try:
         LookupTable(**kwargs)
     except error_type:
