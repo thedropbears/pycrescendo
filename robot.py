@@ -34,7 +34,7 @@ class MyRobot(magicbot.MagicRobot):
     climber_component: ClimberComponent
     lights: LightStrip
 
-    max_speed = magicbot.tunable(ChassisComponent.max_wheel_speed * 0.95)
+    max_speed = magicbot.tunable(4)  # m/s
     inclination_angle = tunable(0.0)
     vision: VisualLocalizer
 
