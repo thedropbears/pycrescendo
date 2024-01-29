@@ -17,7 +17,7 @@ class ClimberComponent:
         self.retract_limit_switch = wpilib.DigitalInput(
             DioChannels.climber_retract_switch
         )
-        self.speed = 0
+        self.speed = 0.0
 
     @feedback
     def has_climb_finished(self):
@@ -31,14 +31,14 @@ class ClimberComponent:
         if self.has_deploy_finished():
             self.speed = 0.0
         else:
-            self.speed = 1
+            self.speed = 1.0
 
     def retract(self) -> None:
         if self.has_climb_finished():
             self.speed = 0.0
         else:
-            self.speed = -1
+            self.speed = -1.0
 
     def execute(self) -> None:
         self.climbing_motor.set(self.speed)
-        self.speed = 0
+        self.speed = 0.0
