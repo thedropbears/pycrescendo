@@ -1,3 +1,4 @@
+from typing import Union
 from hypothesis import given
 from hypothesis.strategies import floats
 
@@ -11,24 +12,28 @@ test_table = LookupTable(
 
 
 def test_not_enough_rows():
-    does_initialisation_triggers_error(ValueError)
-    does_initialisation_triggers_error(ValueError, key=[0.0, 1.0])
+    assert does_initialisation_triggers_error(ValueError)
+    assert does_initialisation_triggers_error(ValueError, key=[0.0, 1.0])
 
 
 def test_not_ascending_key():
-    does_initialisation_triggers_error(ValueError, key=[10.0, 0.0], values=[0.0, 1.0])
+    assert does_initialisation_triggers_error(
+        ValueError, key=[10.0, 0.0], values=[0.0, 1.0]
+    )
 
 
 def test_one_value_table():
-    does_initialisation_triggers_error(ValueError, key=[0.0], value=[0.0])
+    assert does_initialisation_triggers_error(ValueError, key=[0.0], value=[0.0])
 
 
 def test_duplicate_keys():
-    does_initialisation_triggers_error(ValueError, key=[0.0, 0.0], value=[0.0, 1.0])
+    assert does_initialisation_triggers_error(
+        ValueError, key=[0.0, 0.0], value=[0.0, 1.0]
+    )
 
 
 def test_multiple_row_lengths():
-    does_initialisation_triggers_error(
+    assert does_initialisation_triggers_error(
         IndexError, key=[0.0, 1.0, 2.0], value=[0.0, 1.0]
     )
 
@@ -72,10 +77,12 @@ def test_return_between_bounds(lookup_value):
     assert found_value >= search_row[i1] and found_value <= search_row[i2]
 
 
-def does_initialisation_triggers_error(error_type: Exception, **kwargs):
+def does_initialisation_triggers_error(
+    error_type: Union[ValueError, IndexError], **kwargs
+):
     try:
         LookupTable(**kwargs)
     except error_type:
-        pass
+        return True
     else:
-        raise AssertionError
+        return False
