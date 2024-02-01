@@ -1,3 +1,4 @@
+import pytest
 from hypothesis import given
 from hypothesis.strategies import floats
 
@@ -11,30 +12,31 @@ test_table = LookupTable(
 
 
 def test_not_enough_rows():
-    assert does_initialisation_triggers_error(ValueError)
-    assert does_initialisation_triggers_error(ValueError, key=[0.0, 1.0])
+    with pytest.raises(ValueError):
+        LookupTable()
+
+    with pytest.raises(ValueError):
+        LookupTable(key=[0.0, 1.0])
 
 
 def test_not_ascending_key():
-    assert does_initialisation_triggers_error(
-        ValueError, key=[10.0, 0.0], values=[0.0, 1.0]
-    )
+    with pytest.raises(ValueError):
+        LookupTable(key=[10.0, 0.0], values=[0.0, 1.0])
 
 
 def test_one_value_table():
-    assert does_initialisation_triggers_error(ValueError, key=[0.0], value=[0.0])
+    with pytest.raises(ValueError):
+        LookupTable(key=[0.0], value=[0.0])
 
 
 def test_duplicate_keys():
-    assert does_initialisation_triggers_error(
-        ValueError, key=[0.0, 0.0], value=[0.0, 1.0]
-    )
+    with pytest.raises(ValueError):
+        LookupTable(key=[0.0, 0.0], value=[0.0, 1.0])
 
 
 def test_multiple_row_lengths():
-    assert does_initialisation_triggers_error(
-        IndexError, key=[0.0, 1.0, 2.0], value=[0.0, 1.0]
-    )
+    with pytest.raises(IndexError):
+        LookupTable(key=[0.0, 1.0, 2.0], value=[0.0, 1.0])
 
 
 def test_zero_gradient():
@@ -74,12 +76,3 @@ def test_return_between_bounds(lookup_value):
     search_row = test_table.rows[row_name]
     found_value = test_table.lookup(row_name, lookup_value)
     assert found_value >= search_row[i1] and found_value <= search_row[i2]
-
-
-def does_initialisation_triggers_error(error_type, **kwargs) -> bool:
-    try:
-        LookupTable(**kwargs)
-    except error_type:
-        return True
-    else:
-        return False
