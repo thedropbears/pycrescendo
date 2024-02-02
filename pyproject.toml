@@ -57,7 +57,7 @@ package-type = "application"
 deploy = "robotpy deploy"
 download = "robotpy sync --no-install"
 sim = "robotpy sim"
-test = "robotpy test"
+test = "robotpy test --"
 
 [tool.pdm.dev-dependencies]
 dev = [
