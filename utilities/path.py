@@ -45,11 +45,11 @@ class Line:
         closest_x, closest_y = self.closest_point_on_segment(point)
         return ((closest_x - point.x) ** 2 + (closest_y - point.y) ** 2) ** 0.5
 
-    def dist_to_points(self, points):
+    def dist_to_points(self, points: list[Pose2d]):
         mindist = -1
         mindistid = -1
         for point in points:
-            distance = self.dist_to(point.translation)
+            distance = self.dist_to(point.translation())
             if distance < mindist or mindist == -1:
                 mindist = distance
                 mindistid = points.index(point)

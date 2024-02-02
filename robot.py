@@ -127,10 +127,12 @@ class MyRobot(magicbot.MagicRobot):
 
     def testPeriodic(self) -> None:
         if self.show_note_positions:
-            self.SLegs.setPoses([Pose2d(i.translation, i.heading) for i in StageLegs])
+            self.SLegs.setPoses(
+                [Pose2d(i.translation(), i.rotation()) for i in StageLegs]
+            )
             for i in self.allposs:
                 self.field.getObject(i).setPose(
-                    Pose2d(self.allposs[i].translation, self.allposs[i].heading)
+                    Pose2d(self.allposs[i].translation, self.allposs[i].rotation)
                 )
         # injecting
         if self.gamepad.getBButton():
