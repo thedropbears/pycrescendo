@@ -214,13 +214,11 @@ class Front2Note(AutoBase):
             NotePaths(
                 pick_up_path=Make_Path(
                     self.chassis.get_pose(),
-                    [
-                        NotePositions.Stage2.translation,
-                    ],
+                    [NotePositions.Stage2.translation],
                     NotePositions.Stage2.heading,
                 ),
                 shoot_path=Make_Path(
-                    NotePositions.Stage2.translation,
+                    NotePositions.Stage2,
                     [ShootingPositions.Pos1.translation],
                     rotation_to_red_speaker(ShootingPositions.Pos1.translation),
                 ),

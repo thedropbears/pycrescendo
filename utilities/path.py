@@ -42,9 +42,7 @@ class Line:
         return closest_x, closest_y
 
     def dist_to(self, point):
-        closest_x, closest_y = self.closest_point_on_segment(
-            point, self.start, self.end
-        )
+        closest_x, closest_y = self.closest_point_on_segment(point)
         return ((closest_x - point.x) ** 2 + (closest_y - point.y) ** 2) ** 0.5
 
     def dist_to_points(self, points):
