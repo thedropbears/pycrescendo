@@ -20,7 +20,7 @@ from controllers.climber import Climber
 import math
 
 from utilities.scalers import rescale_js
-from utilities.position import NotePositions, ShootingPositions, StageLegs
+from utilities.position import NotePoses, ShootingPoses, StageLegs
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -58,14 +58,14 @@ class MyRobot(magicbot.MagicRobot):
         self.vision_rot = Rotation3d(0, -math.radians(20), 0)
 
         self.allposs = {
-            "NotePositions." + i: getattr(NotePositions, i)
-            for i in dir(NotePositions)
+            "NotePositions." + i: getattr(NotePoses, i)
+            for i in dir(NotePoses)
             if not i.startswith("__")
         }
         self.allposs.update(
             {
-                "ShootingPositions." + i: getattr(ShootingPositions, i)
-                for i in dir(ShootingPositions)
+                "ShootingPositions." + i: getattr(ShootingPoses, i)
+                for i in dir(ShootingPoses)
                 if not i.startswith("__")
             }
         )

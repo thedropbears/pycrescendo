@@ -18,7 +18,7 @@ from wpilib import Field2d
 from wpimath.spline import Spline3
 from wpimath.geometry import Rotation2d, Translation2d
 
-from utilities.position import NotePositions, ShootingPositions
+from utilities.position import NotePoses, ShootingPoses
 from utilities.path import Path, Make_Path, NotePaths
 import utilities.game as game
 
@@ -41,7 +41,7 @@ class AutoBase(AutonomousStateMachine):
     MAX_ACCEL = 0.5
 
     def __init__(self) -> None:
-        self.note_paths: list[NotePaths] = []
+        self.note_paths: list[NotePoses] = []
 
         x_controller = PIDController(2.5, 0, 0)
         y_controller = PIDController(2.5, 0, 0)
@@ -214,13 +214,13 @@ class Front2Note(AutoBase):
             NotePaths(
                 pick_up_path=Make_Path(
                     self.chassis.get_pose(),
-                    [NotePositions.Stage2.translation()],
-                    NotePositions.Stage2.rotation(),
+                    [NotePoses.Stage2.translation()],
+                    NotePoses.Stage2.rotation(),
                 ),
                 shoot_path=Make_Path(
-                    NotePositions.Stage2,
-                    [ShootingPositions.Pos1.translation()],
-                    rotation_to_red_speaker(ShootingPositions.Pos1.translation()),
+                    NotePoses.Stage2,
+                    [ShootingPoses.Pos1.translation()],
+                    rotation_to_red_speaker(ShootingPoses.Pos1.translation()),
                 ),
             )
         ]

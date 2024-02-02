@@ -14,7 +14,7 @@ from wpimath.geometry import Rotation2d, Translation2d, Pose2d
 StageWidth = 16.541748046875
 
 
-class NotePositions:
+class NotePoses:
     # Order from the driver station 1-3
     # 1 is always the closest to the side of driver station 1
     Stage1 = Pose2d(Translation2d(13.645, 7.00045), Rotation2d(0))
@@ -29,7 +29,7 @@ class NotePositions:
 
 # =(-90+x*(360/3))%360
 
-StageLegs = [
+StageLegs: list[Pose2d] = [
     # Red stage legs
     Pose2d(Translation2d(5.652, 5.4015), Rotation2d(60 * pi / 180)),
     Pose2d(Translation2d(5.652, 2.8215), Rotation2d(300 * pi / 180)),
@@ -41,5 +41,5 @@ StageLegs = [
 ]
 
 
-class ShootingPositions:
+class ShootingPoses:
     Pos1 = Pose2d(Translation2d(10, 5.45585), Rotation2d(0))
