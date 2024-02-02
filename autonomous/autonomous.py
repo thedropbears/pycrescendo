@@ -41,7 +41,7 @@ class AutoBase(AutonomousStateMachine):
     MAX_ACCEL = 0.5
 
     def __init__(self) -> None:
-        self.note_paths: list[NotePoses] = []
+        self.note_paths: list[NotePaths] = []
 
         x_controller = PIDController(2.5, 0, 0)
         y_controller = PIDController(2.5, 0, 0)

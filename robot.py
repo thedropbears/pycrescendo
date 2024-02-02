@@ -58,7 +58,7 @@ class MyRobot(magicbot.MagicRobot):
         self.vision_rot = Rotation3d(0, -math.radians(20), 0)
 
         self.allposs = {
-            "NotePositions." + i: getattr(NotePoses, i)
+            "NotePoses." + i: getattr(NotePoses, i)
             for i in dir(NotePoses)
             if not i.startswith("__")
         }
