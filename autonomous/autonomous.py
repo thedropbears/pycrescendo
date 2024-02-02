@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import math
 from magicbot.state_machine import AutonomousStateMachine, state
 from wpimath.trajectory import (
@@ -19,7 +20,6 @@ from wpimath.spline import Spline3
 from wpimath.geometry import Rotation2d, Translation2d
 
 from utilities.position import NotePoses, ShootingPoses
-from utilities.path import Path, Make_Path, NotePaths
 import utilities.game as game
 
 from components.chassis import ChassisComponent
@@ -27,6 +27,20 @@ from components.intake import IntakeComponent
 
 # Add controllers for intake and shooter when available
 from controllers.shooter import Shooter
+
+
+@dataclass
+class Path:
+    waypoints: list[Translation2d]
+    final_heading: Rotation2d
+
+
+@dataclass
+class NotePaths:
+    # All paths assume RED alliance
+    # They will automatically be flipped if we are blue
+    pick_up_path: Path
+    shoot_path: Path
 
 
 class AutoBase(AutonomousStateMachine):
@@ -212,13 +226,11 @@ class Front2Note(AutoBase):
     def setup(self) -> None:
         self.note_paths = [
             NotePaths(
-                pick_up_path=Make_Path(
-                    self.chassis.get_pose(),
+                pick_up_path=Path(
                     [NotePoses.Stage2.translation()],
                     NotePoses.Stage2.rotation(),
                 ),
-                shoot_path=Make_Path(
-                    NotePoses.Stage2,
+                shoot_path=Path(
                     [ShootingPoses.Pos1.translation()],
                     rotation_to_red_speaker(ShootingPoses.Pos1.translation()),
                 ),
