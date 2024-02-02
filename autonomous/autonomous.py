@@ -1,3 +1,4 @@
+import math
 from magicbot.state_machine import AutonomousStateMachine, state
 from wpimath.trajectory import (
     TrajectoryConfig,
@@ -15,18 +16,17 @@ from wpimath.controller import (
 )
 from wpilib import Field2d
 from wpimath.spline import Spline3
-from components.chassis import ChassisComponent
-from components.intake import IntakeComponent
-from controllers.shooter import Shooter
-
-import utilities.game as game
-
-# Add controllers for intake and shooter when available
-
 from wpimath.geometry import Rotation2d, Translation2d
-import math
+
 from utilities.position import NotePositions, ShootingPositions
 from utilities.path import Path, Make_Path, NotePaths
+import utilities.game as game
+
+from components.chassis import ChassisComponent
+from components.intake import IntakeComponent
+
+# Add controllers for intake and shooter when available
+from controllers.shooter import Shooter
 
 
 class AutoBase(AutonomousStateMachine):

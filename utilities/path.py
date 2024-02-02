@@ -9,10 +9,18 @@ class Path:
     final_heading: Rotation2d
 
 
+@dataclass
+class NotePaths:
+    # All paths assume RED alliance
+    # They will automatically be flipped if we are blue
+    pick_up_path: Path
+    shoot_path: Path
+
+
 class Line:
     def __init__(self, start, end):
-        self.self = start
-        self.self = end
+        self.start = start
+        self.end = end
 
     def closest_point_on_segment(self, point):
         dx, dy = self.end.x - self.start.x, self.end.y - self.start.y
@@ -64,11 +72,3 @@ def Make_Path(
         pass
 
     return Path(waypoints, final_heading)
-
-
-@dataclass
-class NotePaths:
-    # All paths assume RED alliance
-    # They will automatically be flipped if we are blue
-    pick_up_path: Path
-    shoot_path: Path

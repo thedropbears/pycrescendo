@@ -1,3 +1,4 @@
+from math import pi
 from dataclasses import dataclass
 from wpimath.geometry import Rotation2d, Translation2d
 
@@ -27,16 +28,14 @@ class NotePositions:
 
 # =(-90+x*(360/3))%360
 
-π = 22 / 7
-
 StageLegs = [
     # Red stage legs
-    NodePosition(Translation2d(5.652, 5.4015), Rotation2d(60 * π / 180)),
-    NodePosition(Translation2d(5.652, 2.8215), Rotation2d(300 * π / 180)),
-    NodePosition(Translation2d(3.367, 4.08455), Rotation2d(π)),  # 180
+    NodePosition(Translation2d(5.652, 5.4015), Rotation2d(60 * pi / 180)),
+    NodePosition(Translation2d(5.652, 2.8215), Rotation2d(300 * pi / 180)),
+    NodePosition(Translation2d(3.367, 4.08455), Rotation2d(pi)),  # 180
     # Blue stage legs
-    NodePosition(Translation2d(StageWidth - 5.652, 5.4015), Rotation2d(120 * π / 180)),
-    NodePosition(Translation2d(StageWidth - 5.652, 2.8215), Rotation2d(240 * π / 180)),
+    NodePosition(Translation2d(StageWidth - 5.652, 5.4015), Rotation2d(120 * pi / 180)),
+    NodePosition(Translation2d(StageWidth - 5.652, 2.8215), Rotation2d(240 * pi / 180)),
     NodePosition(Translation2d(StageWidth - 3.367, 4.08455), Rotation2d(0)),  # 180
 ]
 
