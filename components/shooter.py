@@ -25,7 +25,7 @@ class ShooterComponent:
 
     desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
     desired_flywheel_speed = tunable(0.0)
-    inject_speed = tunable(0.0)
+    inject_speed = tunable(0.3)
 
     def __init__(self) -> None:
         self.inclinator = CANSparkMax(
@@ -133,7 +133,7 @@ class ShooterComponent:
         )
         self.inclinator.set(inclinator_speed)
 
-        if self.should_inject and self.at_inclination():
+        if self.should_inject:
             self.injector.set(self.inject_speed)
         else:
             self.injector.set(0.0)
