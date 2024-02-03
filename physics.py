@@ -44,7 +44,7 @@ class PhysicsEngine:
         self.wheels = [
             SimpleTalonFXMotorSim(
                 module.drive,
-                units_per_rev=1 / module.WHEEL_CIRCUMFERENCE,
+                units_per_rev=1 / module.DRIVE_MOTOR_REV_TO_METRES,
                 kV=2.7,
             )
             for module in robot.chassis.modules
@@ -52,8 +52,8 @@ class PhysicsEngine:
         self.steer = [
             SimpleTalonFXMotorSim(
                 module.steer,
-                units_per_rev=1,
-                kV=0.01,  # TODO: get from sysid logs
+                units_per_rev=1 / module.STEER_GEAR_RATIO,
+                kV=2.356,
             )
             for module in robot.chassis.modules
         ]
