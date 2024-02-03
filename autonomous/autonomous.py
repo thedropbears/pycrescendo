@@ -40,6 +40,24 @@ class Path:
             Rotation2d(self.final_heading.radians()),
         )
 
+    def __add__(self, other):
+        return Path(self.waypoints + other.waypoints, self.final_heading)
+
+    def __iter__(self):
+        return iter(self.waypoints)
+
+    def __getitem__(self, __i: int | slice):
+        return self.waypoints[__i]
+
+    def __setitem__(self, __key: int, __value: Translation2d):
+        self.waypoints[__key] = __value
+
+    def __delitem__(self, __key: int | slice):
+        del self.waypoints[__key]
+
+    def __len__(self):
+        return len(self.waypoints)
+
 
 @dataclass
 class NotePaths:
@@ -108,7 +126,7 @@ class AutoBase(AutonomousStateMachine):
             # go to just behind the note
             self.pathstate = 0
             newpath = self.note_paths_working_copy[0].pick_up_path.copy()
-            newpath.waypoints[-1] += self.note_paths_working_copy[0].pickup_offset
+            newpath[-1] += self.note_paths_working_copy[0].pickup_offset
             newpath.final_heading = (
                 self.note_paths_working_copy[0].pickup_offset.angle()
             ) + Rotation2d(math.pi)
@@ -126,7 +144,7 @@ class AutoBase(AutonomousStateMachine):
                 # TODO Also deploy the intake
                 self.trajectory = self.calculate_trajectory(
                     Path(
-                        [self.note_paths_working_copy[0].pick_up_path.waypoints[-1]],
+                        [self.note_paths_working_copy[0].pick_up_path[-1]],
                         (self.note_paths_working_copy[0].pickup_offset.angle())
                         + Rotation2d(math.pi),
                     )
