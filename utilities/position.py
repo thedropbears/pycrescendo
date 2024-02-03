@@ -100,9 +100,10 @@ class GoodPaths:
     cross_field = Path(
         [
             ShootingPoses.Pos2.translation(),
-            Translation2d(11.612, 4.11),  # under stage 1
-            Translation2d(4.844, 4.129),  # under stage 2
-            Translation2d(1.313, 1.237),
+            Translation2d(11.312, 4.11),  # under stage 1
+            Translation2d(5.785, 4.129),
+            Translation2d(4.3210, 3.207),
+            Translation2d(1.513, 1.437),
         ],
         Rotation2d(),
     )
