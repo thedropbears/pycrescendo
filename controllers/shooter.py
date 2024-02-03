@@ -73,10 +73,9 @@ class Shooter(StateMachine):
         must_finish=True, next_state="resetting", duration=SHOOTING_TIME_DURATION
     )
     def shooting(self) -> None:
-        self.shooter_component.start_injection()
+        self.shooter_component.shoot()
 
     @state
     def resetting(self) -> None:
         self.just_fired = True
-        self.shooter_component.stop_injection()
         self.done()
