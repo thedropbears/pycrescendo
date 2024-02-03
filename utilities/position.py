@@ -25,7 +25,7 @@ class Path:
         self.waypoints.reverse()
         return self
 
-    def __add__(self, other: "Path" | list[Translation2d] | Translation2d):
+    def __add__(self, other):
         if isinstance(other, Translation2d):
             return Path(self.waypoints + [other], self.final_heading)
         elif isinstance(other, list):
