@@ -319,6 +319,32 @@ class CentreNote(AutoBase):
         ]
 
 
+class Middle3(AutoBase):
+    MODE_NAME = "Centre 3 notes"
+
+    def setup(self) -> None:
+        to = Path(
+            [
+                ShootingPoses.Pos2.translation(),
+                Translation2d(11.312, 4.11),  # under stage 1
+            ],
+            rotation_to_red_speaker(ShootingPoses.Pos2.translation()),
+        )
+
+        def make_path(note, offset):
+            return NotePaths(
+                pick_up_path=to + note,
+                shoot_path=to.copy().inverse(),
+                pickup_offset=Translation2d(*offset),
+            )
+
+        self.note_paths = [
+            make_path(NotePoses.Centre3, (1, 0)),
+            make_path(NotePoses.Centre2, (0, -1)),
+            make_path(NotePoses.Centre4, (0, 1)),
+        ]
+
+
 class CrossField(AutoBase):
     MODE_NAME = "Cross field"
 
@@ -356,6 +382,6 @@ class Front2Note(AutoBase):
                     [NotePoses.Stage2.translation()],
                     rotation_to_red_speaker(NotePoses.Stage2.translation()),
                 ),
-                pickup_offset=Translation2d(0, -1),
+                pickup_offset=Translation2d(1, 0),
             )
         ]
