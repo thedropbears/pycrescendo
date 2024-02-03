@@ -109,9 +109,9 @@ class AutoBase(AutonomousStateMachine):
             self.pathstate = 0
             newpath = self.note_paths_working_copy[0].pick_up_path.copy()
             newpath.waypoints[-1] += self.note_paths_working_copy[0].pickup_offset
-            newpath.final_heading = -self.note_paths_working_copy[
-                0
-            ].pickup_offset.angle()
+            newpath.final_heading = (
+                self.note_paths_working_copy[0].pickup_offset.angle()
+            ) + Rotation2d(math.pi)
             self.trajectory = self.calculate_trajectory(newpath)
 
         # Do some driving...
@@ -127,7 +127,8 @@ class AutoBase(AutonomousStateMachine):
                 self.trajectory = self.calculate_trajectory(
                     Path(
                         [self.note_paths_working_copy[0].pick_up_path.waypoints[-1]],
-                        -self.note_paths_working_copy[0].pickup_offset.angle(),
+                        (self.note_paths_working_copy[0].pickup_offset.angle())
+                        + Rotation2d(math.pi),
                     )
                 )
             elif self.pathstate == 1:
