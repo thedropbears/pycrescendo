@@ -290,6 +290,36 @@ class AllNotes(AutoBase):
         ]
 
 
+class NearFarTop(AutoBase):
+    MODE_NAME = "Near and far top notes"
+
+    def setup(self) -> None:
+        self.note_paths = [
+            NotePaths(
+                pick_up_path=Path(
+                    [NotePoses.Stage1.translation()],
+                    Rotation2d(),
+                ),
+                shoot_path=Path(
+                    [NotePoses.Stage1.translation()],
+                    rotation_to_red_speaker(NotePoses.Stage1.translation()),
+                ),
+                pickup_offset=Translation2d(1, -0.6),
+            ),
+            NotePaths(
+                pick_up_path=Path(
+                    [NotePoses.Centre1.translation()],
+                    Rotation2d(),
+                ),
+                shoot_path=Path(
+                    [NotePoses.Stage1.translation()],
+                    rotation_to_red_speaker(NotePoses.Stage1.translation()),
+                ),
+                pickup_offset=Translation2d(2, 0),
+            ),
+        ]
+
+
 class Front2Note(AutoBase):
     MODE_NAME = "Front of speaker 2 note"
 
