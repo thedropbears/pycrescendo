@@ -40,11 +40,17 @@ class ClimberComponent:
 
     @feedback
     def has_climb_finished(self) -> bool:
-        return not self.retract_limit_switch.get()
+        return not self.retract_limit_switch.get() or (
+            self.encoder_limit_enabled
+            and self.climbing_motor.getFault(CANSparkMax.FaultID.kSoftLimitRev)
+        )
 
     @feedback
     def has_deploy_finished(self) -> bool:
-        return not self.deploy_limit_switch.get()
+        return not self.deploy_limit_switch.get() or (
+            self.encoder_limit_enabled
+            and self.climbing_motor.getFault(CANSparkMax.FaultID.kSoftLimitFwd)
+        )
 
     def enable_soft_limit(self) -> None:
         self.climbing_motor.enableSoftLimit(
@@ -56,20 +62,14 @@ class ClimberComponent:
         return
 
     def deploy(self) -> None:
-        if self.has_deploy_finished() or (
-            self.encoder_limit_enabled
-            and self.climbing_motor.getFault(CANSparkMax.FaultID.kSoftLimitFwd)
-        ):
+        if self.has_deploy_finished():
             self.speed = 0.0
         else:
             self.speed = 1.0
         return
 
     def retract(self) -> None:
-        if self.has_climb_finished() or (
-            self.encoder_limit_enabled
-            and self.climbing_motor.getFault(CANSparkMax.FaultID.kSoftLimitRev)
-        ):
+        if self.has_climb_finished():
             self.speed = 0.0
         else:
             self.speed = -1.0
