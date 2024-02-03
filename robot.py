@@ -107,7 +107,7 @@ class MyRobot(magicbot.MagicRobot):
     def testPeriodic(self) -> None:
         # injecting
         if self.gamepad.getBButton():
-            self.shooter.shoot()
+            self.shooter_component.shoot()
 
         if self.gamepad.getXButton():
             self.intake.intake()

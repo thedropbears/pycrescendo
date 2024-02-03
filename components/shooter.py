@@ -1,3 +1,4 @@
+import math
 from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
@@ -9,7 +10,6 @@ from phoenix6.signals import NeutralModeValue
 from wpilib import DigitalInput, DutyCycle, SmartDashboard
 from wpimath.controller import PIDController
 
-import math
 from utilities.functions import clamp
 
 
@@ -25,7 +25,7 @@ class ShooterComponent:
 
     desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
     desired_flywheel_speed = tunable(0.0)
-    inject_speed = tunable(0.0)
+    inject_speed = tunable(0.3)
 
     def __init__(self) -> None:
         self.inclinator = CANSparkMax(
@@ -78,6 +78,9 @@ class ShooterComponent:
     def on_enable(self) -> None:
         self.inclinator_controller.reset()
 
+    def set_flywheel_target(self, target_speed: float) -> None:
+        self.desired_flywheel_speed = target_speed
+
     @feedback
     def is_ready(self) -> bool:
         """Is the shooter ready to fire?"""
@@ -108,9 +111,15 @@ class ShooterComponent:
     def _flywheel_velocity(self) -> float:
         return self.flywheel.get_velocity().value
 
+    @feedback
+    def is_flywheel_at_speed(self) -> bool:
+        return (
+            abs(self.desired_flywheel_speed - self.flywheel.get_velocity().value)
+            < self.FLYWHEEL_TOLERANCE
+        )
+
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
-
         inclinator_speed = self.inclinator_controller.calculate(
             self._inclination_angle(),
             clamp(
@@ -121,7 +130,7 @@ class ShooterComponent:
         )
         self.inclinator.set(inclinator_speed)
 
-        if self.should_inject and self.at_inclination():
+        if self.should_inject:
             self.injector.set(self.inject_speed)
         else:
             self.injector.set(0.0)
