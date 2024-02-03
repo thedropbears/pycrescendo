@@ -221,7 +221,7 @@ class ChassisComponent:
     do_smooth = magicbot.tunable(True)
     swerve_lock = magicbot.tunable(False)
 
-    RED_TEST_POSE = Pose2d(15.1, 5.5, 0)
+    RED_TEST_POSE = Pose2d(15.1, 5.5, math.pi)
     BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
 
     def setup(self) -> None:
