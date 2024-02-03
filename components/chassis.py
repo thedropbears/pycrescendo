@@ -331,9 +331,10 @@ class ChassisComponent:
             self.chassis_speeds.omega = self.heading_controller.calculate(
                 self.get_rotation().radians()
             )
-
-        if self.heading_controller.atGoal():
-            self.stop_snapping()
+        else:
+            self.heading_controller.reset(
+                self.get_rotation().radians(), self.get_rotational_velocity()
+            )
 
         if self.do_fudge:
             # in the sim i found using 5 instead of 0.5 did a lot better
@@ -376,6 +377,9 @@ class ChassisComponent:
     @magicbot.feedback
     def get_imu_speed(self) -> float:
         return math.hypot(self.imu.getVelocityX(), self.imu.getVelocityY())
+
+    def get_rotational_velocity(self) -> float:
+        return math.radians(-self.imu.getRate())
 
     def lock_swerve(self) -> None:
         self.swerve_lock = True

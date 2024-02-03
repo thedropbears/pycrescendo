@@ -67,7 +67,7 @@ class MyRobot(magicbot.MagicRobot):
         self.rumble_for(0.8, 0.3)
 
     def teleopInit(self) -> None:
-        self.dpad_angle = 0.0
+        pass
 
     def teleopPeriodic(self) -> None:
         # Driving
@@ -86,8 +86,9 @@ class MyRobot(magicbot.MagicRobot):
         if drive_z != 0:
             self.chassis.stop_snapping()
 
-        if self.gamepad.getAButtonPressed():
-            self.chassis.snap_to_heading(math.radians(self.dpad_angle))
+        dpad = self.gamepad.getPOV()
+        if dpad != -1:
+            self.chassis.snap_to_heading(math.radians(dpad))
 
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):
