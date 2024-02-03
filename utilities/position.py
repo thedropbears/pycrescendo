@@ -25,7 +25,11 @@ class Path:
         self.waypoints.reverse()
         return self
 
-    def __add__(self, other):
+    def __add__(self, other: "Path" | list[Translation2d] | Translation2d):
+        if isinstance(other, Translation2d):
+            return Path(self.waypoints + [other], self.final_heading)
+        elif isinstance(other, list):
+            return Path(self.waypoints + other, self.final_heading)
         return Path(self.waypoints + other.waypoints, self.final_heading)
 
     def __iter__(self):
