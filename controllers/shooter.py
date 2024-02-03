@@ -9,7 +9,7 @@ class Shooter(StateMachine):
     chassis: ChassisComponent
     shooter_component: ShooterComponent
     should_fire = will_reset_to(False)
-    SHOOTING_TIME_DURATION = 3
+    INJECTION_DURATION = 1  # seconds
 
     def __init__(self) -> None:
         self.just_fired = False
@@ -69,9 +69,7 @@ class Shooter(StateMachine):
         if self.shooter_component.is_ready():
             self.next_state("shooting")
 
-    @timed_state(
-        must_finish=True, next_state="resetting", duration=SHOOTING_TIME_DURATION
-    )
+    @timed_state(must_finish=True, next_state="resetting", duration=INJECTION_DURATION)
     def shooting(self) -> None:
         self.shooter_component.shoot()
 
