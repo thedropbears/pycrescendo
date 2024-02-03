@@ -4,8 +4,8 @@ from typing import Optional
 import wpilib
 import wpiutil.log
 from magicbot import tunable
-from photonlibpy.photonCamera import PhotonCamera  # type: ignore
-from photonlibpy.photonTrackedTarget import PhotonTrackedTarget  # type: ignore
+from photonlibpy.photonCamera import PhotonCamera
+from photonlibpy.photonTrackedTarget import PhotonTrackedTarget
 from wpimath.geometry import Pose2d, Rotation3d, Transform3d, Translation3d, Pose3d
 
 from components.chassis import ChassisComponent

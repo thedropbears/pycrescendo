@@ -21,6 +21,11 @@ module = "phoenix6.*"
 # https://github.com/CrossTheRoadElec/Phoenix-Releases/issues/61#issuecomment-1890171743
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "photonlibpy.*"
+# https://github.com/PhotonVision/photonvision/issues/1210
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 pythonpath = '.'
 
