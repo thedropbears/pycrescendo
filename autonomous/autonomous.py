@@ -223,6 +223,27 @@ def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
     return Rotation2d(math.atan2(t.y, t.x))
 
 
+def combine(name, *Autos):
+    paths = []
+    for auto in Autos:
+        if AutoBase in auto.__bases__:
+            a = auto()
+            a.setup()
+            paths.extend(a.note_paths)
+        elif isinstance(auto, list):
+            paths.extend(auto)
+        else:
+            raise TypeError(f"Invalid type {type(auto)}")
+
+    class CombinedAuto(AutoBase):
+        MODE_NAME = name
+
+        def setup(self) -> None:
+            self.note_paths = paths
+
+    return CombinedAuto
+
+
 class All3Notes(AutoBase):
     MODE_NAME = "All notes in our half"
 
@@ -385,3 +406,6 @@ class Front2Note(AutoBase):
                 pickup_offset=Translation2d(1, 0),
             )
         ]
+
+
+AllMids = combine("All middle notes", Front2Note, Middle3)
