@@ -18,7 +18,7 @@ from wpilib import Field2d
 from wpimath.spline import Spline3
 from wpimath.geometry import Rotation2d, Translation2d
 
-from utilities.position import NotePoses, Path, NotePaths, GoodPaths
+from utilities.position import NotePoses, Path, NotePaths, ShootingPoses
 import utilities.game as game
 
 from components.chassis import ChassisComponent
@@ -302,7 +302,23 @@ class CrossField(AutoBase):
     MODE_NAME = "Cross field"
 
     def setup(self) -> None:
-        self.note_paths = [GoodPaths.Cycle]
+        cross_field = Path(
+            [
+                ShootingPoses.Pos2.translation(),
+                Translation2d(11.312, 4.11),  # under stage 1
+                Translation2d(5.785, 4.129),  # Start of stage 2
+                Translation2d(4.3210, 3.207),  # End of stage 2
+                Translation2d(1.513, 1.437),
+            ],
+            Rotation2d(),
+        )
+        self.note_paths = [
+            NotePaths(
+                pick_up_path=cross_field,
+                shoot_path=cross_field.copy().inverse(),
+                pickup_offset=Translation2d(0.5, 0.5),
+            )
+        ]
 
 
 class Front2Note(AutoBase):

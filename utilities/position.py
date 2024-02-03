@@ -94,21 +94,3 @@ StageLegs: list[Pose2d] = [
 class ShootingPoses:
     Pos1 = Pose2d(Translation2d(10, 5.45585), Rotation2d(0))
     Pos2 = Pose2d(Translation2d(12.585, 5.355), Rotation2d(0))
-
-
-class GoodPaths:
-    cross_field = Path(
-        [
-            ShootingPoses.Pos2.translation(),
-            Translation2d(11.312, 4.11),  # under stage 1
-            Translation2d(5.785, 4.129),
-            Translation2d(4.3210, 3.207),
-            Translation2d(1.513, 1.437),
-        ],
-        Rotation2d(),
-    )
-    Cycle = NotePaths(
-        pick_up_path=cross_field,
-        shoot_path=cross_field.copy().inverse(),
-        pickup_offset=Translation2d(0.5, 0.5),
-    )
