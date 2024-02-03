@@ -25,10 +25,10 @@ class ClimberComponent:
 
         self.encoder_limit_enabled = False
         self.climbing_motor.setSoftLimit(
-            CANSparkMax.SoftLimitDirection.kForward, self.MOTOR_ROT_TOP_LIMIT
+            CANSparkMax.SoftLimitDirection.kForward, self.MOTOR_REV_TOP_LIMIT
         )
         self.climbing_motor.setSoftLimit(
-            CANSparkMax.SoftLimitDirection.kReverse, self.MOTOR_ROT_BOTTOM_LIMIT
+            CANSparkMax.SoftLimitDirection.kReverse, self.MOTOR_REV_BOTTOM_LIMIT
         )
         self.climbing_motor.enableSoftLimit(
             CANSparkMax.SoftLimitDirection.kForward, False
@@ -78,14 +78,14 @@ class ClimberComponent:
     def execute(self) -> None:
         if not self.encoder_limit_enabled:
             if self.has_climb_finished():
-                self.enable_soft_limit()
+                self.enable_soft_limits()
                 self.encoder_limit_enabled = True
-                self.climb_encoder.setPosition(self.MOTOR_ROT_BOTTOM_LIMIT)
+                self.climb_encoder.setPosition(self.MOTOR_REV_BOTTOM_LIMIT)
 
             if self.has_deploy_finished():
-                self.enable_soft_limit()
+                self.enable_soft_limits()
                 self.encoder_limit_enabled = True
-                self.climb_encoder.setPosition(self.MOTOR_ROT_TOP_LIMIT)
+                self.climb_encoder.setPosition(self.MOTOR_REV_TOP_LIMIT)
 
         self.climbing_motor.set(self.speed)
         self.speed = 0.0
