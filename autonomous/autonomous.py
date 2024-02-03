@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import math
 from magicbot.state_machine import AutonomousStateMachine, state
 from wpimath.trajectory import (
@@ -19,7 +18,7 @@ from wpilib import Field2d
 from wpimath.spline import Spline3
 from wpimath.geometry import Rotation2d, Translation2d
 
-from utilities.position import NotePoses
+from utilities.position import NotePoses, Path, NotePaths
 import utilities.game as game
 
 from components.chassis import ChassisComponent
@@ -27,45 +26,6 @@ from components.intake import IntakeComponent
 
 # Add controllers for intake and shooter when available
 from controllers.shooter import Shooter
-
-
-@dataclass
-class Path:
-    waypoints: list[Translation2d]
-    final_heading: Rotation2d
-
-    def copy(self):
-        return Path(
-            [Translation2d(i.x, i.y) for i in self.waypoints],
-            Rotation2d(self.final_heading.radians()),
-        )
-
-    def __add__(self, other):
-        return Path(self.waypoints + other.waypoints, self.final_heading)
-
-    def __iter__(self):
-        return iter(self.waypoints)
-
-    def __getitem__(self, __i: int | slice):
-        return self.waypoints[__i]
-
-    def __setitem__(self, __key: int, __value: Translation2d):
-        self.waypoints[__key] = __value
-
-    def __delitem__(self, __key: int | slice):
-        del self.waypoints[__key]
-
-    def __len__(self):
-        return len(self.waypoints)
-
-
-@dataclass
-class NotePaths:
-    # All paths assume RED alliance
-    # They will automatically be flipped if we are blue
-    pick_up_path: Path
-    shoot_path: Path
-    pickup_offset: Translation2d
 
 
 class AutoBase(AutonomousStateMachine):
