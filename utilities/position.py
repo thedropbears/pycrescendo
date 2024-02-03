@@ -21,6 +21,9 @@ class Path:
             Rotation2d(self.final_heading.radians()),
         )
 
+    def inverse(self):
+        self.waypoints.reverse()
+
     def __add__(self, other):
         return Path(self.waypoints + other.waypoints, self.final_heading)
 
