@@ -223,8 +223,8 @@ def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
     return Rotation2d(math.atan2(t.y, t.x))
 
 
-class AllNotes(AutoBase):
-    MODE_NAME = "All the notes"
+class All3Notes(AutoBase):
+    MODE_NAME = "All notes in our half"
 
     def setup(self) -> None:
         self.note_paths = [
@@ -298,6 +298,27 @@ class NearFarTop(AutoBase):
         ]
 
 
+class CentreNote(AutoBase):
+    MODE_NAME = "Centre note"
+
+    def setup(self) -> None:
+        to = Path(
+            [
+                ShootingPoses.Pos2.translation(),
+                Translation2d(11.312, 4.11),  # under stage 1
+                NotePoses.Centre3.translation(),
+            ],
+            rotation_to_red_speaker(ShootingPoses.Pos2.translation()),
+        )
+        self.note_paths = [
+            NotePaths(
+                pick_up_path=to,
+                shoot_path=to.copy().inverse(),
+                pickup_offset=Translation2d(1, 0),
+            )
+        ]
+
+
 class CrossField(AutoBase):
     MODE_NAME = "Cross field"
 
@@ -310,7 +331,7 @@ class CrossField(AutoBase):
                 Translation2d(4.3210, 3.207),  # End of stage 2
                 Translation2d(1.513, 1.437),
             ],
-            Rotation2d(),
+            rotation_to_red_speaker(ShootingPoses.Pos2.translation()),
         )
         self.note_paths = [
             NotePaths(
