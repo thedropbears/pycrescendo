@@ -244,10 +244,6 @@ def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
     return Rotation2d(math.atan2(t.y, t.x))
 
 
-class PreloadOnly(AutoBase):
-    MODE_NAME = "Preload only"
-
-
 class Front2Note(AutoBase):
     MODE_NAME = "Front of speaker 2 note"
 
