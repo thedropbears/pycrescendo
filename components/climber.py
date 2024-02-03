@@ -36,7 +36,6 @@ class ClimberComponent:
         self.climbing_motor.enableSoftLimit(
             CANSparkMax.SoftLimitDirection.kReverse, False
         )
-        return
 
     @feedback
     def has_climb_finished(self) -> bool:
@@ -59,21 +58,18 @@ class ClimberComponent:
         self.climbing_motor.enableSoftLimit(
             CANSparkMax.SoftLimitDirection.kReverse, True
         )
-        return
 
     def deploy(self) -> None:
         if self.has_deploy_finished():
             self.speed = 0.0
         else:
             self.speed = 1.0
-        return
 
     def retract(self) -> None:
         if self.has_climb_finished():
             self.speed = 0.0
         else:
             self.speed = -1.0
-        return
 
     def execute(self) -> None:
         if not self.encoder_limit_enabled:
@@ -89,4 +85,3 @@ class ClimberComponent:
 
         self.climbing_motor.set(self.speed)
         self.speed = 0.0
-        return
