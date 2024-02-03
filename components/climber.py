@@ -52,7 +52,7 @@ class ClimberComponent:
             and self.climbing_motor.getFault(CANSparkMax.FaultID.kSoftLimitFwd)
         )
 
-    def enable_soft_limit(self) -> None:
+    def enable_soft_limits(self) -> None:
         self.climbing_motor.enableSoftLimit(
             CANSparkMax.SoftLimitDirection.kForward, True
         )
