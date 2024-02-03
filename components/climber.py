@@ -6,8 +6,8 @@ from ids import SparkMaxIds, DioChannels
 
 class ClimberComponent:
     GEAR_RATIO = 1 / 48  # using a Neo with 4:1 4:1 3:1 ratio
-    MOTOR_ROT_TOP_LIMIT = 7.110515
-    MOTOR_ROT_BOTTOM_LIMIT = 0
+    MOTOR_REV_TOP_LIMIT = 7.110515
+    MOTOR_REV_BOTTOM_LIMIT = 0
 
     def __init__(self) -> None:
         self.climbing_motor = CANSparkMax(
