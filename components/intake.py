@@ -5,7 +5,9 @@ from phoenix6.configs import MotorOutputConfigs, config_groups
 from phoenix6.controls import VoltageOut
 from phoenix6.hardware import TalonFX
 
-from ids import TalonIds
+from rev import CANSparkMax
+
+from ids import TalonIds, SparkMaxIds
 
 
 class IntakeComponent:
@@ -18,6 +20,11 @@ class IntakeComponent:
 
     def __init__(self) -> None:
         self.motor = TalonFX(TalonIds.intake)
+        self.deploy_motor = CANSparkMax(SparkMaxIds.intake_deploy)
+        # pid = self.deploy_motor.getPIDController()
+        # pid.setP(0.1)
+        # pid.setI(0.0)
+        # pid.setD(0.0)
         self.direction = self.Direction.STOPPED
 
         motor_configurator = self.motor.configurator
@@ -27,10 +34,10 @@ class IntakeComponent:
         motor_configurator.apply(motor_config)
 
     def deploy(self) -> None:
-        pass
+        self.deploy_motor.set(self.Direction.FORWARD)
 
     def retract(self) -> None:
-        pass
+        self.deploy_motor.set(self.Direction.FORWARD)
 
     def intake(self) -> None:
         self.direction = self.Direction.FORWARD
