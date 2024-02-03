@@ -110,14 +110,12 @@ class SwerveModule:
         )
 
         drive_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
-            1 / self.DRIVE_GEAR_RATIO
+            1 / self.DRIVE_MOTOR_REV_TO_METRES
         )
 
         # configuration for motor pid and feedforward
-        self.drive_pid = (
-            Slot0Configs().with_k_p(0.026450530596285438).with_k_i(0).with_k_d(0)
-        )
-        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.18877, kV=2.7713, kA=0.18824)
+        self.drive_pid = Slot0Configs().with_k_p(0.046062).with_k_i(0).with_k_d(0)
+        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.14039, kV=2.7253, kA=0.09923)
 
         drive_config.apply(drive_motor_config)
         drive_config.apply(self.drive_pid, 0.01)
@@ -145,10 +143,10 @@ class SwerveModule:
 
     def get_speed(self) -> float:
         # velocity is in rot/s, return in m/s
-        return self.drive.get_velocity().value * self.WHEEL_CIRCUMFERENCE
+        return self.drive.get_velocity().value
 
     def get_distance_traveled(self) -> float:
-        return self.drive.get_position().value * self.WHEEL_CIRCUMFERENCE
+        return self.drive.get_position().value
 
     def set(self, desired_state: SwerveModuleState):
         if self.module_locked:
@@ -182,9 +180,7 @@ class SwerveModule:
 
         # original position change/100ms, new m/s -> rot/s
         self.drive.set_control(
-            self.drive_request.with_velocity(
-                target_speed / self.WHEEL_CIRCUMFERENCE
-            ).with_feed_forward(speed_volt)
+            self.drive_request.with_velocity(target_speed).with_feed_forward(speed_volt)
         )
 
     def sync_steer_encoder(self) -> None:

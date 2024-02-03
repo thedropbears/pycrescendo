@@ -17,16 +17,20 @@ if typing.TYPE_CHECKING:
 
 
 class SimpleTalonFXMotorSim:
-    def __init__(self, motor: phoenix6.hardware.TalonFX, kV: float) -> None:
+    def __init__(
+        self, motor: phoenix6.hardware.TalonFX, units_per_rev: float, kV: float
+    ) -> None:
         self.sim_state = motor.sim_state
         self.sim_state.set_supply_voltage(12.0)
         self.kV = kV  # volt seconds per unit
+        self.units_per_rev = units_per_rev
 
     def update(self, dt: float) -> None:
         voltage = self.sim_state.motor_voltage
         velocity = voltage / self.kV  # units per second
-        self.sim_state.set_rotor_velocity(velocity)
-        self.sim_state.add_rotor_position(velocity * dt)
+        velocity_rps = velocity * self.units_per_rev
+        self.sim_state.set_rotor_velocity(velocity_rps)
+        self.sim_state.add_rotor_position(velocity_rps * dt)
 
 
 class PhysicsEngine:
@@ -40,14 +44,16 @@ class PhysicsEngine:
         self.wheels = [
             SimpleTalonFXMotorSim(
                 module.drive,
-                kV=0.1,  # TODO: get from sysid logs
+                units_per_rev=1 / module.DRIVE_MOTOR_REV_TO_METRES,
+                kV=2.7,
             )
             for module in robot.chassis.modules
         ]
         self.steer = [
             SimpleTalonFXMotorSim(
                 module.steer,
-                kV=0.01,  # TODO: get from sysid logs
+                units_per_rev=1 / module.STEER_GEAR_RATIO,
+                kV=2.356,
             )
             for module in robot.chassis.modules
         ]
