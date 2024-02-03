@@ -23,6 +23,7 @@ class Path:
 
     def inverse(self):
         self.waypoints.reverse()
+        return self
 
     def __add__(self, other):
         return Path(self.waypoints + other.waypoints, self.final_heading)
@@ -50,6 +51,13 @@ class NotePaths:
     pick_up_path: Path
     shoot_path: Path
     pickup_offset: Translation2d
+
+    def copy(self):
+        return NotePaths(
+            self.pick_up_path.copy(),
+            self.shoot_path.copy(),
+            Translation2d(self.pickup_offset.x, self.pickup_offset.y),
+        )
 
 
 # StageHeight = 8.210550308227539
@@ -85,3 +93,21 @@ StageLegs: list[Pose2d] = [
 
 class ShootingPoses:
     Pos1 = Pose2d(Translation2d(10, 5.45585), Rotation2d(0))
+    Pos2 = Pose2d(Translation2d(12.585, 5.355), Rotation2d(0))
+
+
+class GoodPaths:
+    cross_field = Path(
+        [
+            ShootingPoses.Pos2.translation(),
+            Translation2d(11.612, 4.11),  # under stage 1
+            Translation2d(4.844, 4.129),  # under stage 2
+            Translation2d(1.313, 1.237),
+        ],
+        Rotation2d(),
+    )
+    Cycle = NotePaths(
+        pick_up_path=cross_field,
+        shoot_path=cross_field.copy().inverse(),
+        pickup_offset=Translation2d(0.5, 0.5),
+    )

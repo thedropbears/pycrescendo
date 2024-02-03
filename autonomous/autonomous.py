@@ -18,7 +18,7 @@ from wpilib import Field2d
 from wpimath.spline import Spline3
 from wpimath.geometry import Rotation2d, Translation2d
 
-from utilities.position import NotePoses, Path, NotePaths
+from utilities.position import NotePoses, Path, NotePaths, GoodPaths
 import utilities.game as game
 
 from components.chassis import ChassisComponent
@@ -296,6 +296,13 @@ class NearFarTop(AutoBase):
                 pickup_offset=Translation2d(2, 0),
             ),
         ]
+
+
+class CrossField(AutoBase):
+    MODE_NAME = "Cross field"
+
+    def setup(self) -> None:
+        self.note_paths = [GoodPaths.Cycle]
 
 
 class Front2Note(AutoBase):
