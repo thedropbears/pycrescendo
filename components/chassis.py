@@ -92,7 +92,7 @@ class SwerveModule:
         )
 
         # configuration for motor pid
-        steer_pid = Slot0Configs().with_k_p(0.3409939393939394).with_k_i(0).with_k_d(0)
+        steer_pid = Slot0Configs().with_k_p(10).with_k_i(0).with_k_d(0.1)
 
         steer_config.apply(steer_motor_config)
         steer_config.apply(steer_pid, 0.01)
