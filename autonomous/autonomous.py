@@ -245,6 +245,51 @@ def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
     return Rotation2d(math.atan2(t.y, t.x))
 
 
+class AllNotes(AutoBase):
+    MODE_NAME = "All the notes"
+
+    def setup(self) -> None:
+        self.note_paths = [
+            NotePaths(
+                pick_up_path=Path(
+                    [NotePoses.Stage1.translation()],
+                    Rotation2d(),
+                ),
+                shoot_path=Path(
+                    [NotePoses.Stage1.translation()],
+                    rotation_to_red_speaker(NotePoses.Stage1.translation()),
+                ),
+                pickup_offset=Translation2d(1, -0.6),
+            ),
+            NotePaths(
+                pick_up_path=Path(
+                    [NotePoses.Stage2.translation()],
+                    Rotation2d(),
+                ),
+                shoot_path=Path(
+                    [NotePoses.Stage2.translation()],
+                    rotation_to_red_speaker(NotePoses.Stage2.translation()),
+                ),
+                pickup_offset=Translation2d(0, 1),
+            ),
+            NotePaths(
+                pick_up_path=Path(
+                    [
+                        NotePoses.Stage3.translation() + Translation2d(0.3, 0.1)
+                    ],  # otherwise it'll hit the stage leg
+                    Rotation2d(),
+                ),
+                shoot_path=Path(
+                    [
+                        NotePoses.Stage3.translation() + Translation2d(1, 0)
+                    ],  # drive it back out to avoid the stage leg when turning
+                    rotation_to_red_speaker(NotePoses.Stage3.translation()),
+                ),
+                pickup_offset=Translation2d(0.9, 0.4),
+            ),
+        ]
+
+
 class Front2Note(AutoBase):
     MODE_NAME = "Front of speaker 2 note"
 
