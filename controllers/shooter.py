@@ -75,5 +75,6 @@ class Shooter(StateMachine):
 
     @state
     def resetting(self) -> None:
+        self.chassis.stop_snapping()
         self.just_fired = True
         self.done()
