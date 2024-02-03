@@ -19,7 +19,7 @@ from wpilib import Field2d
 from wpimath.spline import Spline3
 from wpimath.geometry import Rotation2d, Translation2d
 
-from utilities.position import NotePoses, ShootingPoses
+from utilities.position import NotePoses
 import utilities.game as game
 
 from components.chassis import ChassisComponent
@@ -34,6 +34,12 @@ class Path:
     waypoints: list[Translation2d]
     final_heading: Rotation2d
 
+    def copy(self):
+        return Path(
+            [Translation2d(i.x, i.y) for i in self.waypoints],
+            Rotation2d(self.final_heading.radians()),
+        )
+
 
 @dataclass
 class NotePaths:
@@ -41,6 +47,7 @@ class NotePaths:
     # They will automatically be flipped if we are blue
     pick_up_path: Path
     shoot_path: Path
+    pickup_offset: Translation2d
 
 
 class AutoBase(AutonomousStateMachine):
@@ -69,6 +76,7 @@ class AutoBase(AutonomousStateMachine):
         )
         # Since robot is stationary from one action to another, point the control vector at the goal to avoid the robot taking unnecessary turns before moving towards the goal
         self.kD = 0.3
+        self.pathstate = 0
 
     @state(first=True)
     def initialise(self) -> None:
@@ -97,17 +105,37 @@ class AutoBase(AutonomousStateMachine):
     @state
     def drive_to_pick_up(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
-            self.trajectory = self.calculate_trajectory(
-                self.note_paths_working_copy[0].pick_up_path
-            )
-            # TODO Also deploy the intake
+            # go to just behind the note
+            self.pathstate = 0
+            newpath = self.note_paths_working_copy[0].pick_up_path.copy()
+            newpath.waypoints[-1] += self.note_paths_working_copy[0].pickup_offset
+            newpath.final_heading = -self.note_paths_working_copy[
+                0
+            ].pickup_offset.angle()
+            self.trajectory = self.calculate_trajectory(newpath)
 
         # Do some driving...
         self.drive_on_trajectory(state_tm)
 
-        if self.is_at_goal() or self.intake.is_note_present():
+        if self.intake.is_note_present():
             # Check if we have a note collected
             self.next_state("drive_to_shoot")
+        if self.is_at_goal():
+            if self.pathstate == 0:
+                self.pathstate = 1
+                # TODO Also deploy the intake
+                self.trajectory = self.calculate_trajectory(
+                    Path(
+                        [self.note_paths_working_copy[0].pick_up_path.waypoints[-1]],
+                        -self.note_paths_working_copy[0].pickup_offset.angle(),
+                    )
+                )
+            elif self.pathstate == 1:
+                self.pathstate = 0
+                if not self.intake.is_note_present():
+                    pass  # TODO: do something if we don't have a note, e.g. go to next note position
+                # Check if we have a note collected
+                self.next_state("drive_to_shoot")
 
     @state
     def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
@@ -228,11 +256,12 @@ class Front2Note(AutoBase):
             NotePaths(
                 pick_up_path=Path(
                     [NotePoses.Stage2.translation()],
-                    NotePoses.Stage2.rotation(),
+                    Rotation2d(),
                 ),
                 shoot_path=Path(
-                    [ShootingPoses.Pos1.translation()],
-                    rotation_to_red_speaker(ShootingPoses.Pos1.translation()),
+                    [NotePoses.Stage2.translation()],
+                    rotation_to_red_speaker(NotePoses.Stage2.translation()),
                 ),
+                pickup_offset=Translation2d(0, -1),
             )
         ]
