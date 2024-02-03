@@ -6,6 +6,8 @@ from ids import SparkMaxIds, DioChannels
 
 class ClimberComponent:
     GEAR_RATIO = 1 / 48  # using a Neo with 4:1 4:1 3:1 ratio
+    MOTOR_ROT_TOP_LIMIT = 7.110515
+    MOTOR_ROT_BOTTOM_LIMIT = 0
 
     def __init__(self) -> None:
         self.climbing_motor = CANSparkMax(
@@ -18,6 +20,22 @@ class ClimberComponent:
             DioChannels.climber_retract_switch
         )
         self.speed = 0.0
+        self.climb_encoder = self.climbing_motor.getEncoder()
+        self.climb_encoder.setPositionConversionFactor(self.GEAR_RATIO)
+
+        self.encoder_limit_enabled = False
+        self.climbing_motor.setSoftLimit(
+            CANSparkMax.SoftLimitDirection.kForward, self.MOTOR_ROT_TOP_LIMIT
+        )
+        self.climbing_motor.setSoftLimit(
+            CANSparkMax.SoftLimitDirection.kReverse, self.MOTOR_ROT_BOTTOM_LIMIT
+        )
+        self.climbing_motor.enableSoftLimit(
+            CANSparkMax.SoftLimitDirection.kForward, False
+        )
+        self.climbing_motor.enableSoftLimit(
+            CANSparkMax.SoftLimitDirection.kReverse, False
+        )
 
     @feedback
     def has_climb_finished(self):
@@ -27,18 +45,43 @@ class ClimberComponent:
     def has_deploy_finished(self):
         return not self.deploy_limit_switch.get()
 
+    def enable_soft_limit(self):
+        self.climbing_motor.enableSoftLimit(
+            CANSparkMax.SoftLimitDirection.kForward, True
+        )
+        self.climbing_motor.enableSoftLimit(
+            CANSparkMax.SoftLimitDirection.kReverse, True
+        )
+
     def deploy(self) -> None:
-        if self.has_deploy_finished():
+        if self.has_deploy_finished() or (
+            self.encoder_limit_enabled
+            and self.climbing_motor.getFault(CANSparkMax.FaultID.kSoftLimitFwd)
+        ):
             self.speed = 0.0
         else:
             self.speed = 1.0
 
     def retract(self) -> None:
-        if self.has_climb_finished():
+        if self.has_climb_finished() or (
+            self.encoder_limit_enabled
+            and self.climbing_motor.getFault(CANSparkMax.FaultID.kSoftLimitRev)
+        ):
             self.speed = 0.0
         else:
             self.speed = -1.0
 
     def execute(self) -> None:
+        if not self.encoder_limit_enabled:
+            if self.has_climb_finished():
+                self.enable_soft_limit()
+                self.encoder_limit_enabled = True
+                self.climb_encoder.setPosition(self.MOTOR_ROT_BOTTOM_LIMIT)
+
+            if self.has_deploy_finished():
+                self.enable_soft_limit()
+                self.encoder_limit_enabled = True
+                self.climb_encoder.setPosition(self.MOTOR_ROT_TOP_LIMIT)
+
         self.climbing_motor.set(self.speed)
         self.speed = 0.0
