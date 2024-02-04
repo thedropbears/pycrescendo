@@ -220,7 +220,7 @@ class AutoBase(AutonomousStateMachine):
 
 def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
     t: Translation2d = game.RED_SPEAKER_POSE.toPose2d().translation() - position
-    return Rotation2d(math.atan2(t.y, t.x))
+    return Rotation2d(math.atan2(t.y, t.x)) + Rotation2d(math.pi)
 
 
 def combine(name, *Autos):
