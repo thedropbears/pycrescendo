@@ -129,5 +129,5 @@ def test_fuzz_test(control: TestController) -> None:
         for _ in range(40):
             hids.fuzz()
             DriverStationSim.notifyNewData()
-            wpilib.simulation.stepTiming(0.1)
+            wpilib.simulation.stepTiming(0.2)
             assert control.robot_is_alive
