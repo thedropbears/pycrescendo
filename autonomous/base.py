@@ -54,7 +54,6 @@ class AutoBase(AutonomousStateMachine):
         )
         # Since robot is stationary from one action to another, point the control vector at the goal to avoid the robot taking unnecessary turns before moving towards the goal
         self.kD = 0.3
-        self.pathstate = 0
 
     @state(first=True)
     def initialise(self) -> None:
@@ -81,10 +80,33 @@ class AutoBase(AutonomousStateMachine):
                 self.next_state("drive_to_pick_up")
 
     @state
+    def pick_up(self, state_tm: float, initial_call: bool) -> None:
+        if initial_call:
+            # go to just behind the note
+            self.trajectory = self.calculate_trajectory(
+                Path(
+                    [self.note_paths_working_copy[0].pick_up_path[-1]],
+                    (self.note_paths_working_copy[0].pickup_offset.angle())
+                    + Rotation2d(math.pi),
+                )
+            )
+
+        # Do some driving...
+        self.drive_on_trajectory(state_tm)
+
+        if self.intake.is_note_present():
+            # Check if we have a note collected
+            self.next_state("drive_to_shoot")
+        if self.is_at_goal():
+            if not self.intake.is_note_present():
+                pass  # TODO: do something if we don't have a note, e.g. go to next note position
+            # Check if we have a note collected
+            self.next_state("drive_to_shoot")
+
+    @state
     def drive_to_pick_up(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
             # go to just behind the note
-            self.pathstate = 0
             newpath = self.note_paths_working_copy[0].pick_up_path.copy()
             newpath[-1] += self.note_paths_working_copy[0].pickup_offset
             newpath.final_heading = (
@@ -99,22 +121,7 @@ class AutoBase(AutonomousStateMachine):
             # Check if we have a note collected
             self.next_state("drive_to_shoot")
         if self.is_at_goal():
-            if self.pathstate == 0:
-                self.pathstate = 1
-                # TODO Also deploy the intake
-                self.trajectory = self.calculate_trajectory(
-                    Path(
-                        [self.note_paths_working_copy[0].pick_up_path[-1]],
-                        (self.note_paths_working_copy[0].pickup_offset.angle())
-                        + Rotation2d(math.pi),
-                    )
-                )
-            elif self.pathstate == 1:
-                self.pathstate = 0
-                if not self.intake.is_note_present():
-                    pass  # TODO: do something if we don't have a note, e.g. go to next note position
-                # Check if we have a note collected
-                self.next_state("drive_to_shoot")
+            self.next_state("pick_up")
 
     @state
     def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
