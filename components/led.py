@@ -245,26 +245,26 @@ class Morse(Pattern):
         # TODO Maybe make it not pick the same message as last time?
         return random.choice(self.MESSAGES)
 
-    def translate_message(self, message: str) -> str:
+    @classmethod
+    def translate_message(cls, message: str) -> str:
         message = message.upper()
         morse_message = ""
         for letter in message:
             if letter == " ":
                 morse_message += " "
                 continue
-            if letter not in self.MORSE_TRANSLATION:
-                continue
-            morse_message += self.MORSE_TRANSLATION[letter] + " "
+            morse_message += cls.MORSE_TRANSLATION[letter] + " "
 
         # Add some space at end of message
         morse_message += "  "
         return morse_message
 
-    def calculate_message_length(self, morse_message: str) -> int:
+    @classmethod
+    def calculate_message_length(cls, morse_message: str) -> int:
         return (
-            self.DOT_LENGTH * morse_message.count(".")
-            + self.DASH_LENGTH * morse_message.count("-")
-            + self.SPACE_LENGTH * morse_message.count(" ")
+            cls.DOT_LENGTH * morse_message.count(".")
+            + cls.DASH_LENGTH * morse_message.count("-")
+            + cls.SPACE_LENGTH * morse_message.count(" ")
         )
 
 
