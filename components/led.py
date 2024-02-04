@@ -9,7 +9,7 @@ from ids import PwmChannels
 
 
 MAX_BRIGHTNESS = 50  # Integer value 0-255
-HSV = tuple[int, int, int]
+Hsv = tuple[int, int, int]
 
 FLASH_SPEED = 2
 BREATHE_SPEED = 4
@@ -51,7 +51,7 @@ class LightStrip:
         self.pattern_state = PatternState.RAINBOW
         self.pattern_start_time = time.monotonic()
 
-        self.colour: HSV = HsvColour.MAGENTA.value
+        self.colour: Hsv = HsvColour.MAGENTA.value
         self.led_data.setHSV(*self.colour)
         self.leds.setData(self.strip_data)
         self.leds.start()
@@ -60,7 +60,7 @@ class LightStrip:
         self.pattern_state = new_pattern
         self.pattern_start_time = time.monotonic()
 
-    def set_colour(self, new_colour: HSV) -> None:
+    def set_colour(self, new_colour: Hsv) -> None:
         self.colour = new_colour
 
     # TODO ADD FUNCTIONS TO CALL FROM ROBOT.PY
@@ -120,7 +120,7 @@ class Pattern(ABC):
         self.speed = speed
 
     @abstractmethod
-    def update(self, colour: HSV, start_time: float) -> HSV:
+    def update(self, colour: Hsv, start_time: float) -> Hsv:
         return colour
 
 
@@ -128,7 +128,7 @@ class Flash(Pattern):
     def __init__(self) -> None:
         super().__init__(FLASH_SPEED)
 
-    def update(self, colour: HSV, start_time: float) -> HSV:
+    def update(self, colour: Hsv, start_time: float) -> Hsv:
         elapsed_time = time.monotonic() - start_time
         brightness = math.cos(self.speed * elapsed_time * math.tau) >= 0
         return (colour[0], colour[1], int(MAX_BRIGHTNESS * brightness))
@@ -138,7 +138,7 @@ class Breathe(Pattern):
     def __init__(self) -> None:
         super().__init__(BREATHE_SPEED)
 
-    def update(self, colour: HSV, start_time: float) -> HSV:
+    def update(self, colour: Hsv, start_time: float) -> Hsv:
         elapsed_time = time.monotonic() - start_time
         brightness = (math.sin(self.speed * elapsed_time * math.tau) + 1) / 2
         return (colour[0], colour[1], int(MAX_BRIGHTNESS * brightness))
@@ -148,7 +148,7 @@ class Rainbow(Pattern):
     def __init__(self) -> None:
         super().__init__(RAINBOW_SPEED)
 
-    def update(self, colour: HSV, start_time: float) -> HSV:
+    def update(self, colour: Hsv, start_time: float) -> Hsv:
         elapsed_time = time.monotonic() - start_time
         hue = round(360 * (elapsed_time / self.speed % 1))
         return (hue, colour[1], MAX_BRIGHTNESS)
@@ -209,7 +209,7 @@ class Morse(Pattern):
         super().__init__(MORSE_SPEED)
         self.pick_new_message()
 
-    def update(self, colour: HSV, start_time: float) -> HSV:
+    def update(self, colour: Hsv, start_time: float) -> Hsv:
         elapsed_time = time.monotonic() - start_time
         if elapsed_time > self.message_time:
             return colour
