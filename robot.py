@@ -39,6 +39,9 @@ class MyRobot(magicbot.MagicRobot):
     lights: LightStrip
 
     max_speed = magicbot.tunable(4)  # m/s
+    lower_max_speed = magicbot.tunable(2)  # m/s
+    max_spin_rate = magicbot.tunable(4)  # m/s
+    lower_max_spin_rate = magicbot.tunable(2)  # m/s
     inclination_angle = tunable(0.0)
     vision_port: VisualLocalizer
     vision_starboard: VisualLocalizer
@@ -85,10 +88,21 @@ class MyRobot(magicbot.MagicRobot):
 
     def teleopPeriodic(self) -> None:
         # Driving
-        spin_rate = 4
-        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * self.max_speed
-        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * self.max_speed
-        drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
+        max_speed = (
+            self.lower_max_speed
+            if self.gamepad.getLeftStickButtonPressed()
+            else self.max_speed
+        )
+        max_spin_rate = (
+            self.lower_max_spin_rate
+            if self.gamepad.getLeftStickButtonPressed
+            else self.max_spin_rate
+        )
+        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * max_speed
+        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * max_speed
+        drive_z = (
+            -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * max_spin_rate
+        )
         local_driving = self.gamepad.getYButton()
 
         if local_driving:
@@ -114,12 +128,17 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getXButton():
             self.chassis.reset_yaw()
 
+        # Reverse intake and shooter
+        if self.gamepad.getBackButton():
+            self.intake.outtake()
+            # TODO: Reverse shooter
+
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):
             self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
 
-        # Climbing arm controls
-
+        # Climbing arm controls. TODO: Change to single button toggle
+        # TODO: LB should cancel intake
         if self.gamepad.getLeftBumper():
             self.climber.deploy()
 
