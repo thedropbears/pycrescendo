@@ -120,8 +120,7 @@ class Pattern(ABC):
         self.speed = speed
 
     @abstractmethod
-    def update(self, colour: Hsv, start_time: float) -> Hsv:
-        return colour
+    def update(self, colour: Hsv, start_time: float) -> Hsv: ...
 
 
 class Flash(Pattern):
