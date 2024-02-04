@@ -1,13 +1,6 @@
-from math import pi
-
+import math
 from dataclasses import dataclass
 from wpimath.geometry import Rotation2d, Translation2d, Pose2d
-
-# Is this redundant? -> Using Pose2d instead
-# @dataclass
-# class NodePosition:
-#     translation: Translation2d
-#     heading: Rotation2d
 
 
 @dataclass
@@ -87,12 +80,12 @@ class NotePoses:
 
 StageLegs: list[Pose2d] = [
     # Red stage legs
-    Pose2d(Translation2d(5.652, 5.4015), Rotation2d(60 * pi / 180)),
-    Pose2d(Translation2d(5.652, 2.8215), Rotation2d(300 * pi / 180)),
-    Pose2d(Translation2d(3.367, 4.08455), Rotation2d(pi)),  # 180
+    Pose2d(Translation2d(5.652, 5.4015), Rotation2d(math.radians(60))),
+    Pose2d(Translation2d(5.652, 2.8215), Rotation2d(math.radians(300))),
+    Pose2d(Translation2d(3.367, 4.08455), Rotation2d(math.pi)),  # 180
     # Blue stage legs
-    Pose2d(Translation2d(StageWidth - 5.652, 5.4015), Rotation2d(120 * pi / 180)),
-    Pose2d(Translation2d(StageWidth - 5.652, 2.8215), Rotation2d(240 * pi / 180)),
+    Pose2d(Translation2d(StageWidth - 5.652, 5.4015), Rotation2d(math.radians(120))),
+    Pose2d(Translation2d(StageWidth - 5.652, 2.8215), Rotation2d(math.radians(240))),
     Pose2d(Translation2d(StageWidth - 3.367, 4.08455), Rotation2d(0)),  # 180
 ]
 
