@@ -92,7 +92,7 @@ class SwerveModule:
         )
 
         # configuration for motor pid
-        steer_pid = Slot0Configs().with_k_p(5).with_k_i(0).with_k_d(0.1)
+        steer_pid = Slot0Configs().with_k_p(3).with_k_i(0).with_k_d(0.1)
 
         steer_config.apply(steer_motor_config)
         steer_config.apply(steer_pid, 0.01)
@@ -227,7 +227,7 @@ class ChassisComponent:
     def setup(self) -> None:
         self.imu = navx.AHRS.create_spi()
         self.heading_controller = ProfiledPIDControllerRadians(
-            1, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
+            4, 0, 0, TrapezoidProfileRadians.Constraints(5, 5)
         )
         self.heading_controller.enableContinuousInput(-math.pi, math.pi)
         self.snapping_to_heading = False
