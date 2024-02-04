@@ -138,16 +138,12 @@ class MyRobot(magicbot.MagicRobot):
             self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
 
         # Climbing arm controls. Toggles!
-        if self.gamepad.getRightBumper():
-            self.climber_extended = not self.climber_extended
-            if self.climber_extended:
-                self.climber.climb()
-            else:
-                self.climber.deploy()
+        if self.gamepad.getRightBumperPressed():
+            self.climber.try_toggle()
 
         # TODO: LB should cancel intake
         if self.gamepad.getLeftBumper():
-            self.climber.climb()
+            pass
 
     def testInit(self) -> None:
         pass
@@ -166,6 +162,7 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getXButton():
             self.intake.intake()
 
+        # Climbing arm controls
         if self.gamepad.getLeftBumper():
             self.climber_component.deploy()
 
