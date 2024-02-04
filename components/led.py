@@ -110,7 +110,6 @@ class LightStrip:
 
         self.led_data.setHSV(*colour)
         self.leds.setData(self.strip_data)
-        return
 
 
 class Pattern(ABC):
