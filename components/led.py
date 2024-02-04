@@ -30,6 +30,15 @@ class HsvColour(Enum):
     WHITE = (0, 0, MAX_BRIGHTNESS)
     OFF = (0, 0, 0)
 
+    def with_hue(self, hue: int) -> Hsv:
+        """
+        Change the hue of the colour.
+
+        Args:
+            hue: The desired hue in [0,180).
+        """
+        _, s, v = self.value
+        return (hue, s, v)
 
     def with_relative_brightness(self, multiplier: float) -> Hsv:
         """
@@ -139,7 +148,7 @@ class Rainbow(CommonPattern):
 
     def update(self) -> Hsv:
         hue = round(360 * (self.elapsed_time() / self.speed % 1))
-        return (hue, self.colour.value[1], MAX_BRIGHTNESS)
+        return self.colour.with_hue(hue)
 
 
 @dataclasses.dataclass
