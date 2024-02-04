@@ -138,7 +138,8 @@ class Breathe(CommonPattern):
     speed: float = BREATHE_SPEED
 
     def update(self) -> Hsv:
-        brightness = (math.sin(self.speed * self.elapsed_time() * math.tau) + 1) / 2
+        brightness = (
+            math.sin(self.speed * self.elapsed_time() * math.tau) + 1) / 2
         return self.colour.with_relative_brightness(brightness)
 
 
