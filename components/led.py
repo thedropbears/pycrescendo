@@ -31,6 +31,15 @@ class HsvColour(Enum):
     OFF = (0, 0, 0)
 
 
+    def with_relative_brightness(self, multiplier: float) -> Hsv:
+        """
+        Scale the brightness of the colour.
+
+        `multiplier` MUST be non-negative, and SHOULD be <= 1.
+        """
+        h, s, v = self.value
+        return (h, s, int(v * multiplier))
+
 
 class LightStrip:
     def __init__(self, strip_length: int) -> None:
@@ -112,8 +121,7 @@ class Flash(CommonPattern):
 
     def update(self) -> Hsv:
         brightness = math.cos(self.speed * self.elapsed_time() * math.tau) >= 0
-        colour = self.colour.value
-        return (colour[0], colour[1], int(MAX_BRIGHTNESS * brightness))
+        return self.colour.with_relative_brightness(brightness)
 
 
 @dataclasses.dataclass
@@ -122,8 +130,7 @@ class Breathe(CommonPattern):
 
     def update(self) -> Hsv:
         brightness = (math.sin(self.speed * self.elapsed_time() * math.tau) + 1) / 2
-        colour = self.colour.value
-        return (colour[0], colour[1], int(MAX_BRIGHTNESS * brightness))
+        return self.colour.with_relative_brightness(brightness)
 
 
 @dataclasses.dataclass
