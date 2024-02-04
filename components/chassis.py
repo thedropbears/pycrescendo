@@ -92,7 +92,7 @@ class SwerveModule:
         )
 
         # configuration for motor pid
-        steer_pid = Slot0Configs().with_k_p(10).with_k_i(0).with_k_d(0.1)
+        steer_pid = Slot0Configs().with_k_p(5).with_k_i(0).with_k_d(0.1)
 
         steer_config.apply(steer_motor_config)
         steer_config.apply(steer_pid, 0.01)
@@ -114,8 +114,8 @@ class SwerveModule:
         )
 
         # configuration for motor pid and feedforward
-        self.drive_pid = Slot0Configs().with_k_p(0.046062).with_k_i(0).with_k_d(0)
-        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.14039, kV=2.7253, kA=0.09923)
+        self.drive_pid = Slot0Configs().with_k_p(1.0868).with_k_i(0).with_k_d(0)
+        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.15172, kV=2.8305, kA=0.082659)
 
         drive_config.apply(drive_motor_config)
         drive_config.apply(self.drive_pid, 0.01)
