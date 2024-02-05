@@ -4,7 +4,6 @@ from wpimath.trajectory import (
     TrajectoryConfig,
     Trajectory,
     TrajectoryGenerator,
-    TrapezoidProfileRadians,
 )
 from wpimath.trajectory.constraint import (
     CentripetalAccelerationConstraint,
@@ -12,7 +11,6 @@ from wpimath.trajectory.constraint import (
 from wpimath.controller import (
     HolonomicDriveController,
     PIDController,
-    ProfiledPIDControllerRadians,
 )
 from wpilib import Field2d
 from wpimath.spline import Spline3
@@ -40,16 +38,15 @@ class AutoBase(AutonomousStateMachine):
     MAX_ACCEL = 0.5
     FINAL_VELOCITY_STEPBACK = 1e-3
 
-    def __init__(self) -> None:
+    def __init__(self):
+        """Should be overloaded by subclass method with paths"""
         self.note_paths: list[Path] = []
         self.shoot_paths: list[Path] = []
 
+    def setup(self) -> None:
         x_controller = PIDController(2.5, 0, 0)
         y_controller = PIDController(2.5, 0, 0)
-        heading_controller = ProfiledPIDControllerRadians(
-            3, 0, 0, TrapezoidProfileRadians.Constraints(2, 2)
-        )
-        heading_controller.enableContinuousInput(math.pi, -math.pi)
+        heading_controller = self.chassis.heading_controller
 
         self.drive_controller = HolonomicDriveController(
             x_controller, y_controller, heading_controller
@@ -57,20 +54,10 @@ class AutoBase(AutonomousStateMachine):
         # Since robot is stationary from one action to another, point the control vector at the goal to avoid the robot taking unnecessary turns before moving towards the goal
         self.kD = 0.3
 
-    def setup(self) -> None:
-        """Must be called after the subclass' setup"""
-        for path in self.note_paths:
-            # assume an initial final heading
-            path.final_heading = 0
-            self.calculate_trajectory(path)
-            # get the last velocity
-            robot_relative_speeds = self.trajectory.sample(
-                self.trajectory.totalTime() - self.FINAL_VELOCITY_STEPBACK
-            ).velocity
-            vx, vy, _ = self.chassis.to_field_oriented(*robot_relative_speeds)
-            path.final_heading = math.atan2(vy, vx)
-        for path in self.shoot_paths:
-            path.final_heading = rotation_to_red_speaker(path.waypoints[-1])
+        for i, path in enumerate(self.shoot_paths):
+            self.shoot_paths[i].final_heading = rotation_to_red_speaker(
+                path.waypoints[-1]
+            )
 
     @state(first=True)
     def initialise(self) -> None:
@@ -95,32 +82,37 @@ class AutoBase(AutonomousStateMachine):
                 # Just shot the last note
                 self.done()
             else:
-                self.next_state("drive_to_pick_up")
+                self.next_state("pick_up")
 
     @state
     def pick_up(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
             # go to just behind the note
-            newpath = self.note_paths_working_copy[0]
-            self.trajectory = self.calculate_trajectory(newpath)
+            self.trajectory = self.calculate_trajectory(
+                self.note_paths_working_copy.pop(0)
+            )
 
-        # Do some driving...
-        self.drive_on_trajectory(state_tm)
+        # Drive with the intake always facing the tangent
+        self.drive_on_trajectory(state_tm, enforce_tangent_heading=True)
 
         if self.intake.is_note_present():
             # Check if we have a note collected
+            # Return heading control to path controller
+            self.chassis.stop_snapping()
             self.next_state("drive_to_shoot")
         if self.is_at_goal():
             if not self.intake.is_note_present():
                 pass  # TODO: do something if we don't have a note, e.g. go to next note position
             # Check if we have a note collected
+            # Return heading control to the path controller
+            self.chassis.stop_snapping()
             self.next_state("drive_to_shoot")
 
     @state
     def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
             self.trajectory = self.calculate_trajectory(
-                self.shoot_paths_working_copy[0]
+                self.shoot_paths_working_copy.pop(0)
             )
 
         # Do some driving...
@@ -128,10 +120,11 @@ class AutoBase(AutonomousStateMachine):
 
         if self.is_at_goal():
             # If we are in position, remove this note from the list and shoot it
-            self.shoot_paths_working_copy.pop(0)
             self.next_state("shoot_note")
 
-    def drive_on_trajectory(self, trajectory_tm: float):
+    def drive_on_trajectory(
+        self, trajectory_tm: float, enforce_tangent_heading: bool = False
+    ):
         # Grabbing the target position at the current point in time from the trajectory.
         target_state = self.trajectory.sample(trajectory_tm)
 
@@ -146,6 +139,13 @@ class AutoBase(AutonomousStateMachine):
             chassis_speed.vy,
             chassis_speed.omega,
         )
+
+        # if we are enforcing heading, hyjack rotational control from the main controller
+        if enforce_tangent_heading:
+            vx, vy, _ = self.chassis.to_field_oriented(*chassis_speed)
+            heading_target = math.atan2(vy, vx)
+            self.goal_heading = Rotation2d(heading_target)
+            self.chassis.snap_to_heading(heading_target)
 
     def calculate_trajectory(self, path: Path) -> Trajectory:
         pose = self.chassis.get_pose()
