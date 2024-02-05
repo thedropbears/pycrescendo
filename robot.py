@@ -2,7 +2,7 @@
 
 import wpilib
 import wpilib.event
-from wpimath.geometry import Rotation3d, Translation3d, Pose2d
+from wpimath.geometry import Rotation3d, Translation3d
 import magicbot
 from magicbot import tunable
 
@@ -20,7 +20,6 @@ from controllers.climber import Climber
 import math
 
 from utilities.scalers import rescale_js
-from utilities.position import NotePositions, ShootingPoses, StageLegs
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -56,20 +55,6 @@ class MyRobot(magicbot.MagicRobot):
         self.vision_name = "ardu_cam_port"
         self.vision_pos = Translation3d(0.11, 0.24, 0.273)
         self.vision_rot = Rotation3d(0, -math.radians(20), 0)
-
-        self.allposs = {
-            "NotePoses." + i: getattr(NotePositions, i)
-            for i in dir(NotePositions)
-            if not i.startswith("__")
-        }
-        self.allposs.update(
-            {
-                "ShootingPositions." + i: getattr(ShootingPoses, i)
-                for i in dir(ShootingPoses)
-                if not i.startswith("__")
-            }
-        )
-        self.SLegs = self.field.getObject("StageLegs")
 
     def rumble_for(self, intensity: float, duration: float):
         self.rumble_duration = duration
@@ -126,14 +111,6 @@ class MyRobot(magicbot.MagicRobot):
         pass
 
     def testPeriodic(self) -> None:
-        if self.show_note_positions:
-            self.SLegs.setPoses(
-                [Pose2d(i.translation(), i.rotation()) for i in StageLegs]
-            )
-            for i in self.allposs:
-                self.field.getObject(i).setPose(
-                    Pose2d(self.allposs[i].translation, self.allposs[i].rotation)
-                )
         # injecting
         if self.gamepad.getBButton():
             self.shooter_component.shoot()
