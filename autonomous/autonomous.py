@@ -36,7 +36,6 @@ class AutoBase(AutonomousStateMachine):
     ANGLE_TOLERANCE = math.radians(2)
     MAX_VEL = 1
     MAX_ACCEL = 0.5
-    FINAL_VELOCITY_STEPBACK = 1e-3
 
     def __init__(self):
         """Should be overloaded by subclass method with paths"""
