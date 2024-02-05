@@ -1,5 +1,7 @@
 from wpimath.geometry import Rotation2d, Translation2d
 
+from utilities.game import RED_SPEAKER_POSE
+
 
 class Path:
     waypoints: list[Translation2d]
@@ -30,6 +32,4 @@ class NotePositions:
 
 
 class ShootingPoses:
-    Pos1 = Translation2d(10, 5.45585)
-    Pos2 = Translation2d(12.585, 5.355)
-    CloseStraight = Translation2d(15, NotePositions.Stage2.Y())
+    CloseStraight = Translation2d(15, RED_SPEAKER_POSE.y)
