@@ -221,8 +221,12 @@ class ChassisComponent:
     do_smooth = magicbot.tunable(True)
     swerve_lock = magicbot.tunable(False)
 
+    # TODO: Read from positions.py once autonomous is finished
     RED_TEST_POSE = Pose2d(15.1, 5.5, math.pi)
     BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
+    stage_width = 16.541748046875
+    RED_PODIUM = Pose2d(Translation2d(3.367, 4.08455), Rotation2d(math.pi))
+    BLUE_PODIUM = Pose2d(Translation2d(stage_width - 3.367, 4.08455), Rotation2d(0))
 
     def __init__(self) -> None:
         self.imu = navx.AHRS.create_spi()
@@ -429,6 +433,13 @@ class ChassisComponent:
         self.set_pose(
             Pose2d(cur_pose.translation(), Rotation2d(math.pi if is_red() else 0))
         )
+
+    def reset_odometry(self) -> None:
+        """Reset odometry to current team's podium"""
+        if self.on_red_alliance:
+            self.set_pose(ChassisComponent.RED_PODIUM)
+        else:
+            self.set_pose(ChassisComponent.BLUE_PODIUM)
 
     def get_module_positions(
         self,

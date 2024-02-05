@@ -87,17 +87,14 @@ class MyRobot(magicbot.MagicRobot):
         pass
 
     def teleopPeriodic(self) -> None:
+        # Set max speed
+        max_speed = self.max_speed
+        max_spin_rate = self.max_spin_rate
+        if self.gamepad.getXButton():
+            max_speed = self.lower_max_speed
+            max_spin_rate = self.lower_max_spin_rate
+
         # Driving
-        max_speed = (
-            self.lower_max_speed
-            if self.gamepad.getLeftStickButtonPressed()
-            else self.max_speed
-        )
-        max_spin_rate = (
-            self.lower_max_spin_rate
-            if self.gamepad.getLeftStickButtonPressed
-            else self.max_spin_rate
-        )
         drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * max_speed
         drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * max_speed
         drive_z = (
@@ -113,7 +110,7 @@ class MyRobot(magicbot.MagicRobot):
                 drive_y = -drive_y
             self.chassis.drive_field(drive_x, drive_y, drive_z)
 
-        # give rotational access to the driver
+        # Give rotational access to the driver
         if drive_z != 0:
             self.chassis.stop_snapping()
 
@@ -128,12 +125,16 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getXButton():
             self.chassis.reset_yaw()
 
-        # Reverse intake and shooter
+        # Reset Odometry
+        if self.gamepad.getStartButtonPressed():
+            self.chassis.reset_odometry()
+
+        # Reverse intake and shoot shooter
         if self.gamepad.getBackButton():
             self.intake.outtake()
-            # TODO: Reverse shooter
+            self.shooter.shoot()
 
-        # stop rumble after time
+        # Stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):
             self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
 
@@ -141,7 +142,7 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getRightBumperPressed():
             self.climber.try_toggle()
 
-        # TODO: LB should cancel intake
+        # TODO: LB should retract intake
         if self.gamepad.getLeftBumper():
             pass
 
