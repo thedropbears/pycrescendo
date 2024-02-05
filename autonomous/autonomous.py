@@ -140,7 +140,7 @@ class AutoBase(AutonomousStateMachine):
             chassis_speed.omega,
         )
 
-        # if we are enforcing heading, hyjack rotational control from the main controller
+        # if we are enforcing heading, hijack rotational control from the main controller
         if enforce_tangent_heading:
             vx, vy, _ = self.chassis.to_field_oriented(*chassis_speed)
             heading_target = math.atan2(vy, vx)
@@ -202,8 +202,8 @@ class AutoBase(AutonomousStateMachine):
         except Exception:
             return Trajectory([Trajectory.State(0, 0, 0, pose)])
 
-        self.robot_object = self.field.getObject("auto_trajectory")
-        self.robot_object.setTrajectory(trajectory)
+        self.trajectory_marker = self.field.getObject("auto_trajectory")
+        self.trajectory_marker.setTrajectory(trajectory)
         return trajectory
 
     def is_at_goal(self) -> bool:
@@ -214,7 +214,7 @@ class AutoBase(AutonomousStateMachine):
         ) < self.ANGLE_TOLERANCE
 
     def done(self):
-        self.robot_object.setPoses([])
+        self.trajectory_marker.setPoses([])
         super().done()
 
 
