@@ -43,22 +43,6 @@ class Path:
         return len(self.waypoints)
 
 
-@dataclass
-class NotePaths:
-    # All paths assume RED alliance
-    # They will automatically be flipped if we are blue
-    pick_up_path: Path
-    shoot_path: Path
-    pickup_offset: Translation2d
-
-    def copy(self):
-        return NotePaths(
-            self.pick_up_path.copy(),
-            self.shoot_path.copy(),
-            Translation2d(self.pickup_offset.x, self.pickup_offset.y),
-        )
-
-
 # StageHeight = 8.210550308227539
 StageWidth = 16.541748046875
 

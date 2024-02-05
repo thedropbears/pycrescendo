@@ -18,7 +18,7 @@ from wpilib import Field2d
 from wpimath.spline import Spline3
 from wpimath.geometry import Rotation2d, Translation2d
 
-from utilities.position import Path, NotePaths
+from utilities.position import Path
 import utilities.game as game
 
 from components.chassis import ChassisComponent
@@ -38,9 +38,11 @@ class AutoBase(AutonomousStateMachine):
     ANGLE_TOLERANCE = math.radians(2)
     MAX_VEL = 1
     MAX_ACCEL = 0.5
+    FINAL_VELOCITY_STEPBACK = 1e-3
 
     def __init__(self) -> None:
-        self.note_paths: list[NotePaths] = []
+        self.note_paths: list[Path] = []
+        self.shoot_paths: list[Path] = []
 
         x_controller = PIDController(2.5, 0, 0)
         y_controller = PIDController(2.5, 0, 0)
@@ -55,11 +57,27 @@ class AutoBase(AutonomousStateMachine):
         # Since robot is stationary from one action to another, point the control vector at the goal to avoid the robot taking unnecessary turns before moving towards the goal
         self.kD = 0.3
 
+    def setup(self) -> None:
+        """Must be called after the subclass' setup"""
+        for path in self.note_paths:
+            # assume an initial final heading
+            path.final_heading = 0
+            self.calculate_trajectory(path)
+            # get the last velocity
+            robot_relative_speeds = self.trajectory.sample(
+                self.trajectory.totalTime() - self.FINAL_VELOCITY_STEPBACK
+            ).velocity
+            vx, vy, _ = self.chassis.to_field_oriented(*robot_relative_speeds)
+            path.final_heading = math.atan2(vy, vx)
+        for path in self.shoot_paths:
+            path.final_heading = rotation_to_red_speaker(path.waypoints[-1])
+
     @state(first=True)
     def initialise(self) -> None:
         # Make a working copy of the NotePaths so that we can pop
         # This isn't necessary but makes testing better because we can re-run auto routines
         self.note_paths_working_copy = list(self.note_paths)
+        self.shoot_paths_working_copy = list(self.shoot_paths)
 
         # We always start ready to shoot, so fire straight away
         self.next_state("shoot_note")
@@ -83,13 +101,8 @@ class AutoBase(AutonomousStateMachine):
     def pick_up(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
             # go to just behind the note
-            self.trajectory = self.calculate_trajectory(
-                Path(
-                    [self.note_paths_working_copy[0].pick_up_path[-1]],
-                    (self.note_paths_working_copy[0].pickup_offset.angle())
-                    + Rotation2d(math.pi),
-                )
-            )
+            newpath = self.note_paths_working_copy[0]
+            self.trajectory = self.calculate_trajectory(newpath)
 
         # Do some driving...
         self.drive_on_trajectory(state_tm)
@@ -104,30 +117,10 @@ class AutoBase(AutonomousStateMachine):
             self.next_state("drive_to_shoot")
 
     @state
-    def drive_to_pick_up(self, state_tm: float, initial_call: bool) -> None:
-        if initial_call:
-            # go to just behind the note
-            newpath = self.note_paths_working_copy[0].pick_up_path.copy()
-            newpath[-1] += self.note_paths_working_copy[0].pickup_offset
-            newpath.final_heading = (
-                self.note_paths_working_copy[0].pickup_offset.angle()
-            ) + Rotation2d(math.pi)
-            self.trajectory = self.calculate_trajectory(newpath)
-
-        # Do some driving...
-        self.drive_on_trajectory(state_tm)
-
-        if self.intake.is_note_present():
-            # Check if we have a note collected
-            self.next_state("drive_to_shoot")
-        if self.is_at_goal():
-            self.next_state("pick_up")
-
-    @state
     def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
             self.trajectory = self.calculate_trajectory(
-                self.note_paths_working_copy[0].shoot_path
+                self.shoot_paths_working_copy[0]
             )
 
         # Do some driving...
@@ -135,7 +128,7 @@ class AutoBase(AutonomousStateMachine):
 
         if self.is_at_goal():
             # If we are in position, remove this note from the list and shoot it
-            self.note_paths_working_copy.pop(0)
+            self.shoot_paths_working_copy.pop(0)
             self.next_state("shoot_note")
 
     def drive_on_trajectory(self, trajectory_tm: float):
