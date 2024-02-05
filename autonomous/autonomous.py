@@ -59,6 +59,8 @@ class AutoBase(AutonomousStateMachine):
                 path.waypoints[-1]
             )
 
+        self.goal_heading: Rotation2d
+
     @state(first=True)
     def initialise(self) -> None:
         # Make a working copy of the NotePaths so that we can pop
@@ -142,7 +144,7 @@ class AutoBase(AutonomousStateMachine):
 
         # if we are enforcing heading, hijack rotational control from the main controller
         if enforce_tangent_heading:
-            vx, vy, _ = self.chassis.to_field_oriented(*chassis_speed)
+            vx, vy, _ = self.chassis.to_field_oriented(chassis_speed)
             heading_target = math.atan2(vy, vx)
             self.goal_heading = Rotation2d(heading_target)
             self.chassis.snap_to_heading(heading_target)

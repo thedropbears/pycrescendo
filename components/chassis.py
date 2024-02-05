@@ -312,11 +312,9 @@ class ChassisComponent:
             vx, vy, omega, current_heading
         )
 
-    def to_field_oriented(
-        self, vx: float, vy: float, omega: float
-    ) -> tuple[float, float, float]:
+    def to_field_oriented(self, chassis_speed: ChassisSpeeds) -> ChassisSpeeds:
         current_heading = self.get_rotation()
-        return ChassisSpeeds.fromRobotRelativeSpeeds(vx, vy, omega, current_heading)
+        return ChassisSpeeds.fromRobotRelativeSpeeds(chassis_speed, current_heading)
 
     def drive_local(self, vx: float, vy: float, omega: float) -> None:
         """Robot oriented drive commands"""
