@@ -36,7 +36,6 @@ class MyRobot(magicbot.MagicRobot):
 
     max_speed = magicbot.tunable(4)  # m/s
     inclination_angle = tunable(0.0)
-    show_note_positions = tunable(False)
     vision: VisualLocalizer
 
     def createObjects(self) -> None:
@@ -147,8 +146,6 @@ class MyRobot(magicbot.MagicRobot):
 
         self.lights.execute()
         self.vision.execute()
-        if self.gamepad.getBButtonPressed() and wpilib.RobotBase.isSimulation():
-            self.chassis.reset_estimator()
 
     def autonomousInit(self) -> None:
         pass

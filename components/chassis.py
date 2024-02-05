@@ -299,12 +299,6 @@ class ChassisComponent:
             self.module_objs.append(self.field.getObject("s_module_" + str(idx)))
         self.set_pose(self.initial_pose)
 
-    def reset_estimator(self):
-        self.estimator.resetPosition(
-            self.imu.getRotation2d(), self.get_module_positions(), self.initial_pose
-        )
-        self.set_pose(self.initial_pose)
-
     def drive_field(self, vx: float, vy: float, omega: float) -> None:
         """Field oriented drive commands"""
         current_heading = self.get_rotation()
