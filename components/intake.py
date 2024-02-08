@@ -21,7 +21,7 @@ class IntakeComponent:
     MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = tau / 60 * GEAR_RATIO
 
     SHAFT_REV_TOP_LIMIT = 0
-    SHAFT_REV_BOTTOM_LIMIT = 10  # TODO: replace with correct number
+    SHAFT_REV_BOTTOM_LIMIT = 2.004
 
     class Direction(Enum):
         BACKWARD = -1
