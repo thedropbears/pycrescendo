@@ -31,6 +31,7 @@ class IntakeComponent:
     def __init__(self) -> None:
         self.motor = TalonFX(TalonIds.intake)
 
+        # TODO check motor direction
         self.deploy_motor = CANSparkMax(
             SparkMaxIds.intake_deploy, CANSparkMax.MotorType.kBrushless
         )
@@ -42,7 +43,6 @@ class IntakeComponent:
         self.deploy_encoder.setPositionConversionFactor(
             self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC
         )
-        # pv = self.encoder.getPosition()
 
         self.pid_controller.setP(0.1)
         self.pid_controller.setI(0)
@@ -68,6 +68,9 @@ class IntakeComponent:
         self.deploy_motor.setSoftLimit(
             CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_BOTTOM_LIMIT
         )
+        # Intake should begin raised...
+        self.deploy_setpoint = self.SHAFT_REV_TOP_LIMIT
+        self.deploy_encoder.setPosition(self.deploy_setpoint)
         self.set_soft_limit_state(False)
 
         motor_configurator = self.motor.configurator
