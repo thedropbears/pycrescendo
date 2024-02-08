@@ -119,6 +119,10 @@ class IntakeComponent:
             and self.deploy_motor.getFault(CANSparkMax.FaultID.kSoftLimitFwd)
         )
 
+    @feedback
+    def distance_of_limit_switch_range(self) -> float:
+        return self.deploy_encoder.getPosition()
+
     def execute(self) -> None:
         if not self.encoder_limit_enabled:
             if self.is_fully_retracted():
