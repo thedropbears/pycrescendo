@@ -17,8 +17,9 @@ from ids import TalonIds, SparkMaxIds, DioChannels
 class IntakeComponent:
     motor_speed = tunable(0.4)
 
-    GEAR_RATIO = 24 / 48  # 24 / 54 / 48
-    MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = tau / 60 * GEAR_RATIO
+    GEAR_RATIO = 1 / 50  # 24 / 54 / 48
+    MOTOR_REV_TO_SHAFT_RADIANS = GEAR_RATIO * tau
+    MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = MOTOR_REV_TO_SHAFT_RADIANS / 60
 
     SHAFT_REV_TOP_LIMIT = 0
     SHAFT_REV_BOTTOM_LIMIT = 2.004
