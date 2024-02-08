@@ -41,9 +41,7 @@ class IntakeComponent:
         self.deploy_encoder.setVelocityConversionFactor(
             self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC
         )
-        self.deploy_encoder.setPositionConversionFactor(
-            self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC
-        )
+        self.deploy_encoder.setPositionConversionFactor(self.MOTOR_REV_TO_SHAFT_RADIANS)
 
         self.pid_controller.setP(0.1)
         self.pid_controller.setI(0)
