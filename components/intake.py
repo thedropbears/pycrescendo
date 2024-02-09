@@ -1,15 +1,12 @@
+import math
 from enum import Enum
 
+from wpilib import DigitalInput
 from magicbot import tunable, feedback
+from rev import CANSparkMax
 from phoenix6.configs import MotorOutputConfigs, config_groups
 from phoenix6.controls import VoltageOut
 from phoenix6.hardware import TalonFX
-
-from wpilib import DigitalInput
-
-from math import tau
-
-from rev import CANSparkMax
 
 from ids import TalonIds, SparkMaxIds, DioChannels
 
@@ -18,10 +15,10 @@ class IntakeComponent:
     motor_speed = tunable(0.4)
 
     GEAR_RATIO = 1 / 50  # 24 / 54 / 48
-    MOTOR_REV_TO_SHAFT_RADIANS = GEAR_RATIO * tau
+    MOTOR_REV_TO_SHAFT_RADIANS = GEAR_RATIO * math.tau
     MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = MOTOR_REV_TO_SHAFT_RADIANS / 60
 
-    SHAFT_REV_TOP_LIMIT = 0
+    SHAFT_REV_TOP_LIMIT = 0.0
     SHAFT_REV_BOTTOM_LIMIT = 2.004
 
     class Direction(Enum):
@@ -67,6 +64,7 @@ class IntakeComponent:
         self.deploy_motor.setSoftLimit(
             CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_BOTTOM_LIMIT
         )
+
         # Intake should begin raised...
         self.deploy_setpoint = self.SHAFT_REV_TOP_LIMIT
         self.deploy_encoder.setPosition(self.deploy_setpoint)
