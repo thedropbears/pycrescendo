@@ -130,6 +130,13 @@ class MyRobot(magicbot.MagicRobot):
         pass
 
     def testPeriodic(self) -> None:
+        # moving arm
+        if self.gamepad.getAButtonPressed():
+            self.intake.deploy()
+
+        if self.gamepad.getYButtonPressed():
+            self.intake.retract()
+
         # injecting
         if self.gamepad.getBButton():
             self.injector_component.shoot()

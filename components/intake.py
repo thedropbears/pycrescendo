@@ -66,7 +66,7 @@ class IntakeComponent:
         )
 
         # Intake should begin raised...
-        self.deploy_setpoint = self.SHAFT_REV_TOP_LIMIT
+        self.retract()
         self.deploy_encoder.setPosition(self.deploy_setpoint)
         self.set_soft_limit_state(False)
 
