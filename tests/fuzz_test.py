@@ -119,8 +119,9 @@ def test_fuzz_test(control: TestController) -> None:
     with control.run_robot():
         hids = DSInputs()
 
-        DriverStationSim.setDsAttached(True)
-        DriverStationSim.setAutonomous(False)
+        # Start the robot in disabled mode for a short period
+        control.step_timing(seconds=0.5, autonomous=False, enabled=False)
+
         DriverStationSim.setTest(True)
         DriverStationSim.setEnabled(True)
 
