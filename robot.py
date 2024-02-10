@@ -143,7 +143,7 @@ class MyRobot(magicbot.MagicRobot):
             self.climber.try_toggle()
 
         # Intake -> TODO: Tune trigger zone (0-1)
-        if self.gamepad.getLeftTriggerAxis > 0.5:
+        if self.gamepad.getLeftTriggerAxis() > 0.5:
             self.intake.deploy()
             self.intake.intake()
 
@@ -152,7 +152,7 @@ class MyRobot(magicbot.MagicRobot):
             self.intake.retract()
 
         # Shoot
-        if self.gamepad.getRightTriggerAxis > 0.5:
+        if self.gamepad.getRightTriggerAxis() > 0.5:
             self.shooter.shoot()
 
     def testInit(self) -> None:
