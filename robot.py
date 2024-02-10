@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import math
 import wpilib
 import wpilib.event
 from wpimath.geometry import Rotation3d, Translation3d
@@ -142,9 +142,18 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getRightBumperPressed():
             self.climber.try_toggle()
 
+        # Intake -> TODO: Tune trigger zone (0-1)
+        if self.gamepad.getLeftTriggerAxis > 0.5:
+            self.intake.deploy()
+            self.intake.intake()
+
         # TODO: LB should retract intake
         if self.gamepad.getLeftBumper():
-            pass
+            self.intake.retract()
+
+        # Shoot
+        if self.gamepad.getRightTriggerAxis > 0.5:
+            self.shooter.shoot()
 
     def testInit(self) -> None:
         pass
