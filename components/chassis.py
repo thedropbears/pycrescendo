@@ -126,6 +126,9 @@ class SwerveModule:
 
         self.sync_steer_encoder()
 
+        self.drive_request = VelocityVoltage(0)
+        self.stop_request = VoltageOut(0)
+
     def get_angle_absolute(self) -> float:
         """Gets steer angle (rot) from absolute encoder"""
         return self.encoder.get_absolute_position().value
@@ -159,11 +162,11 @@ class SwerveModule:
             self.state = desired_state
         self.state = SwerveModuleState.optimize(self.state, self.get_rotation())
 
-        self.drive_request = VelocityVoltage(0)
-        self.steer_request = VoltageOut(0)
         if abs(self.state.speed) < 0.01 and not self.module_locked:
-            self.drive.set_control(self.drive_request.with_velocity(0))
-            self.steer.set_control(self.steer_request)
+            self.drive.set_control(
+                self.drive_request.with_velocity(0).with_feed_forward(0)
+            )
+            self.steer.set_control(self.stop_request)
             return
 
         current_angle = self.get_angle_integrated()

@@ -17,11 +17,6 @@ warn_unreachable = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-module = "phoenix6.*"
-# https://github.com/CrossTheRoadElec/Phoenix-Releases/issues/61#issuecomment-1890171743
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
 module = "photonlibpy.*"
 # https://github.com/PhotonVision/photonvision/issues/1210
 ignore_missing_imports = true
@@ -83,13 +78,12 @@ requires-python = ">=3.10,<3.13"
 
 dependencies = [
     "numpy~=1.25",
-    "phoenix6==24.1.0",
+    "phoenix6~=24.2.0",
     # robotpy[apriltag] pins numpy to a version that doesn't build cleanly on Python 3.12.
     "robotpy==2024.2.1.1",
     "robotpy-apriltag~=2024.2.1",
-    "robotpy-ctre==2024.1.1",
     "robotpy-navx==2024.1.0",
-    "robotpy-rev==2024.2.0",
+    "robotpy-rev~=2024.2.1",
     "robotpy-wpilib-utilities==2024.0.0",
     "photonlibpy==2024.2.2",
 ]
@@ -97,10 +91,9 @@ dependencies = [
 [tool.robotpy]
 requires = [
     "numpy~=1.25",
-    "phoenix6==24.1.0",
-    "robotpy-ctre==2024.1.1",
+    "phoenix6~=24.2.0",
     "robotpy-navx==2024.1.0",
-    "robotpy-rev==2024.2.0",
+    "robotpy-rev~=2024.2.1",
     "robotpy-wpilib-utilities==2024.0.0",
     "photonlibpy==2024.2.2",
 ]
