@@ -17,6 +17,8 @@ from components.led import LightStrip
 from controllers.shooter import Shooter
 from controllers.climber import Climber
 
+from utilities.game import is_red
+
 import math
 
 from utilities.scalers import rescale_js
@@ -76,11 +78,15 @@ class MyRobot(magicbot.MagicRobot):
         drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * self.max_speed
         drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
         local_driving = self.gamepad.getYButton()
-        driver_inputs = (drive_x, drive_y, drive_z)
+
+        if is_red():
+            drive_x = -drive_x
+            drive_y = -drive_y
+
         if local_driving:
-            self.chassis.drive_local(*driver_inputs)
+            self.chassis.drive_local(drive_x, drive_y, drive_z)
         else:
-            self.chassis.drive_field(*driver_inputs)
+            self.chassis.drive_field(drive_x, drive_y, drive_z)
 
         # give rotational access to the driver
         if drive_z != 0:
@@ -88,7 +94,10 @@ class MyRobot(magicbot.MagicRobot):
 
         dpad = self.gamepad.getPOV()
         if dpad != -1:
-            self.chassis.snap_to_heading(-math.radians(dpad))
+            if is_red():
+                self.chassis.snap_to_heading(-math.radians(dpad) + math.pi)
+            else:
+                self.chassis.snap_to_heading(-math.radians(dpad))
 
         # Set current robot direction to forward
         if self.gamepad.getXButton():
