@@ -52,7 +52,7 @@ class SwerveModule:
         steer_id: int,
         encoder_id: int,
         steer_reversed=True,
-        drive_reversed=True,
+        drive_reversed=False,
     ):
         """
         x, y: where the module is relative to the center of the robot
