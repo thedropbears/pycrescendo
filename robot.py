@@ -88,7 +88,7 @@ class MyRobot(magicbot.MagicRobot):
 
         dpad = self.gamepad.getPOV()
         if dpad != -1:
-            self.chassis.snap_to_heading(math.radians(dpad))
+            self.chassis.snap_to_heading(-math.radians(dpad))
 
         # Set current robot direction to forward
         if self.gamepad.getXButton():
