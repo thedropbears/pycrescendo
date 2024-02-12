@@ -390,20 +390,6 @@ class ChassisComponent:
     def unlock_swerve(self) -> None:
         self.swerve_lock = False
 
-    def get_velocity(self) -> ChassisSpeeds:
-        """Gets field relative measured robot ChassisSpeeds"""
-        self.local_speed = self.kinematics.toChassisSpeeds(
-            (
-                self.modules[0].get(),
-                self.modules[1].get(),
-                self.modules[2].get(),
-                self.modules[3].get(),
-            )
-        )
-        return ChassisSpeeds.fromFieldRelativeSpeeds(
-            self.local_speed, -self.get_rotation()
-        )
-
     def update_odometry(self) -> None:
         # Check whether our alliance has "changed"
         # If so, it means we have an update from the FMS and need to re-init the odom
