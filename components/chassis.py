@@ -1,5 +1,6 @@
 from logging import Logger
 import math
+
 from phoenix6.hardware import TalonFX, CANcoder
 from phoenix6.controls import VoltageOut, VelocityVoltage, PositionDutyCycle
 from phoenix6.signals import InvertedValue, NeutralModeValue
@@ -11,6 +12,7 @@ from phoenix6.configs import (
 )
 import magicbot
 import navx
+import ntcore
 import wpilib
 from wpimath.kinematics import (
     SwerveDrive4Kinematics,
@@ -222,7 +224,7 @@ class ChassisComponent:
     RED_TEST_POSE = Pose2d(15.1, 5.5, math.pi)
     BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
 
-    def setup(self) -> None:
+    def __init__(self) -> None:
         self.imu = navx.AHRS.create_spi()
         self.heading_controller = ProfiledPIDControllerRadians(
             4, 0, 0, TrapezoidProfileRadians.Constraints(5, 5)
@@ -278,6 +280,16 @@ class ChassisComponent:
         self.imu.zeroYaw()
         self.imu.resetDisplacement()
 
+        nt = ntcore.NetworkTableInstance.getDefault().getTable("/components/chassis")
+        module_states_table = nt.getSubTable("module_states")
+        self.setpoints_publisher = module_states_table.getStructArrayTopic(
+            "setpoints", SwerveModuleState
+        ).publish()
+        self.measurements_publisher = module_states_table.getStructArrayTopic(
+            "measured", SwerveModuleState
+        ).publish()
+
+    def setup(self) -> None:
         initial_pose = (
             ChassisComponent.RED_TEST_POSE
             if is_red()
@@ -292,9 +304,6 @@ class ChassisComponent:
             visionMeasurementStdDevs=(0.25, 0.25, 50),
         )
         self.field_obj = self.field.getObject("fused_pose")
-        self.module_objs: list[wpilib.FieldObject2d] = []
-        for idx, _module in enumerate(self.modules):
-            self.module_objs.append(self.field.getObject("s_module_" + str(idx)))
         self.set_pose(initial_pose)
 
     def drive_field(self, vx: float, vy: float, omega: float) -> None:
@@ -400,16 +409,8 @@ class ChassisComponent:
         self.estimator.update(self.imu.getRotation2d(), self.get_module_positions())
         self.field_obj.setPose(self.get_pose())
         if self.send_modules:
-            robot_location = self.estimator.getEstimatedPosition()
-            for idx, module in enumerate(self.modules):
-                module_location = (
-                    robot_location.translation()
-                    + module.translation.rotateBy(robot_location.rotation())
-                )
-                module_rotation = module.get_rotation().rotateBy(
-                    robot_location.rotation()
-                )
-                self.module_objs[idx].setPose(Pose2d(module_location, module_rotation))
+            self.setpoints_publisher.set([module.state for module in self.modules])
+            self.measurements_publisher.set([module.get() for module in self.modules])
 
     def sync_all(self) -> None:
         for m in self.modules:
