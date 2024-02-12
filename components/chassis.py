@@ -141,9 +141,6 @@ class SwerveModule:
         """Get the steer angle as a Rotation2d"""
         return Rotation2d(self.get_angle_integrated())
 
-    def get_drive_current(self) -> float:
-        return self.drive.get_stator_current().value
-
     def get_speed(self) -> float:
         # velocity is in rot/s, return in m/s
         return self.drive.get_velocity().value
@@ -456,10 +453,6 @@ class ChassisComponent:
     def get_rotation(self) -> Rotation2d:
         """Get the current heading of the robot."""
         return self.get_pose().rotation()
-
-    @feedback
-    def get_drive_current(self) -> float:
-        return sum(abs(x.get_drive_current()) for x in self.modules)
 
     @feedback
     def at_desired_heading(self) -> bool:
