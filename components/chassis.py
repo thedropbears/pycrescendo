@@ -121,7 +121,7 @@ class SwerveModule:
         drive_config.apply(self.drive_pid, 0.01)
         drive_config.apply(drive_gear_ratio_config)
 
-        self.central_angle = math.atan2(x, y)
+        self.central_angle = Rotation2d(x, y)
         self.module_locked = False
 
         self.sync_steer_encoder()
@@ -153,7 +153,7 @@ class SwerveModule:
 
     def set(self, desired_state: SwerveModuleState):
         if self.module_locked:
-            desired_state = SwerveModuleState(0, Rotation2d(self.central_angle))
+            desired_state = SwerveModuleState(0, self.central_angle)
 
         # smooth wheel velocity vector
         if self.do_smooth:
