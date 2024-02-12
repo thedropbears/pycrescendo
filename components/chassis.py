@@ -112,6 +112,8 @@ class SwerveModule:
             else InvertedValue.COUNTER_CLOCKWISE_POSITIVE
         )
 
+        # Note: we change the dimension of the drive encoder readings
+        # here from wheel rotations to metres.
         drive_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
             1 / self.DRIVE_MOTOR_REV_TO_METRES
         )
@@ -148,11 +150,14 @@ class SwerveModule:
         return Rotation2d(self.get_angle_integrated())
 
     def get_speed(self) -> float:
-        # velocity is in rot/s, return in m/s
-        return self.drive.get_velocity().value
+        return self.drive.get_velocity().get_latency_compensated_value(
+            self.drive.get_acceleration()
+        )
 
     def get_distance_traveled(self) -> float:
-        return self.drive.get_position().value
+        return self.drive.get_position().get_latency_compensated_value(
+            self.drive.get_velocity()
+        )
 
     def set(self, desired_state: SwerveModuleState):
         if self.module_locked:
