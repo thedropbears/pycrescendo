@@ -5,6 +5,7 @@ from phoenix6.controls import VoltageOut, VelocityVoltage, PositionDutyCycle
 from phoenix6.signals import NeutralModeValue
 from phoenix6.configs import (
     config_groups,
+    ClosedLoopGeneralConfigs,
     MotorOutputConfigs,
     FeedbackConfigs,
     Slot0Configs,
@@ -26,7 +27,7 @@ from wpimath.controller import ProfiledPIDControllerRadians
 
 from magicbot import feedback
 
-from utilities.functions import constrain_angle, rate_limit_module
+from utilities.functions import rate_limit_module
 from utilities.game import is_red, field_flip_pose2d
 from utilities.ctre import FALCON_FREE_RPS
 from ids import CancoderIds, TalonIds
@@ -93,10 +94,13 @@ class SwerveModule:
 
         # configuration for motor pid
         steer_pid = Slot0Configs().with_k_p(3).with_k_i(0).with_k_d(0.1)
+        steer_closed_loop_config = ClosedLoopGeneralConfigs()
+        steer_closed_loop_config.continuous_wrap = True
 
         steer_config.apply(steer_motor_config)
         steer_config.apply(steer_pid, 0.01)
         steer_config.apply(steer_gear_ratio_config)
+        steer_config.apply(steer_closed_loop_config)
 
         # Configure drive motor
         drive_config = self.drive.configurator
@@ -157,7 +161,8 @@ class SwerveModule:
             self.state = rate_limit_module(self.state, desired_state, self.accel_limit)
         else:
             self.state = desired_state
-        self.state = SwerveModuleState.optimize(self.state, self.get_rotation())
+        current_angle = self.get_rotation()
+        self.state = SwerveModuleState.optimize(self.state, current_angle)
 
         if abs(self.state.speed) < 0.01 and not self.module_locked:
             self.drive.set_control(
@@ -166,16 +171,13 @@ class SwerveModule:
             self.steer.set_control(self.stop_request)
             return
 
-        current_angle = self.get_angle_integrated()
-        target_displacement = constrain_angle(
-            self.state.angle.radians() - current_angle
-        )
-        target_angle = target_displacement + current_angle
+        target_displacement = self.state.angle - current_angle
+        target_angle = self.state.angle.radians()
         self.steer_request = PositionDutyCycle(target_angle / math.tau)
         self.steer.set_control(self.steer_request)
 
         # rescale the speed target based on how close we are to being correctly aligned
-        target_speed = self.state.speed * math.cos(target_displacement) ** 2
+        target_speed = self.state.speed * target_displacement.cos() ** 2
         speed_volt = self.drive_ff.calculate(target_speed)
 
         # original position change/100ms, new m/s -> rot/s
