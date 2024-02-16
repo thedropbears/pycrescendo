@@ -2,62 +2,62 @@ from utilities.position import NotePositions, Path, ShootingPositions, PathPosit
 from autonomous.base import AutoBase
 
 
-class CloseNotes(AutoBase):
-    MODE_NAME = "4 notes: internal and 3 close"
+class PodiumSpeakerAmp(AutoBase):
+    MODE_NAME = "4 notes: internal, podium, speaker, amp"
 
     def __init__(self) -> None:
         self.note_paths = [
-            Path([NotePositions.Stage3NW]),
-            Path([NotePositions.Stage2]),
-            Path([NotePositions.Stage1]),
+            Path([NotePositions.podium_NW]),
+            Path([NotePositions.speaker]),
+            Path([NotePositions.amp]),
         ]
         self.shoot_paths = [
-            Path([ShootingPositions.CloseStraight]),
-            Path([ShootingPositions.BetweenStage1AndStage2]),
-            Path([NotePositions.Stage1]),
+            Path([ShootingPositions.close_straight]),
+            Path([ShootingPositions.amp_speaker_bounce]),
+            Path([NotePositions.amp]),
         ]
 
 
-class Amp1(AutoBase):
+class AmpCentre1(AutoBase):
     # The "top" or north notes of the field
-    MODE_NAME = "3 notes: internal, amp and centre 1"
+    MODE_NAME = "3 notes: internal, amp, centre 1"
 
     def __init__(self) -> None:
         self.note_paths = [
-            Path([NotePositions.Stage1]),
+            Path([NotePositions.amp]),
             Path([NotePositions.Centre1]),
         ]
         self.shoot_paths = [
-            Path([NotePositions.Stage1]),
-            Path([NotePositions.Stage1]),
+            Path([NotePositions.amp]),
+            Path([NotePositions.amp]),
         ]
 
 
-class Speaker3(AutoBase):
+class SpeakerCentre3(AutoBase):
     # Moving through the stage
-    MODE_NAME = "3 notes: internal, speaker and centre 3"
+    MODE_NAME = "3 notes: internal, speaker, centre 3"
 
     def __init__(self) -> None:
         self.note_paths = [
-            Path([NotePositions.Stage2]),
-            Path([PathPositions.StageTransitionUpper, NotePositions.Centre3]),
+            Path([NotePositions.speaker]),
+            Path([PathPositions.stage_transition_N, NotePositions.Centre3]),
         ]
         self.shoot_paths = [
-            Path([NotePositions.Stage2]),
-            Path([PathPositions.StageTransitionUpper, NotePositions.Stage2]),
+            Path([NotePositions.speaker]),
+            Path([PathPositions.stage_transition_N, NotePositions.speaker]),
         ]
 
 
-class Middle3(AutoBase):
-    # Moving to and shooting south middle notes of the field
+class Centre3Centre5(AutoBase):
+    # Stay in the south of the field to avoid interfering with allies using the close notes
     MODE_NAME = "3 notes: internal, center 3, center 5"
 
     def __init__(self) -> None:
         self.note_paths = [
             Path(
                 [
-                    PathPositions.StageTransitionLowerEntry,
-                    PathPositions.StageTransitionLower,
+                    PathPositions.stage_transition_S_entry,
+                    PathPositions.stage_transition_S,
                     NotePositions.Centre3,
                 ]
             ),
@@ -67,10 +67,10 @@ class Middle3(AutoBase):
         self.shoot_paths = [
             Path(
                 [
-                    PathPositions.StageTransitionLower,
-                    PathPositions.StageTransitionLowerEntry,
-                    ShootingPositions.SourceSide,
+                    PathPositions.stage_transition_S,
+                    PathPositions.stage_transition_S_entry,
+                    ShootingPositions.source_side,
                 ]
             ),
-            Path([ShootingPositions.SourceSide]),
+            Path([ShootingPositions.source_side]),
         ]
