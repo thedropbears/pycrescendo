@@ -131,11 +131,12 @@ class MyRobot(magicbot.MagicRobot):
 
     def testPeriodic(self) -> None:
         # moving arm
-        if self.gamepad.getAButtonPressed():
+        if self.gamepad.getAButton():
             self.intake.deploy()
-
-        if self.gamepad.getYButtonPressed():
+        elif self.gamepad.getYButton():
             self.intake.retract()
+        else:
+            self.intake.stop_deploy()
 
         # injecting
         if self.gamepad.getBButton():
@@ -172,6 +173,7 @@ class MyRobot(magicbot.MagicRobot):
         self.chassis.update_alliance()
         self.chassis.update_odometry()
 
+        self.intake.try_initialise_limits()
         self.lights.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()

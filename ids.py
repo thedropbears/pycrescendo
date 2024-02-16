@@ -42,9 +42,6 @@ class DioChannels(enum.IntEnum):
     injector_break_beam = 2
     climber_deploy_switch = 3
     climber_retract_switch = 4
-    # TODO Change ↓ to the correct ID
-    intake_deploy_switch = 5
-    intake_retract_switch = 6
 
 
 @enum.unique
