@@ -36,7 +36,7 @@ class NotePositions:
 class ShootingPositions:
     CloseStraight = Translation2d(15, RED_SPEAKER_POSE.y)
     BetweenStage1AndStage2 = Translation2d(
-        14.5, (NotePositions.Stage1.y + NotePositions.Stage2.y) / 2
+        14.7, (NotePositions.Stage1.y + NotePositions.Stage2.y) / 2
     )
     SourceSide = Translation2d(14.7, 2.8)
 
@@ -49,5 +49,5 @@ class TeamPoses:
 class PathPositions:
     StageCentre = Translation2d(11.75, 4)
     StageTransitionUpper = Translation2d(11.4, 4.5)
-    StageTransitionLower = Translation2d(11.77, 3.74)
-    StageTransitionMoreLower = Translation2d(12.608, 2.5)
+    StageTransitionLower = Translation2d(11.4, 3.74)
+    StageTransitionLowerEntry = Translation2d(13.0, 2.5)

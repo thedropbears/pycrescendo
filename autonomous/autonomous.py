@@ -56,15 +56,21 @@ class Middle3(AutoBase):
         self.note_paths = [
             Path(
                 [
-                    PathPositions.StageTransitionMoreLower,
+                    PathPositions.StageTransitionLowerEntry,
                     PathPositions.StageTransitionLower,
                     NotePositions.Centre3,
                 ]
             ),
-            Path([ShootingPositions.SourceSide, NotePositions.Centre5]),
+            Path([NotePositions.Centre5]),
         ]
 
         self.shoot_paths = [
-            Path([NotePositions.Centre3, ShootingPositions.SourceSide]),
-            Path([NotePositions.Centre5, ShootingPositions.SourceSide]),
+            Path(
+                [
+                    PathPositions.StageTransitionLower,
+                    PathPositions.StageTransitionLowerEntry,
+                    ShootingPositions.SourceSide,
+                ]
+            ),
+            Path([ShootingPositions.SourceSide]),
         ]
