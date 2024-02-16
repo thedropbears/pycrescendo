@@ -2,9 +2,8 @@ from logging import Logger
 import math
 from phoenix6.hardware import TalonFX, CANcoder
 from phoenix6.controls import VoltageOut, VelocityVoltage, PositionDutyCycle
-from phoenix6.signals import NeutralModeValue
+from phoenix6.signals import InvertedValue, NeutralModeValue
 from phoenix6.configs import (
-    config_groups,
     ClosedLoopGeneralConfigs,
     MotorOutputConfigs,
     FeedbackConfigs,
@@ -52,8 +51,8 @@ class SwerveModule:
         drive_id: int,
         steer_id: int,
         encoder_id: int,
-        steer_reversed=True,
-        drive_reversed=False,
+        *,
+        drive_reversed: bool = False,
     ):
         """
         x, y: where the module is relative to the center of the robot
@@ -82,11 +81,8 @@ class SwerveModule:
 
         steer_motor_config = MotorOutputConfigs()
         steer_motor_config.neutral_mode = NeutralModeValue.BRAKE
-        steer_motor_config.inverted = (
-            config_groups.InvertedValue.CLOCKWISE_POSITIVE
-            if steer_reversed
-            else config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
-        )
+        # The SDS Mk4i rotation has one pair of gears.
+        steer_motor_config.inverted = InvertedValue.CLOCKWISE_POSITIVE
 
         steer_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
             1 / self.STEER_GEAR_RATIO
@@ -108,9 +104,9 @@ class SwerveModule:
         drive_motor_config = MotorOutputConfigs()
         drive_motor_config.neutral_mode = NeutralModeValue.BRAKE
         drive_motor_config.inverted = (
-            config_groups.InvertedValue.CLOCKWISE_POSITIVE
+            InvertedValue.CLOCKWISE_POSITIVE
             if drive_reversed
-            else config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+            else InvertedValue.COUNTER_CLOCKWISE_POSITIVE
         )
 
         drive_gear_ratio_config = FeedbackConfigs().with_sensor_to_mechanism_ratio(
