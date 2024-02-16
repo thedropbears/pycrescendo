@@ -31,17 +31,18 @@ class CancoderIds(enum.IntEnum):
 @enum.unique
 class SparkMaxIds(enum.IntEnum):
     shooter_injector = 1
-    shooter_inclinator = 2  # TODO Change to the correct ID
+    shooter_inclinator = 2
     climber = 3
 
 
 @enum.unique
 class DioChannels(enum.IntEnum):
-    inclinator_encoder = 1  # TODO Change to the correct ID
+    inclinator_encoder = 1
+    injector_break_beam = 2
     climber_deploy_switch = 3
     climber_retract_switch = 4
 
 
 @enum.unique
 class PwmChannels(enum.IntEnum):
-    led_strip = 1  # TODO Change to the correct ID
+    led_strip = 1
