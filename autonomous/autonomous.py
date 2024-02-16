@@ -40,9 +40,31 @@ class Speaker3(AutoBase):
     def __init__(self) -> None:
         self.note_paths = [
             Path([NotePositions.Stage2]),
-            Path([PathPositions.Stage2Centre3Transition, NotePositions.Centre3]),
+            Path([PathPositions.StageTransitionUpper, NotePositions.Centre3]),
         ]
         self.shoot_paths = [
             Path([NotePositions.Stage2]),
-            Path([PathPositions.Stage2Centre3Transition, NotePositions.Stage2]),
+            Path([PathPositions.StageTransitionUpper, NotePositions.Stage2]),
+        ]
+
+
+class Middle3(AutoBase):
+    # Moving to and shooting south middle notes of the field
+    MODE_NAME = "3 notes: internal, center 3, center 5"
+
+    def __init__(self) -> None:
+        self.note_paths = [
+            Path(
+                [
+                    PathPositions.StageTransitionMoreLower,
+                    PathPositions.StageTransitionLower,
+                    NotePositions.Centre3,
+                ]
+            ),
+            Path([ShootingPositions.SourceSide, NotePositions.Centre5]),
+        ]
+
+        self.shoot_paths = [
+            Path([NotePositions.Centre3, ShootingPositions.SourceSide]),
+            Path([NotePositions.Centre5, ShootingPositions.SourceSide]),
         ]
