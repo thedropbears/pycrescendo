@@ -38,6 +38,7 @@ class ShootingPositions:
     BetweenStage1AndStage2 = Translation2d(
         14.5, (NotePositions.Stage1.y + NotePositions.Stage2.y) / 2
     )
+    SourceSide = Translation2d(14.7, 2.8)
 
 
 class TeamPoses:
@@ -47,4 +48,6 @@ class TeamPoses:
     RED_PODIUM = field_flip_pose2d(BLUE_PODIUM)
 class PathPositions:
     StageCentre = Translation2d(11.75, 4)
-    Stage2Centre3Transition = Translation2d(11.4, 4.5)
+    StageTransitionUpper = Translation2d(11.4, 4.5)
+    StageTransitionLower = Translation2d(11.77, 3.74)
+    StageTransitionMoreLower = Translation2d(12.608, 2.5)
