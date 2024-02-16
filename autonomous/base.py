@@ -32,8 +32,9 @@ class AutoBase(AutonomousStateMachine):
 
     POSITION_TOLERANCE = 0.025
     ANGLE_TOLERANCE = math.radians(2)
-    MAX_VEL = 1
-    MAX_ACCEL = 0.5
+    MAX_VEL = 3
+    MAX_ACCEL = 2
+    ENFORCE_HEADING_SPEED = MAX_VEL / 6
 
     def __init__(self):
         """Should be overloaded by subclass method with paths"""
@@ -141,12 +142,14 @@ class AutoBase(AutonomousStateMachine):
 
         # if we are enforcing heading, hijack rotational control from the main controller
         if enforce_tangent_heading:
-            field_chassis_speeds = self.chassis.to_field_oriented(chassis_speed)
-            heading_target = math.atan2(
-                field_chassis_speeds.vy, field_chassis_speeds.vx
-            )
-            self.goal_heading = Rotation2d(heading_target)
-            self.chassis.snap_to_heading(heading_target)
+            speed = Translation2d(chassis_speed.vx, chassis_speed.vy).norm()
+            if speed > self.ENFORCE_HEADING_SPEED:
+                field_chassis_speeds = self.chassis.to_field_oriented(chassis_speed)
+                heading_target = math.atan2(
+                    field_chassis_speeds.vy, field_chassis_speeds.vx
+                )
+                self.goal_heading = Rotation2d(heading_target)
+                self.chassis.snap_to_heading(heading_target)
 
     def calculate_trajectory(self, path: Path) -> Trajectory:
         pose = self.chassis.get_pose()
