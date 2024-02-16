@@ -2,8 +2,8 @@ from utilities.position import NotePositions, Path, ShootingPositions, PathPosit
 from autonomous.base import AutoBase
 
 
-class All3Notes(AutoBase):
-    MODE_NAME = "All notes in our half"
+class CloseNotes(AutoBase):
+    MODE_NAME = "4 notes: internal and 3 close"
 
     def __init__(self) -> None:
         self.note_paths = [
@@ -13,8 +13,8 @@ class All3Notes(AutoBase):
         ]
         self.shoot_paths = [
             Path([ShootingPositions.CloseStraight]),
-            Path([ShootingPositions.CloseStraight]),
-            Path([ShootingPositions.CloseStraight]),
+            Path([ShootingPositions.BetweenStage1AndStage2]),
+            Path([NotePositions.Stage1]),
         ]
 
 

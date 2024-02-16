@@ -35,6 +35,9 @@ class NotePositions:
 
 class ShootingPositions:
     CloseStraight = Translation2d(15, RED_SPEAKER_POSE.y)
+    BetweenStage1AndStage2 = Translation2d(
+        14.5, (NotePositions.Stage1.y + NotePositions.Stage2.y) / 2
+    )
 
 
 class TeamPoses:
