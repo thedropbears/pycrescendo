@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 from magicbot.state_machine import AutonomousStateMachine, state
 from wpimath.trajectory import (
     TrajectoryConfig,
@@ -12,9 +13,9 @@ from wpimath.controller import (
     HolonomicDriveController,
     PIDController,
 )
-from wpilib import Field2d
+from wpilib import Field2d, RobotBase
 from wpimath.spline import Spline3
-from wpimath.geometry import Rotation2d, Translation2d
+from wpimath.geometry import Rotation2d, Translation2d, Pose2d
 
 from utilities.position import Path
 import utilities.game as game
@@ -36,10 +37,16 @@ class AutoBase(AutonomousStateMachine):
     MAX_ACCEL = 2
     ENFORCE_HEADING_SPEED = MAX_VEL / 6
 
-    def __init__(self):
+    def __init__(
+        self,
+        note_paths: list[Path],
+        shoot_paths: list[Path],
+        starting_pose: Optional[Pose2d] = None,
+    ):
         """Should be overloaded by subclass method with paths"""
-        self.note_paths: list[Path] = []
-        self.shoot_paths: list[Path] = []
+        self.note_paths = note_paths
+        self.shoot_paths = shoot_paths
+        self.starting_pose = starting_pose
 
     def setup(self) -> None:
         x_controller = PIDController(2.5, 0, 0)
@@ -58,6 +65,14 @@ class AutoBase(AutonomousStateMachine):
             )
 
         self.goal_heading: Rotation2d
+
+    def on_enable(self):
+        # Setup starting position in the simulator
+        if RobotBase.isSimulation() and self.starting_pose:
+            if not game.is_red():
+                self.starting_pose = game.field_flip_pose2d(self.starting_pose)
+            self.chassis.set_pose(self.starting_pose)
+        super().on_enable()
 
     @state(first=True)
     def initialise(self) -> None:

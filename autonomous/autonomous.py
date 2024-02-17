@@ -1,21 +1,23 @@
 from utilities.position import NotePositions, Path, ShootingPositions, PathPositions
-from autonomous.base import AutoBase
+from autonomous.base import AutoBase, rotation_to_red_speaker
+from wpimath.geometry import Pose2d, Translation2d
 
 
 class PodiumSpeakerAmp(AutoBase):
     MODE_NAME = "4 notes: internal, podium, speaker, amp"
 
     def __init__(self) -> None:
-        self.note_paths = [
+        note_paths = [
             Path([NotePositions.podium_NW]),
             Path([NotePositions.speaker]),
             Path([NotePositions.amp]),
         ]
-        self.shoot_paths = [
+        shoot_paths = [
             Path([ShootingPositions.close_straight]),
             Path([ShootingPositions.amp_speaker_bounce]),
             Path([NotePositions.amp]),
         ]
+        super().__init__(note_paths, shoot_paths)
 
 
 class AmpCentre1(AutoBase):
@@ -23,14 +25,15 @@ class AmpCentre1(AutoBase):
     MODE_NAME = "3 notes: internal, amp, centre 1"
 
     def __init__(self) -> None:
-        self.note_paths = [
+        note_paths = [
             Path([NotePositions.amp]),
             Path([NotePositions.Centre1]),
         ]
-        self.shoot_paths = [
+        shoot_paths = [
             Path([NotePositions.amp]),
             Path([NotePositions.amp]),
         ]
+        super().__init__(note_paths, shoot_paths)
 
 
 class SpeakerCentre3(AutoBase):
@@ -38,14 +41,15 @@ class SpeakerCentre3(AutoBase):
     MODE_NAME = "3 notes: internal, speaker, centre 3"
 
     def __init__(self) -> None:
-        self.note_paths = [
+        note_paths = [
             Path([NotePositions.speaker]),
             Path([PathPositions.stage_transition_N, NotePositions.Centre3]),
         ]
-        self.shoot_paths = [
+        shoot_paths = [
             Path([NotePositions.speaker]),
             Path([PathPositions.stage_transition_N, NotePositions.speaker]),
         ]
+        super().__init__(note_paths, shoot_paths)
 
 
 class Centre3Centre5(AutoBase):
@@ -53,7 +57,7 @@ class Centre3Centre5(AutoBase):
     MODE_NAME = "3 notes: internal, center 3, center 5"
 
     def __init__(self) -> None:
-        self.note_paths = [
+        note_paths = [
             Path(
                 [
                     PathPositions.stage_transition_S_entry,
@@ -64,7 +68,7 @@ class Centre3Centre5(AutoBase):
             Path([NotePositions.Centre5]),
         ]
 
-        self.shoot_paths = [
+        shoot_paths = [
             Path(
                 [
                     PathPositions.stage_transition_S,
@@ -74,3 +78,7 @@ class Centre3Centre5(AutoBase):
             ),
             Path([ShootingPositions.source_side]),
         ]
+        sim_start_pos = Translation2d(15.4, 2.94)
+        rotation = rotation_to_red_speaker(sim_start_pos)
+        sim_start_pose = Pose2d(sim_start_pos, rotation)
+        super().__init__(note_paths, shoot_paths, sim_start_pose)
