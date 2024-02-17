@@ -81,13 +81,12 @@ class MyRobot(magicbot.MagicRobot):
         drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
         local_driving = self.gamepad.getYButton()
 
-        if is_red():
-            drive_x = -drive_x
-            drive_y = -drive_y
-
         if local_driving:
             self.chassis.drive_local(drive_x, drive_y, drive_z)
         else:
+            if is_red():
+                drive_x = -drive_x
+                drive_y = -drive_y
             self.chassis.drive_field(drive_x, drive_y, drive_z)
 
         # give rotational access to the driver
@@ -103,7 +102,7 @@ class MyRobot(magicbot.MagicRobot):
 
         # Set current robot direction to forward
         if self.gamepad.getXButton():
-            self.chassis.zero_yaw()
+            self.chassis.reset_yaw()
 
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):

@@ -420,13 +420,11 @@ class ChassisComponent:
         self.field.setRobotPose(pose)
         self.field_obj.setPose(pose)
 
-    def zero_yaw(self) -> None:
-        """Sets pose to current pose but with a heading of zero"""
+    def reset_yaw(self) -> None:
+        """Sets pose to current pose but with a heading of forwards"""
         cur_pose = self.estimator.getEstimatedPosition()
-        self.estimator.resetPosition(
-            self.imu.getRotation2d(),
-            self.get_module_positions(),
-            Pose2d(cur_pose.translation(), Rotation2d(0)),
+        self.set_pose(
+            Pose2d(cur_pose.translation(), Rotation2d(math.pi if is_red() else 0))
         )
 
     def get_module_positions(
