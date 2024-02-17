@@ -69,9 +69,10 @@ class AutoBase(AutonomousStateMachine):
     def on_enable(self):
         # Setup starting position in the simulator
         if RobotBase.isSimulation() and self.starting_pose:
+            starting_pose = self.starting_pose
             if not game.is_red():
-                self.starting_pose = game.field_flip_pose2d(self.starting_pose)
-            self.chassis.set_pose(self.starting_pose)
+                starting_pose = game.field_flip_pose2d(self.starting_pose)
+            self.chassis.set_pose(starting_pose)
         super().on_enable()
 
     @state(first=True)
