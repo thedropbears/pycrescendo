@@ -423,11 +423,7 @@ class ChassisComponent:
     def zero_yaw(self) -> None:
         """Sets pose to current pose but with a heading of zero"""
         cur_pose = self.estimator.getEstimatedPosition()
-        self.estimator.resetPosition(
-            self.imu.getRotation2d(),
-            self.get_module_positions(),
-            Pose2d(cur_pose.translation(), Rotation2d(0)),
-        )
+        self.set_pose(Pose2d(cur_pose.translation(), Rotation2d()))
 
     def get_module_positions(
         self,
