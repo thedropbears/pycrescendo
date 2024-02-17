@@ -7,7 +7,7 @@ import phoenix6
 import phoenix6.unmanaged
 import wpilib
 from pyfrc.physics.core import PhysicsInterface
-from wpilib.simulation import FlywheelSim, SimDeviceSim
+from wpilib.simulation import DCMotorSim, SimDeviceSim
 from wpimath.kinematics import SwerveDrive4Kinematics
 from wpimath.system.plant import DCMotor
 from wpimath.units import kilogram_square_meters
@@ -36,28 +36,31 @@ class SimpleTalonFXMotorSim:
         self.sim_state.add_rotor_position(velocity_rps * dt)
 
 
-class Falcon500FlywheelSim:
+class Falcon500MotorSim:
     def __init__(
         self,
         motor: phoenix6.hardware.TalonFX,
-        # Reduction between motor and encoder, as output over input. If the flywheel
-        # spins slower than the motor, this number should be greater than one.
+        # Reduction between motor and encoder readings, as output over input.
+        # If the mechanism spins slower than the motor, this number should be greater than one.
         gearing: float,
         moi: kilogram_square_meters,
     ):
         self.gearing = gearing
         self.sim_state = motor.sim_state
         self.sim_state.set_supply_voltage(12.0)
-        self.flywheel_sim = FlywheelSim(DCMotor.falcon500(), gearing, moi)
+        self.motor_sim = DCMotorSim(DCMotor.falcon500(), gearing, moi)
 
     def update(self, dt: float) -> None:
         voltage = self.sim_state.motor_voltage
-        self.flywheel_sim.setInputVoltage(voltage)
-        self.flywheel_sim.update(dt)
-        flywheel_velocity_rps = self.flywheel_sim.getAngularVelocity() / math.tau
-        motor_velocity_rps = flywheel_velocity_rps * self.gearing
-        self.sim_state.set_rotor_velocity(motor_velocity_rps)
-        self.sim_state.add_rotor_position(motor_velocity_rps * dt)
+        self.motor_sim.setInputVoltage(voltage)
+        self.motor_sim.update(dt)
+        motor_rev_per_mechanism_rad = self.gearing / math.tau
+        self.sim_state.set_raw_rotor_position(
+            self.motor_sim.getAngularPosition() * motor_rev_per_mechanism_rad
+        )
+        self.sim_state.set_rotor_velocity(
+            self.motor_sim.getAngularVelocity() * motor_rev_per_mechanism_rad
+        )
 
 
 class PhysicsEngine:
@@ -77,17 +80,18 @@ class PhysicsEngine:
             for module in robot.chassis.modules
         ]
         self.steer = [
-            SimpleTalonFXMotorSim(
+            Falcon500MotorSim(
                 module.steer,
-                units_per_rev=1 / module.STEER_GEAR_RATIO,
-                kV=2.356,
+                gearing=1 / module.STEER_GEAR_RATIO,
+                # measured from MKCad CAD
+                moi=0.0009972,
             )
             for module in robot.chassis.modules
         ]
 
         # TODO(davo): update CAD to include hex shaft and remeasure
         single_roller_moi = 0.00041  # measured from CAD
-        self.flywheel = Falcon500FlywheelSim(
+        self.flywheel = Falcon500MotorSim(
             robot.shooter_component.flywheel,
             1 / ShooterComponent.FLYWHEEL_GEAR_RATIO,
             moi=2 * single_roller_moi,
