@@ -151,6 +151,7 @@ class MyRobot(magicbot.MagicRobot):
         self.climber.stop()
 
     def disabledPeriodic(self) -> None:
+        self.chassis.update_alliance()
         self.chassis.update_odometry()
 
         self.lights.execute()
