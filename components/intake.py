@@ -65,8 +65,12 @@ class IntakeComponent:
         self.deploy_encoder.setPosition(self.deploy_setpoint)
         self.set_soft_limit_state(False)
 
-        self.deploy_limit_switch = self.deploy_motor.getForwardLimitSwitch(rev.SparkLimitSwitch.Type.kNormallyOpen)
-        self.retract_limit_switch = self.deploy_motor.getReverseLimitSwitch(rev.SparkLimitSwitch.Type.kNormallyOpen)
+        self.deploy_limit_switch = self.deploy_motor.getForwardLimitSwitch(
+            rev.SparkLimitSwitch.Type.kNormallyOpen
+        )
+        self.retract_limit_switch = self.deploy_motor.getReverseLimitSwitch(
+            rev.SparkLimitSwitch.Type.kNormallyOpen
+        )
 
         self.deploy_motor.setSoftLimit(
             CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_BOTTOM_LIMIT
@@ -89,7 +93,7 @@ class IntakeComponent:
         self.deploy_motor.enableSoftLimit(
             CANSparkMax.SoftLimitDirection.kReverse, state
         )
-    
+
     def retract_hard_limit(self) -> bool:
         return self.retract_limit_switch.get()
 
@@ -103,7 +107,7 @@ class IntakeComponent:
     def retract(self) -> None:
         self.deploying = True
         self.deploy_setpoint = self.SHAFT_REV_TOP_LIMIT
-    
+
     def stop_deploy(self) -> None:
         self.deploying = False
 
@@ -121,14 +125,16 @@ class IntakeComponent:
     def is_fully_retracted(self) -> bool:
         return self.retract_hard_limit() or (
             self.encoder_limit_enabled
-            and abs(self.SHAFT_REV_TOP_LIMIT - self.deploy_encoder.getPosition()) < self.ALLOWABLE_ERROR
+            and abs(self.SHAFT_REV_TOP_LIMIT - self.deploy_encoder.getPosition())
+            < self.ALLOWABLE_ERROR
         )
 
     @feedback
     def is_fully_deployed(self) -> bool:
         return self.deploy_hard_limit() or (
             self.encoder_limit_enabled
-            and abs(self.SHAFT_REV_BOTTOM_LIMIT - self.deploy_encoder.getPosition()) < self.ALLOWABLE_ERROR
+            and abs(self.SHAFT_REV_BOTTOM_LIMIT - self.deploy_encoder.getPosition())
+            < self.ALLOWABLE_ERROR
         )
 
     @feedback
