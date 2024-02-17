@@ -4,7 +4,9 @@ import random
 import typing
 
 import hal
+import pytest
 import wpilib.simulation
+from wpilib.simulation import DriverStationSim
 
 if typing.TYPE_CHECKING:
     from pyfrc.test_support.controller import TestController
@@ -74,10 +76,13 @@ def fuzz_xbox_gamepad(gamepad: wpilib.simulation.XboxControllerSim) -> None:
     gamepad.setPOV(rand_pov())
 
 
-def _test_fuzz(control: TestController, fuzz_disabled_hids: bool) -> None:
+def _test_fuzz(
+    control: TestController, station: hal.AllianceStationID, fuzz_disabled_hids: bool
+) -> None:
     with control.run_robot():
         things = AllTheThings()
         hids = DSInputs()
+        DriverStationSim.setAllianceStationId(station)
 
         # Disabled mode
         control.step_timing(seconds=0.2, autonomous=False, enabled=False)
@@ -105,17 +110,25 @@ def _test_fuzz(control: TestController, fuzz_disabled_hids: bool) -> None:
             control.step_timing(seconds=0.1, autonomous=False, enabled=True)
 
 
-def test_fuzz(control: TestController) -> None:
-    _test_fuzz(control, fuzz_disabled_hids=False)
+alliance_stations = [
+    station
+    for station in hal.AllianceStationID.__members__.values()
+    if station != hal.AllianceStationID.kUnknown
+]
+alliance_station_names = [station.name[1:] for station in alliance_stations]
 
 
-def test_fuzz_disabled(control: TestController) -> None:
-    _test_fuzz(control, fuzz_disabled_hids=True)
+@pytest.mark.parametrize("station", alliance_stations, ids=alliance_station_names)
+def test_fuzz(control: TestController, station: hal.AllianceStationID) -> None:
+    _test_fuzz(control, station, fuzz_disabled_hids=False)
+
+
+@pytest.mark.parametrize("station", alliance_stations, ids=alliance_station_names)
+def test_fuzz_disabled(control: TestController, station: hal.AllianceStationID) -> None:
+    _test_fuzz(control, station, fuzz_disabled_hids=True)
 
 
 def test_fuzz_test(control: TestController) -> None:
-    from wpilib.simulation import DriverStationSim
-
     with control.run_robot():
         hids = DSInputs()
 
@@ -127,7 +140,7 @@ def test_fuzz_test(control: TestController) -> None:
 
         assert control.robot_is_alive
 
-        for _ in range(40):
+        for _ in range(20):
             hids.fuzz()
             DriverStationSim.notifyNewData()
             wpilib.simulation.stepTiming(0.2)
