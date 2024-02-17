@@ -103,7 +103,7 @@ class MyRobot(magicbot.MagicRobot):
 
         # Set current robot direction to forward
         if self.gamepad.getXButton():
-            self.chassis.zero_yaw()
+            self.chassis.reset_yaw()
 
         # stop rumble after time
         if self.rumble_timer.hasElapsed(self.rumble_duration):
