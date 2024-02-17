@@ -370,6 +370,7 @@ class ChassisComponent:
         While we should be building the pose buffer while disabled,
         this accounts for the edge case of crashing mid match and immediately enabling with an empty buffer
         """
+        self.update_alliance()
         self.update_odometry()
 
     @magicbot.feedback
@@ -385,7 +386,7 @@ class ChassisComponent:
     def unlock_swerve(self) -> None:
         self.swerve_lock = False
 
-    def update_odometry(self) -> None:
+    def update_alliance(self) -> None:
         # Check whether our alliance has "changed"
         # If so, it means we have an update from the FMS and need to re-init the odom
         if is_red() != self.on_red_alliance:
@@ -395,6 +396,7 @@ class ChassisComponent:
             else:
                 self.set_pose(ChassisComponent.BLUE_TEST_POSE)
 
+    def update_odometry(self) -> None:
         self.estimator.update(self.imu.getRotation2d(), self.get_module_positions())
         self.field_obj.setPose(self.get_pose())
         if self.send_modules:
