@@ -7,6 +7,7 @@ import magicbot
 from magicbot import tunable
 
 from components.chassis import ChassisComponent
+from components.injector import InjectorComponent
 from components.vision import VisualLocalizer
 
 from components.shooter import ShooterComponent
@@ -31,6 +32,7 @@ class MyRobot(magicbot.MagicRobot):
 
     # Components
     chassis: ChassisComponent
+    injector_component: InjectorComponent
     shooter_component: ShooterComponent
     intake: IntakeComponent
     climber_component: ClimberComponent
@@ -121,7 +123,7 @@ class MyRobot(magicbot.MagicRobot):
     def testPeriodic(self) -> None:
         # injecting
         if self.gamepad.getBButton():
-            self.shooter_component.shoot()
+            self.injector_component.shoot()
 
         if self.gamepad.getXButton():
             self.intake.intake()

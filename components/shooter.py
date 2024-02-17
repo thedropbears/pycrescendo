@@ -25,7 +25,6 @@ class ShooterComponent:
 
     desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
     desired_flywheel_speed = tunable(0.0)
-    inject_speed = tunable(0.3)
 
     def __init__(self) -> None:
         self.inclinator = CANSparkMax(
@@ -58,22 +57,13 @@ class ShooterComponent:
         flywheel_config.apply(flywheel_pid)
         flywheel_config.apply(flywheel_gear_ratio)
 
-        self.injector = CANSparkMax(
-            SparkMaxIds.shooter_injector, CANSparkMax.MotorType.kBrushless
-        )
-        self.injector.setInverted(False)
-
         self.inclinator_controller = PIDController(3, 0, 0)
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
         SmartDashboard.putData(self.inclinator_controller)
-        self.should_inject = False
 
     def set_inclination(self, angle: float) -> None:
         """Set the angle of the mechanism in radians measured positive upwards from zero parellel to the ground."""
         self.desired_inclinator_angle = angle
-
-    def shoot(self) -> None:
-        self.should_inject = True
 
     def on_enable(self) -> None:
         self.inclinator_controller.reset()
@@ -130,11 +120,5 @@ class ShooterComponent:
         )
         self.inclinator.set(inclinator_speed)
 
-        if self.should_inject:
-            self.injector.set(self.inject_speed)
-        else:
-            self.injector.set(0.0)
-
         flywheel_request = VelocityVoltage(self.desired_flywheel_speed)
         self.flywheel.set_control(flywheel_request)
-        self.should_inject = False

@@ -1,13 +1,16 @@
 from math import atan2
 from magicbot import StateMachine, state, timed_state, default_state, will_reset_to
 from components.chassis import ChassisComponent
+from components.injector import InjectorComponent
 from components.shooter import ShooterComponent
 from utilities.game import get_goal_speaker_position
 
 
 class Shooter(StateMachine):
     chassis: ChassisComponent
+    injector_component: InjectorComponent
     shooter_component: ShooterComponent
+
     should_fire = will_reset_to(False)
     INJECTION_DURATION = 1  # seconds
 
@@ -71,7 +74,7 @@ class Shooter(StateMachine):
 
     @timed_state(must_finish=True, next_state="resetting", duration=INJECTION_DURATION)
     def shooting(self) -> None:
-        self.shooter_component.shoot()
+        self.injector_component.shoot()
 
     @state
     def resetting(self) -> None:
