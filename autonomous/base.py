@@ -233,6 +233,7 @@ class AutoBase(AutonomousStateMachine):
         ) < self.ANGLE_TOLERANCE
 
     def done(self):
+        self.chassis.stop_snapping()
         self.trajectory_marker.setPoses([])
         super().done()
 
