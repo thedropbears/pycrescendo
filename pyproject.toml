@@ -85,7 +85,7 @@ dependencies = [
     "robotpy-navx==2024.1.0",
     "robotpy-rev~=2024.2.1",
     "robotpy-wpilib-utilities==2024.0.0",
-    "photonlibpy==2024.2.2",
+    "photonlibpy==2024.2.6",
 ]
 
 [tool.robotpy]
@@ -95,7 +95,7 @@ requires = [
     "robotpy-navx==2024.1.0",
     "robotpy-rev~=2024.2.1",
     "robotpy-wpilib-utilities==2024.0.0",
-    "photonlibpy==2024.2.2",
+    "photonlibpy==2024.2.6",
 ]
 robotpy_version = "2024.2.1.1"
 robotpy_extras = ["apriltag"]
