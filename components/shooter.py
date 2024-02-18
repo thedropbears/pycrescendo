@@ -101,9 +101,8 @@ class ShooterComponent:
             < self.FLYWHEEL_TOLERANCE
         )
 
-    def set_range(self, range: float) -> None:  # type: ignore
+    def set_range(self, range: float) -> None:
         pass
-        # TODO remove mypy supression when the param is used ^
         # TODO balistics / lookup table here
         # self.desired_inclinator_angle = ???
         # self.desired_flywheel_speed = ???
