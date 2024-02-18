@@ -40,7 +40,8 @@ class MyRobot(magicbot.MagicRobot):
 
     max_speed = magicbot.tunable(4)  # m/s
     inclination_angle = tunable(0.0)
-    vision: VisualLocalizer
+    vision_port: VisualLocalizer
+    vision_starboard: VisualLocalizer
 
     def createObjects(self) -> None:
         self.data_log = wpilib.DataLogManager.getLog()
@@ -55,9 +56,14 @@ class MyRobot(magicbot.MagicRobot):
         wpilib.SmartDashboard.putData(self.field)
 
         self.lights_strip_length = 144  # TODO Change to correct length
-        self.vision_name = "ardu_cam_port"
-        self.vision_pos = Translation3d(0.11, 0.24, 0.273)
-        self.vision_rot = Rotation3d(0, -math.radians(20), 0)
+
+        self.vision_port_name = "ardu_cam_port"
+        self.vision_port_pos = Translation3d(0.11, 0.24, 0.273)
+        self.vision_port_rot = Rotation3d(0, -math.radians(20), 0)
+
+        self.vision_starboard_name = "ardu_cam_starboard"
+        self.vision_starboard_pos = Translation3d(0.11, 0.24, 0.273)
+        self.vision_starboard_rot = Rotation3d(0, -math.radians(20), 0)
 
     def rumble_for(self, intensity: float, duration: float):
         self.rumble_duration = duration
@@ -145,7 +151,8 @@ class MyRobot(magicbot.MagicRobot):
 
         self.chassis.update_odometry()
 
-        self.vision.execute()
+        self.vision_port.execute()
+        self.vision_starboard.execute()
 
     def cancel_controllers(self):
         self.climber.stop()
@@ -155,7 +162,8 @@ class MyRobot(magicbot.MagicRobot):
         self.chassis.update_odometry()
 
         self.lights.execute()
-        self.vision.execute()
+        self.vision_port.execute()
+        self.vision_starboard.execute()
 
     def autonomousInit(self) -> None:
         pass
