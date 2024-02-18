@@ -61,15 +61,8 @@ class ShooterComponent:
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
         SmartDashboard.putData(self.inclinator_controller)
 
-    def set_inclination(self, angle: float) -> None:
-        """Set the angle of the mechanism in radians measured positive upwards from zero parellel to the ground."""
-        self.desired_inclinator_angle = angle
-
     def on_enable(self) -> None:
         self.inclinator_controller.reset()
-
-    def set_flywheel_target(self, target_speed: float) -> None:
-        self.desired_flywheel_speed = target_speed
 
     @feedback
     def is_ready(self) -> bool:
@@ -107,6 +100,13 @@ class ShooterComponent:
             abs(self.desired_flywheel_speed - self.flywheel.get_velocity().value)
             < self.FLYWHEEL_TOLERANCE
         )
+
+    def set_range(self, range: float) -> None:  # type: ignore
+        pass
+        # TODO remove mypy supression when the param is used ^
+        # TODO balistics / lookup table here
+        # self.desired_inclinator_angle = ???
+        # self.desired_flywheel_speed = ???
 
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
