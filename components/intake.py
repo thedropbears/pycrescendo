@@ -139,10 +139,6 @@ class IntakeComponent:
         self.direction = self.Direction.BACKWARD
 
     @feedback
-    def is_note_present(self) -> bool:
-        return False
-
-    @feedback
     def is_fully_retracted(self) -> bool:
         return self._at_retract_hard_limit() or (
             abs(self.SHAFT_REV_RETRACT_HARD_LIMIT - self.deploy_encoder.getPosition())
