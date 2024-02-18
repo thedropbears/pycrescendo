@@ -20,16 +20,14 @@ from utilities.position import Path
 import utilities.game as game
 
 from components.chassis import ChassisComponent
-from components.intake import IntakeComponent
 
 # Add controllers for intake and shooter when available
-from controllers.shooter import Shooter
+from controllers.note import NoteManager
 
 
 class AutoBase(AutonomousStateMachine):
     chassis: ChassisComponent
-    intake: IntakeComponent
-    shooter: Shooter
+    note_manager: NoteManager
     field: Field2d
 
     POSITION_TOLERANCE = 0.025
@@ -96,13 +94,13 @@ class AutoBase(AutonomousStateMachine):
         # Drive with the intake always facing the tangent
         self.drive_on_trajectory(state_tm, enforce_tangent_heading=True)
 
-        if self.intake.is_note_present():
+        if self.note_manager.has_note():
             # Check if we have a note collected
             # Return heading control to path controller
             self.chassis.stop_snapping()
             self.next_state("drive_to_shoot")
         if self.is_at_goal():
-            if not self.intake.is_note_present():
+            if not self.note_manager.has_note():
                 pass  # TODO: do something if we don't have a note, e.g. go to next note position
             # Check if we have a note collected
             # Return heading control to the path controller

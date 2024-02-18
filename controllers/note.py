@@ -22,9 +22,6 @@ class NoteManager(StateMachine):
     intake_desired = will_reset_to(False)
     intake_cancel_desired = will_reset_to(False)
 
-    def __init__(self):
-        pass
-
     def try_intake(self):
         self.intake_desired = True
 
@@ -34,6 +31,9 @@ class NoteManager(StateMachine):
     def try_shoot(self):
         self.shot_desired = True
 
+    def has_note(self):
+        return self.injector_component.has_note()
+
     @property
     def translation_to_goal(self) -> Translation2d:
         return (
@@ -42,9 +42,8 @@ class NoteManager(StateMachine):
         )
 
     @state(must_finish=True)
-    def idling(self, initial_call):
-        if initial_call:
-            self.intake.retract()
+    def idling(self):
+        self.intake.retract()
 
         # Update range
         self.shooter_component.set_range(self.translation_to_goal.norm())
@@ -53,9 +52,8 @@ class NoteManager(StateMachine):
             self.next_state(self.dropping_intake)
 
     @state(must_finish=True)
-    def dropping_intake(self, inital_call):
-        if inital_call:
-            self.intake.deploy()
+    def dropping_intake(self):
+        self.intake.deploy()
 
         # Update range
         self.shooter_component.set_range(self.translation_to_goal.norm())
@@ -78,9 +76,8 @@ class NoteManager(StateMachine):
             self.next_state(self.idling)
 
     @state(first=True, must_finish=True)
-    def holding_note(self, initial_call):
-        if initial_call:
-            self.intake.retract()
+    def holding_note(self):
+        self.intake.retract()
         # Update range
         self.shooter_component.set_range(self.translation_to_goal.norm())
 
