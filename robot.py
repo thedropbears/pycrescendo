@@ -58,12 +58,16 @@ class MyRobot(magicbot.MagicRobot):
         self.lights_strip_length = 144  # TODO Change to correct length
 
         self.vision_port_name = "ardu_cam_port"
-        self.vision_port_pos = Translation3d(0.11, 0.24, 0.273)
-        self.vision_port_rot = Rotation3d(0, -math.radians(20), 0)
+        self.vision_port_pos = Translation3d(0.287, 0.055, 0.27)
+        self.vision_port_rot = Rotation3d(
+            0, -math.radians(20), math.radians(180) - math.radians(90 - 71.252763)
+        )
 
         self.vision_starboard_name = "ardu_cam_starboard"
-        self.vision_starboard_pos = Translation3d(0.11, 0.24, 0.273)
-        self.vision_starboard_rot = Rotation3d(0, -math.radians(20), 0)
+        self.vision_starboard_pos = Translation3d(0.287, -0.058, 0.27)
+        self.vision_starboard_rot = Rotation3d(
+            0, -math.radians(20), math.radians(180) + math.radians(90 - 71.252763)
+        )
 
     def rumble_for(self, intensity: float, duration: float):
         self.rumble_duration = duration
