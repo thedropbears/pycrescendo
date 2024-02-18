@@ -11,6 +11,8 @@ from wpilib.simulation import DriverStationSim
 if typing.TYPE_CHECKING:
     from pyfrc.test_support.controller import TestController
 
+pytestmark = pytest.mark.integration_test
+
 
 def rand_bool() -> bool:
     return random.getrandbits(1) != 0
@@ -82,10 +84,10 @@ def _test_fuzz(
     with control.run_robot():
         things = AllTheThings()
         hids = DSInputs()
-        DriverStationSim.setAllianceStationId(station)
 
         # Disabled mode
         control.step_timing(seconds=0.2, autonomous=False, enabled=False)
+        DriverStationSim.setAllianceStationId(station)
         things.fuzz()
         if fuzz_disabled_hids:
             hids.fuzz()
@@ -108,6 +110,8 @@ def _test_fuzz(
             things.fuzz()
             hids.fuzz()
             control.step_timing(seconds=0.1, autonomous=False, enabled=True)
+
+        DriverStationSim.setAllianceStationId(hal.AllianceStationID.kUnknown)
 
 
 alliance_stations = [
