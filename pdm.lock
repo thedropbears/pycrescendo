@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:1ab6e4436222cad3578c4c4019ddfafac05c2a12bda224b4e77c18cf4d441dc3"
+content_hash = "sha256:e0c173a34078751b8f2fb7a63f8d1df46042e0933b1d91932913bce6a0e1faa6"
 
 [[package]]
 name = "attrs"
@@ -417,6 +417,17 @@ dependencies = [
 files = [
     {file = "pytest-8.0.0-py3-none-any.whl", hash = "sha256:50fb9cbe836c3f20f0dfa99c565201fb75dc54c8d76373cd1bde06b06657bdb6"},
     {file = "pytest-8.0.0.tar.gz", hash = "sha256:249b1b0864530ba251b7438274c4d251c58d868edaaec8762893ad4a0d71c36c"},
+]
+
+[[package]]
+name = "pytest-integration"
+version = "0.2.3"
+requires_python = ">=3.6"
+summary = "Organizing pytests by integration or not"
+groups = ["dev"]
+files = [
+    {file = "pytest_integration-0.2.3-py3-none-any.whl", hash = "sha256:7f59ed1fa1cc8cb240f9495b68bc02c0421cce48589f78e49b7b842231604b12"},
+    {file = "pytest_integration-0.2.3.tar.gz", hash = "sha256:b00988a5de8a6826af82d4c7a3485b43fbf32c11235e9f4a8b7225eef5fbcf65"},
 ]
 
 [[package]]

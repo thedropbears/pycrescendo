@@ -22,7 +22,10 @@ module = "photonlibpy.*"
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-pythonpath = '.'
+addopts = "--strict-markers"
+pythonpath = "."
+testpaths = ["tests"]
+xfail_strict = true
 
 [tool.ruff]
 target-version = "py39"
@@ -63,6 +66,7 @@ test = "robotpy test --"
 dev = [
     "hypothesis",
     "pytest>=7.2.0",
+    "pytest-integration>=0.2.3",
 ]
 
 [project]
