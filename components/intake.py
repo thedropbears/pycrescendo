@@ -14,12 +14,12 @@ from ids import TalonIds, SparkMaxIds
 class IntakeComponent:
     motor_speed = tunable(0.4)
 
-    GEAR_RATIO = 1 / 50
+    GEAR_RATIO = (1 / 5) * (1 / 5) * (18 / 72)
     MOTOR_REV_TO_SHAFT_RADIANS = GEAR_RATIO * math.tau
     MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = MOTOR_REV_TO_SHAFT_RADIANS / 60
 
-    SHAFT_REV_TOP_LIMIT = 0.0
-    SHAFT_REV_BOTTOM_LIMIT = 2.115336
+    SHAFT_REV_RETRACT_LIMIT = 0.0
+    SHAFT_REV_DEPLOY_LIMIT = 1.8675022996
 
     ALLOWABLE_ERROR = 0.01
 
@@ -73,10 +73,10 @@ class IntakeComponent:
         )
 
         self.deploy_motor.setSoftLimit(
-            CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_BOTTOM_LIMIT
+            CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_DEPLOY_LIMIT
         )
         self.deploy_motor.setSoftLimit(
-            CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_TOP_LIMIT
+            CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_RETRACT_LIMIT
         )
 
         motor_configurator = self.motor.configurator
@@ -102,11 +102,11 @@ class IntakeComponent:
 
     def deploy(self) -> None:
         self.deploying = True
-        self.deploy_setpoint = self.SHAFT_REV_BOTTOM_LIMIT
+        self.deploy_setpoint = self.SHAFT_REV_DEPLOY_LIMIT
 
     def retract(self) -> None:
         self.deploying = True
-        self.deploy_setpoint = self.SHAFT_REV_TOP_LIMIT
+        self.deploy_setpoint = self.SHAFT_REV_RETRACT_LIMIT
 
     def stop_deploy(self) -> None:
         self.deploying = False
@@ -125,7 +125,7 @@ class IntakeComponent:
     def is_fully_retracted(self) -> bool:
         return self.retract_hard_limit() or (
             self.encoder_limit_enabled
-            and abs(self.SHAFT_REV_TOP_LIMIT - self.deploy_encoder.getPosition())
+            and abs(self.SHAFT_REV_RETRACT_LIMIT - self.deploy_encoder.getPosition())
             < self.ALLOWABLE_ERROR
         )
 
@@ -133,7 +133,7 @@ class IntakeComponent:
     def is_fully_deployed(self) -> bool:
         return self.deploy_hard_limit() or (
             self.encoder_limit_enabled
-            and abs(self.SHAFT_REV_BOTTOM_LIMIT - self.deploy_encoder.getPosition())
+            and abs(self.SHAFT_REV_DEPLOY_LIMIT - self.deploy_encoder.getPosition())
             < self.ALLOWABLE_ERROR
         )
 
@@ -145,11 +145,11 @@ class IntakeComponent:
         if not self.encoder_limit_enabled:
             if self.is_fully_retracted():
                 self.set_soft_limit_state(True)
-                self.deploy_encoder.setPosition(self.SHAFT_REV_TOP_LIMIT)
+                self.deploy_encoder.setPosition(self.SHAFT_REV_RETRACT_LIMIT)
 
             if self.is_fully_deployed():
                 self.set_soft_limit_state(True)
-                self.deploy_encoder.setPosition(self.SHAFT_REV_BOTTOM_LIMIT)
+                self.deploy_encoder.setPosition(self.SHAFT_REV_DEPLOY_LIMIT)
 
     def execute(self) -> None:
         self.try_initialise_limits()
