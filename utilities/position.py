@@ -1,6 +1,8 @@
-from wpimath.geometry import Rotation2d, Translation2d
+import math
 
-from utilities.game import RED_SPEAKER_POSE
+from wpimath.geometry import Rotation2d, Translation2d, Pose2d
+
+from utilities.game import RED_SPEAKER_POSE, field_flip_pose2d
 
 
 class Path:
@@ -33,3 +35,11 @@ class NotePositions:
 
 class ShootingPoses:
     CloseStraight = Translation2d(15, RED_SPEAKER_POSE.y)
+
+
+class teamPoses:
+    RED_TEST_POSE = Pose2d(15.1, 5.5, math.pi)
+    BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
+    stage_width = 16.541748046875
+    RED_PODIUM = Pose2d(Translation2d(3.367, 4.08455), Rotation2d(math.pi))
+    BLUE_PODIUM = field_flip_pose2d(RED_PODIUM)
