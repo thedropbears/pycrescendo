@@ -72,17 +72,6 @@ class MyRobot(magicbot.MagicRobot):
             0, -math.radians(20), math.radians(180) + math.radians(90 - 71.252763)
         )
 
-    def rumble_for(self, intensity: float, duration: float):
-        self.rumble_duration = duration
-        self.rumble_timer.reset()
-        self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, intensity)
-
-    def short_rumble(self):
-        self.rumble_for(0.4, 0.1)
-
-    def long_rumble(self):
-        self.rumble_for(0.8, 0.3)
-
     def teleopInit(self) -> None:
         pass
 
@@ -131,12 +120,8 @@ class MyRobot(magicbot.MagicRobot):
 
         # Reverse intake and shoot shooter
         if self.gamepad.getBackButton():
-            self.intake.outtake()
-            self.shooter.shoot()
-
-        # Stop rumble after time
-        if self.rumble_timer.hasElapsed(self.rumble_duration):
-            self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
+            # TODO add this capability to note manager
+            pass
 
         # Climbing arm controls. Toggles!
         if self.gamepad.getRightBumperPressed():
@@ -144,16 +129,15 @@ class MyRobot(magicbot.MagicRobot):
 
         # Intake -> TODO: Tune trigger zone (0-1)
         if self.gamepad.getLeftTriggerAxis() > 0.5:
-            self.intake.deploy()
-            self.intake.intake()
+            self.note_manager.try_intake()
 
         # TODO: LB should retract intake
         if self.gamepad.getLeftBumper():
-            self.intake.retract()
+            self.note_manager.cancel_intake()
 
         # Shoot
         if self.gamepad.getRightTriggerAxis() > 0.5:
-            self.shooter.shoot()
+            self.note_manager.try_shoot()
 
     def testInit(self) -> None:
         pass
