@@ -18,8 +18,11 @@ class IntakeComponent:
     MOTOR_REV_TO_SHAFT_RADIANS = GEAR_RATIO * math.tau
     MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = MOTOR_REV_TO_SHAFT_RADIANS / 60
 
-    SHAFT_REV_RETRACT_LIMIT = 0.0
-    SHAFT_REV_DEPLOY_LIMIT = 1.8675022996
+    SHAFT_REV_RETRACT_HARD_LIMIT = 0.0
+    SHAFT_REV_DEPLOY_HARD_LIMIT = 1.8675022996
+
+    SHAFT_REV_RETRACT_SOFT_LIMIT = SHAFT_REV_RETRACT_HARD_LIMIT + math.radians(5)
+    SHAFT_REV_DEPLOY_SOFT_LIMIT = SHAFT_REV_DEPLOY_HARD_LIMIT - math.radians(5)
 
     ALLOWABLE_ERROR = 0.01
 
@@ -58,7 +61,7 @@ class IntakeComponent:
         self.direction = self.Direction.STOPPED
 
         # Intake should begin raised...
-        self.deploy_setpoint = self.SHAFT_REV_RETRACT_LIMIT
+        self.deploy_setpoint = self.SHAFT_REV_RETRACT_SOFT_LIMIT
         self.deploy_encoder.setPosition(self.deploy_setpoint)
 
         self.deploy_limit_switch = self.deploy_motor.getForwardLimitSwitch(
@@ -69,10 +72,10 @@ class IntakeComponent:
         )
 
         self.deploy_motor.setSoftLimit(
-            CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_DEPLOY_LIMIT
+            CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_DEPLOY_SOFT_LIMIT
         )
         self.deploy_motor.setSoftLimit(
-            CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_RETRACT_LIMIT
+            CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_RETRACT_SOFT_LIMIT
         )
 
         motor_configurator = self.motor.configurator
@@ -81,17 +84,17 @@ class IntakeComponent:
 
         motor_configurator.apply(motor_config)
 
-    def retract_hard_limit(self) -> bool:
+    def at_retract_hard_limit(self) -> bool:
         return self.retract_limit_switch.get()
 
-    def deploy_hard_limit(self) -> bool:
+    def at_deploy_hard_limit(self) -> bool:
         return self.deploy_limit_switch.get()
 
     def deploy(self) -> None:
-        self.deploy_setpoint = self.SHAFT_REV_DEPLOY_LIMIT
+        self.deploy_setpoint = self.SHAFT_REV_DEPLOY_SOFT_LIMIT
 
     def retract(self) -> None:
-        self.deploy_setpoint = self.SHAFT_REV_RETRACT_LIMIT
+        self.deploy_setpoint = self.SHAFT_REV_RETRACT_SOFT_LIMIT
 
     def intake(self) -> None:
         self.direction = self.Direction.FORWARD
@@ -105,15 +108,15 @@ class IntakeComponent:
 
     @feedback
     def is_fully_retracted(self) -> bool:
-        return self.retract_hard_limit() or (
-            abs(self.SHAFT_REV_RETRACT_LIMIT - self.deploy_encoder.getPosition())
+        return self.at_retract_hard_limit() or (
+            abs(self.SHAFT_REV_RETRACT_SOFT_LIMIT - self.deploy_encoder.getPosition())
             < self.ALLOWABLE_ERROR
         )
 
     @feedback
     def is_fully_deployed(self) -> bool:
-        return self.deploy_hard_limit() or (
-            abs(self.SHAFT_REV_DEPLOY_LIMIT - self.deploy_encoder.getPosition())
+        return self.at_deploy_hard_limit() or (
+            abs(self.SHAFT_REV_DEPLOY_SOFT_LIMIT - self.deploy_encoder.getPosition())
             < self.ALLOWABLE_ERROR
         )
 
@@ -122,11 +125,11 @@ class IntakeComponent:
         return self.deploy_encoder.getPosition()
 
     def try_initialise_limits(self) -> None:
-        if self.is_fully_retracted():
-            self.deploy_encoder.setPosition(self.SHAFT_REV_RETRACT_LIMIT)
+        if self.at_retract_hard_limit():
+            self.deploy_encoder.setPosition(self.SHAFT_REV_RETRACT_HARD_LIMIT)
 
-        if self.is_fully_deployed():
-            self.deploy_encoder.setPosition(self.SHAFT_REV_DEPLOY_LIMIT)
+        if self.at_deploy_hard_limit():
+            self.deploy_encoder.setPosition(self.SHAFT_REV_DEPLOY_HARD_LIMIT)
 
     def execute(self) -> None:
         self.try_initialise_limits()
