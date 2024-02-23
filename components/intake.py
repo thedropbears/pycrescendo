@@ -57,7 +57,6 @@ class IntakeComponent:
 
         self.direction = self.Direction.STOPPED
 
-        self.deploying = False
         self.deploy_setpoint = 0.0
 
         # Intake should begin raised...
@@ -101,15 +100,10 @@ class IntakeComponent:
         return self.deploy_limit_switch.get()
 
     def deploy(self) -> None:
-        self.deploying = True
         self.deploy_setpoint = self.SHAFT_REV_DEPLOY_LIMIT
 
     def retract(self) -> None:
-        self.deploying = True
         self.deploy_setpoint = self.SHAFT_REV_RETRACT_LIMIT
-
-    def stop_deploy(self) -> None:
-        self.deploying = False
 
     def intake(self) -> None:
         self.direction = self.Direction.FORWARD
@@ -158,10 +152,8 @@ class IntakeComponent:
 
         self.motor.set_control(intake_request)
 
-        if self.deploying:
-            self.pid_controller.setReference(
-                self.deploy_setpoint, CANSparkMax.ControlType.kSmartMotion
-            )
-        else:
-            self.deploy_motor.set(0)
+        self.pid_controller.setReference(
+            self.deploy_setpoint, CANSparkMax.ControlType.kSmartMotion
+        )
+
         self.direction = self.Direction.STOPPED

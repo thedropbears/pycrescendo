@@ -135,8 +135,6 @@ class MyRobot(magicbot.MagicRobot):
             self.intake.deploy()
         elif self.gamepad.getYButton():
             self.intake.retract()
-        else:
-            self.intake.stop_deploy()
 
         # injecting
         if self.gamepad.getBButton():
