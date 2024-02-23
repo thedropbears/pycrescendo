@@ -84,10 +84,10 @@ class IntakeComponent:
 
         motor_configurator.apply(motor_config)
 
-    def at_retract_hard_limit(self) -> bool:
+    def _at_retract_hard_limit(self) -> bool:
         return self.retract_limit_switch.get()
 
-    def at_deploy_hard_limit(self) -> bool:
+    def _at_deploy_hard_limit(self) -> bool:
         return self.deploy_limit_switch.get()
 
     def deploy(self) -> None:
@@ -108,14 +108,14 @@ class IntakeComponent:
 
     @feedback
     def is_fully_retracted(self) -> bool:
-        return self.at_retract_hard_limit() or (
+        return self._at_retract_hard_limit() or (
             abs(self.SHAFT_REV_RETRACT_SOFT_LIMIT - self.deploy_encoder.getPosition())
             < self.ALLOWABLE_ERROR
         )
 
     @feedback
     def is_fully_deployed(self) -> bool:
-        return self.at_deploy_hard_limit() or (
+        return self._at_deploy_hard_limit() or (
             abs(self.SHAFT_REV_DEPLOY_SOFT_LIMIT - self.deploy_encoder.getPosition())
             < self.ALLOWABLE_ERROR
         )
@@ -125,10 +125,10 @@ class IntakeComponent:
         return self.deploy_encoder.getPosition()
 
     def maybe_reindex_deployment_encoder(self) -> None:
-        if self.at_retract_hard_limit():
+        if self._at_retract_hard_limit():
             self.deploy_encoder.setPosition(self.SHAFT_REV_RETRACT_HARD_LIMIT)
 
-        if self.at_deploy_hard_limit():
+        if self._at_deploy_hard_limit():
             self.deploy_encoder.setPosition(self.SHAFT_REV_DEPLOY_HARD_LIMIT)
 
     def execute(self) -> None:
