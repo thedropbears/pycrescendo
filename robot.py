@@ -171,7 +171,7 @@ class MyRobot(magicbot.MagicRobot):
         self.chassis.update_alliance()
         self.chassis.update_odometry()
 
-        self.intake.try_initialise_limits()
+        self.intake.maybe_reindex_deployment_encoder()
         self.lights.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()

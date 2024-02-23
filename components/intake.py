@@ -124,7 +124,7 @@ class IntakeComponent:
     def deploy_current_position(self) -> float:
         return self.deploy_encoder.getPosition()
 
-    def try_initialise_limits(self) -> None:
+    def maybe_reindex_deployment_encoder(self) -> None:
         if self.at_retract_hard_limit():
             self.deploy_encoder.setPosition(self.SHAFT_REV_RETRACT_HARD_LIMIT)
 
@@ -132,7 +132,7 @@ class IntakeComponent:
             self.deploy_encoder.setPosition(self.SHAFT_REV_DEPLOY_HARD_LIMIT)
 
     def execute(self) -> None:
-        self.try_initialise_limits()
+        self.maybe_reindex_deployment_encoder()
 
         intake_request = VoltageOut(self.direction.value * self.motor_speed * 12.0)
 
