@@ -40,6 +40,13 @@ class NoteManager(StateMachine):
             - self.chassis.get_pose().translation()
         )
 
+    def on_enable(self) -> None:
+        super().on_enable()
+        if self.has_note():
+            self.engage()
+        else:
+            self.engage(self.idling)
+
     @state(must_finish=True)
     def idling(self):
         self.intake.retract()
@@ -87,6 +94,7 @@ class NoteManager(StateMachine):
     def aiming(self):
         if not self.shot_desired:
             self.next_state(self.holding_note)
+            return
 
         translation_to_goal = self.translation_to_goal()
 
