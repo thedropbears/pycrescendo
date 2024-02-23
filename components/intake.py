@@ -60,7 +60,6 @@ class IntakeComponent:
         # Intake should begin raised...
         self.deploy_setpoint = self.SHAFT_REV_RETRACT_LIMIT
         self.deploy_encoder.setPosition(self.deploy_setpoint)
-        self.set_soft_limit_state(False)
 
         self.deploy_limit_switch = self.deploy_motor.getForwardLimitSwitch(
             rev.SparkLimitSwitch.Type.kNormallyOpen
@@ -81,15 +80,6 @@ class IntakeComponent:
         motor_config.inverted = config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
 
         motor_configurator.apply(motor_config)
-
-    def set_soft_limit_state(self, state: bool) -> None:
-        self.encoder_limit_enabled = state
-        self.deploy_motor.enableSoftLimit(
-            CANSparkMax.SoftLimitDirection.kForward, state
-        )
-        self.deploy_motor.enableSoftLimit(
-            CANSparkMax.SoftLimitDirection.kReverse, state
-        )
 
     def retract_hard_limit(self) -> bool:
         return self.retract_limit_switch.get()
@@ -116,16 +106,14 @@ class IntakeComponent:
     @feedback
     def is_fully_retracted(self) -> bool:
         return self.retract_hard_limit() or (
-            self.encoder_limit_enabled
-            and abs(self.SHAFT_REV_RETRACT_LIMIT - self.deploy_encoder.getPosition())
+            abs(self.SHAFT_REV_RETRACT_LIMIT - self.deploy_encoder.getPosition())
             < self.ALLOWABLE_ERROR
         )
 
     @feedback
     def is_fully_deployed(self) -> bool:
         return self.deploy_hard_limit() or (
-            self.encoder_limit_enabled
-            and abs(self.SHAFT_REV_DEPLOY_LIMIT - self.deploy_encoder.getPosition())
+            abs(self.SHAFT_REV_DEPLOY_LIMIT - self.deploy_encoder.getPosition())
             < self.ALLOWABLE_ERROR
         )
 
@@ -134,14 +122,11 @@ class IntakeComponent:
         return self.deploy_encoder.getPosition()
 
     def try_initialise_limits(self) -> None:
-        if not self.encoder_limit_enabled:
-            if self.is_fully_retracted():
-                self.set_soft_limit_state(True)
-                self.deploy_encoder.setPosition(self.SHAFT_REV_RETRACT_LIMIT)
+        if self.is_fully_retracted():
+            self.deploy_encoder.setPosition(self.SHAFT_REV_RETRACT_LIMIT)
 
-            if self.is_fully_deployed():
-                self.set_soft_limit_state(True)
-                self.deploy_encoder.setPosition(self.SHAFT_REV_DEPLOY_LIMIT)
+        if self.is_fully_deployed():
+            self.deploy_encoder.setPosition(self.SHAFT_REV_DEPLOY_LIMIT)
 
     def execute(self) -> None:
         self.try_initialise_limits()
