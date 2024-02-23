@@ -67,6 +67,9 @@ class NoteManager(StateMachine):
         if self.intake.is_fully_deployed():
             self.next_state(self.intaking)
 
+        if self.intake_cancel_desired:
+            self.next_state(self.idling)
+
     @state(must_finish=True)
     def intaking(self):
         self.intake.intake()
