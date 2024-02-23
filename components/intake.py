@@ -55,7 +55,9 @@ class IntakeComponent:
         self.pid_controller.setSmartMotionMinOutputVelocity(
             0, self.retract_pid_slot
         )  # rad/s
-        self.pid_controller.setSmartMotionMaxAccel(6, self.retract_pid_slot)  # rad/s^2
+        self.pid_controller.setSmartMotionMaxAccel(
+            math.pi, self.retract_pid_slot
+        )  # rad/s^2
         self.pid_controller.setSmartMotionAllowedClosedLoopError(
             self.ALLOWABLE_ERROR, self.retract_pid_slot
         )  # Max allowed error
@@ -74,7 +76,9 @@ class IntakeComponent:
         self.pid_controller.setSmartMotionMinOutputVelocity(
             0, self.deploy_pid_slot
         )  # rad/s
-        self.pid_controller.setSmartMotionMaxAccel(6, self.deploy_pid_slot)  # rad/s^2
+        self.pid_controller.setSmartMotionMaxAccel(
+            math.pi, self.deploy_pid_slot
+        )  # rad/s^2
         self.pid_controller.setSmartMotionAllowedClosedLoopError(
             self.ALLOWABLE_ERROR, self.deploy_pid_slot
         )  # Max allowed error
