@@ -20,7 +20,6 @@ from controllers.climber import Climber
 
 from utilities.game import is_red
 
-import math
 
 from utilities.scalers import rescale_js
 
@@ -50,10 +49,6 @@ class MyRobot(magicbot.MagicRobot):
         self.data_log = wpilib.DataLogManager.getLog()
 
         self.gamepad = wpilib.XboxController(0)
-
-        self.rumble_timer = wpilib.Timer()
-        self.rumble_timer.start()
-        self.rumble_duration = 0.0
 
         self.field = wpilib.Field2d()
         wpilib.SmartDashboard.putData(self.field)
