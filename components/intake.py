@@ -43,9 +43,9 @@ class IntakeComponent:
 
         # Retract PID Controller
         self.retract_pid_slot = 0
-        self.pid_controller.setP(0.05, self.retract_pid_slot)
+        self.pid_controller.setP(0.08, self.retract_pid_slot)
         self.pid_controller.setI(0, self.retract_pid_slot)
-        self.pid_controller.setD(0, self.retract_pid_slot)
+        self.pid_controller.setD(0.4, self.retract_pid_slot)
         self.pid_controller.setOutputRange(-1, 1, self.retract_pid_slot)
 
         self.pid_controller.setSmartMotionMaxVelocity(6, self.retract_pid_slot)  # rad/s
@@ -59,9 +59,9 @@ class IntakeComponent:
 
         # Deploy PID Controller
         self.deploy_pid_slot = 1
-        self.pid_controller.setP(0.03, self.deploy_pid_slot)
+        self.pid_controller.setP(0.06, self.deploy_pid_slot)
         self.pid_controller.setI(0, self.deploy_pid_slot)
-        self.pid_controller.setD(0, self.deploy_pid_slot)
+        self.pid_controller.setD(0.4, self.deploy_pid_slot)
         self.pid_controller.setOutputRange(-1, 1, self.deploy_pid_slot)
 
         self.pid_controller.setSmartMotionMaxVelocity(6, self.deploy_pid_slot)  # rad/s
