@@ -34,7 +34,6 @@ class NoteManager(StateMachine):
     def has_note(self):
         return self.injector_component.has_note()
 
-    @property
     def translation_to_goal(self) -> Translation2d:
         return (
             get_goal_speaker_position().toTranslation2d()
@@ -46,7 +45,7 @@ class NoteManager(StateMachine):
         self.intake.retract()
 
         # Update range
-        self.shooter_component.set_range(self.translation_to_goal.norm())
+        self.shooter_component.set_range(self.translation_to_goal().norm())
 
         if self.intake_desired:
             self.next_state(self.dropping_intake)
@@ -56,7 +55,7 @@ class NoteManager(StateMachine):
         self.intake.deploy()
 
         # Update range
-        self.shooter_component.set_range(self.translation_to_goal.norm())
+        self.shooter_component.set_range(self.translation_to_goal().norm())
 
         if self.intake.is_fully_deployed():
             self.next_state(self.intaking)
@@ -67,7 +66,7 @@ class NoteManager(StateMachine):
         self.injector_component.intake()
 
         # Update range
-        self.shooter_component.set_range(self.translation_to_goal.norm())
+        self.shooter_component.set_range(self.translation_to_goal().norm())
 
         if self.injector_component.has_note():
             self.next_state(self.holding_note)
@@ -79,7 +78,7 @@ class NoteManager(StateMachine):
     def holding_note(self):
         self.intake.retract()
         # Update range
-        self.shooter_component.set_range(self.translation_to_goal.norm())
+        self.shooter_component.set_range(self.translation_to_goal().norm())
 
         if self.shot_desired:
             self.next_state(self.aiming)
@@ -89,7 +88,7 @@ class NoteManager(StateMachine):
         if not self.shot_desired:
             self.next_state(self.holding_note)
 
-        translation_to_goal = self.translation_to_goal
+        translation_to_goal = self.translation_to_goal()
 
         # Determine heading required for goal
         bearing_to_speaker = math.atan2(translation_to_goal.y, translation_to_goal.x)
