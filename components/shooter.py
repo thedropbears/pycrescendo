@@ -67,15 +67,16 @@ class ShooterComponent:
     @feedback
     def is_ready(self) -> bool:
         """Is the shooter ready to fire?"""
-        return self.at_inclination() and self.flywheels_at_speed()
+        return True
+        # return self._flywheels_at_speed() and self._at_inclination()
 
     @feedback
-    def at_inclination(self) -> bool:
+    def _at_inclination(self) -> bool:
         """Is the inclinator close to the correct angle?"""
         return self.inclinator_controller.atSetpoint()
 
     @feedback
-    def flywheels_at_speed(self) -> bool:
+    def _flywheels_at_speed(self) -> bool:
         """Are the flywheels close to thier target speed"""
         return (
             abs(self.desired_flywheel_speed - self.flywheel.get_velocity().value)
@@ -93,13 +94,6 @@ class ShooterComponent:
     @feedback
     def _flywheel_velocity(self) -> float:
         return self.flywheel.get_velocity().value
-
-    @feedback
-    def is_flywheel_at_speed(self) -> bool:
-        return (
-            abs(self.desired_flywheel_speed - self.flywheel.get_velocity().value)
-            < self.FLYWHEEL_TOLERANCE
-        )
 
     def set_range(self, range: float) -> None:
         pass
