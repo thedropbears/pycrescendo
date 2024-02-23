@@ -12,7 +12,7 @@ from ids import TalonIds, SparkMaxIds
 
 
 class IntakeComponent:
-    motor_speed = tunable(0.4)
+    motor_speed = tunable(1.0)
 
     GEAR_RATIO = (1 / 5) * (1 / 5) * (18 / 72)
     MOTOR_REV_TO_SHAFT_RADIANS = GEAR_RATIO * math.tau
