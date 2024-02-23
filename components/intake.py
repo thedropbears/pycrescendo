@@ -41,18 +41,39 @@ class IntakeComponent:
         )
         self.deploy_encoder.setPositionConversionFactor(self.MOTOR_REV_TO_SHAFT_RADIANS)
 
-        self.pid_controller.setP(0.05)
-        self.pid_controller.setI(0)
-        self.pid_controller.setD(0)
-        self.pid_controller.setOutputRange(-1, 1)
+        # Retract PID Controller
+        self.retract_pid_slot = 0
+        self.pid_controller.setP(0.05, self.retract_pid_slot)
+        self.pid_controller.setI(0, self.retract_pid_slot)
+        self.pid_controller.setD(0, self.retract_pid_slot)
+        self.pid_controller.setOutputRange(-1, 1, self.retract_pid_slot)
 
-        slot = 0
-        self.pid_controller.setSmartMotionMaxVelocity(6, slot)  # rad/s
-        self.pid_controller.setSmartMotionMinOutputVelocity(0, slot)  # rad/s
-        self.pid_controller.setSmartMotionMaxAccel(6, slot)  # rad/s^2
+        self.pid_controller.setSmartMotionMaxVelocity(6, self.retract_pid_slot)  # rad/s
+        self.pid_controller.setSmartMotionMinOutputVelocity(
+            0, self.retract_pid_slot
+        )  # rad/s
+        self.pid_controller.setSmartMotionMaxAccel(6, self.retract_pid_slot)  # rad/s^2
         self.pid_controller.setSmartMotionAllowedClosedLoopError(
-            self.ALLOWABLE_ERROR, slot
+            self.ALLOWABLE_ERROR, self.retract_pid_slot
         )  # Max allowed error
+
+        # Deploy PID Controller
+        self.deploy_pid_slot = 1
+        self.pid_controller.setP(0.03, self.deploy_pid_slot)
+        self.pid_controller.setI(0, self.deploy_pid_slot)
+        self.pid_controller.setD(0, self.deploy_pid_slot)
+        self.pid_controller.setOutputRange(-1, 1, self.deploy_pid_slot)
+
+        self.pid_controller.setSmartMotionMaxVelocity(6, self.deploy_pid_slot)  # rad/s
+        self.pid_controller.setSmartMotionMinOutputVelocity(
+            0, self.deploy_pid_slot
+        )  # rad/s
+        self.pid_controller.setSmartMotionMaxAccel(6, self.deploy_pid_slot)  # rad/s^2
+        self.pid_controller.setSmartMotionAllowedClosedLoopError(
+            self.ALLOWABLE_ERROR, self.deploy_pid_slot
+        )  # Max allowed error
+
+        self.pid_slot = self.retract_pid_slot
 
         self.direction = self.Direction.STOPPED
 
@@ -88,9 +109,11 @@ class IntakeComponent:
 
     def deploy(self) -> None:
         self.deploy_setpoint = self.SHAFT_REV_DEPLOY_HARD_LIMIT
+        self.pid_slot = self.deploy_pid_slot
 
     def retract(self) -> None:
         self.deploy_setpoint = self.SHAFT_REV_RETRACT_HARD_LIMIT
+        self.pid_slot = self.retract_pid_slot
 
     def intake(self) -> None:
         self.direction = self.Direction.FORWARD
@@ -135,7 +158,9 @@ class IntakeComponent:
         self.motor.set_control(intake_request)
 
         self.pid_controller.setReference(
-            self.deploy_setpoint, CANSparkMax.ControlType.kSmartMotion
+            self.deploy_setpoint,
+            CANSparkMax.ControlType.kSmartMotion,
+            pidSlot=self.pid_slot,
         )
 
         self.direction = self.Direction.STOPPED
