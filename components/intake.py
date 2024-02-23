@@ -34,7 +34,6 @@ class IntakeComponent:
     def __init__(self) -> None:
         self.motor = TalonFX(TalonIds.intake)
 
-        # TODO check motor direction
         self.deploy_motor = CANSparkMax(
             SparkMaxIds.intake_deploy, CANSparkMax.MotorType.kBrushless
         )
