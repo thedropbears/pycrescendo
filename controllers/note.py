@@ -1,6 +1,7 @@
 import math
+import time
 
-from magicbot import StateMachine, state, timed_state, will_reset_to
+from magicbot import StateMachine, state, timed_state, feedback, will_reset_to
 from wpimath.geometry import Translation2d
 
 from components.chassis import ChassisComponent
@@ -31,6 +32,7 @@ class NoteManager(StateMachine):
     def try_shoot(self):
         self.shot_desired = True
 
+    @feedback
     def has_note(self):
         return self.injector_component.has_note()
 
@@ -42,6 +44,7 @@ class NoteManager(StateMachine):
 
     def on_enable(self) -> None:
         super().on_enable()
+        self.note_seen_time = math.inf
         if self.has_note():
             self.engage()
         else:
@@ -79,6 +82,10 @@ class NoteManager(StateMachine):
         self.shooter_component.set_range(self.translation_to_goal().norm())
 
         if self.injector_component.has_note():
+            self.note_seen_time = time.monotonic()
+
+        delay = 1  # seconds
+        if time.monotonic() > self.note_seen_time + delay:
             self.next_state(self.holding_note)
 
         if self.intake_cancel_desired:
