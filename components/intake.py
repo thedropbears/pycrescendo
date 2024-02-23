@@ -43,6 +43,9 @@ class IntakeComponent:
 
         # Retract PID Controller
         self.retract_pid_slot = 0
+        self.pid_controller.setFF(
+            1 / (5700.0 * self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC), self.retract_pid_slot
+        )
         self.pid_controller.setP(0.08, self.retract_pid_slot)
         self.pid_controller.setI(0, self.retract_pid_slot)
         self.pid_controller.setD(0.4, self.retract_pid_slot)
@@ -59,6 +62,9 @@ class IntakeComponent:
 
         # Deploy PID Controller
         self.deploy_pid_slot = 1
+        self.pid_controller.setFF(
+            1 / (5700.0 * self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC), self.deploy_pid_slot
+        )
         self.pid_controller.setP(0.06, self.deploy_pid_slot)
         self.pid_controller.setI(0, self.deploy_pid_slot)
         self.pid_controller.setD(0.4, self.deploy_pid_slot)
