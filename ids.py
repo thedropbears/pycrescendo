@@ -16,6 +16,7 @@ class TalonIds(enum.IntEnum):
     steer_4 = 8
 
     shooter_flywheel = 9
+    shooter_flywheel1 = 10
 
     intake = 11
 
