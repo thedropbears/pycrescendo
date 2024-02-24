@@ -5,38 +5,38 @@ from hypothesis.strategies import floats
 from utilities.lookup import LookupTable
 
 test_table = LookupTable(
-    angle=[0.0, 10.0, 12.0, 15.0, 20.0],
+    [0.0, 10.0, 12.0, 15.0, 20.0],
     distance=[-5.0, -2.0, -2.0, 0.0, 6.0],
     speed=[-3.0, -2.5, -1.0, 0.0, 0.5],
 )
 
 
 def test_not_enough_rows():
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         LookupTable()
 
     with pytest.raises(ValueError):
-        LookupTable(key=[0.0, 1.0])
+        LookupTable([0.0, 1.0])
 
 
 def test_not_ascending_key():
     with pytest.raises(ValueError):
-        LookupTable(key=[10.0, 0.0], values=[0.0, 1.0])
+        LookupTable([10.0, 0.0], values=[0.0, 1.0])
 
 
 def test_one_value_table():
     with pytest.raises(ValueError):
-        LookupTable(key=[0.0], value=[0.0])
+        LookupTable([0.0], value=[0.0])
 
 
 def test_duplicate_keys():
     with pytest.raises(ValueError):
-        LookupTable(key=[0.0, 0.0], value=[0.0, 1.0])
+        LookupTable([0.0, 0.0], value=[0.0, 1.0])
 
 
 def test_multiple_row_lengths():
     with pytest.raises(IndexError):
-        LookupTable(key=[0.0, 1.0, 2.0], value=[0.0, 1.0])
+        LookupTable([0.0, 1.0, 2.0], value=[0.0, 1.0])
 
 
 def test_zero_gradient():

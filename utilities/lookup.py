@@ -3,34 +3,25 @@ from utilities.functions import clamp
 
 
 class LookupTable:
-    def __init__(self, **kwargs: Sequence[float]) -> None:
-        if len(kwargs.keys()) < 2:
+    def __init__(self, key_row: Sequence[float], **kwargs: Sequence[float]) -> None:
+        # Find length of table based on first row, which should be the key
+        if key_row != sorted(key_row):
+            raise ValueError("LookupTable: Key values must be in ascending order!")
+
+        self.key_values = tuple(key_row)
+        self.table_length = len(key_row)
+
+        if self.table_length < 2:
+            raise ValueError("LookupTable: Should have more than one value!")
+
+        if self.table_length != len(set(key_row)):
+            raise ValueError("LookupTable: Should not have duplicate key value!")
+
+        if len(kwargs.keys()) < 1:
             raise ValueError("LookupTable: Must have more than one row!")
 
-        key_found = False
         self.rows = {}
         for key, val in kwargs.items():
-            # Find length of table based on first row, which should be the key
-            if not key_found:
-                self.key_name = key
-
-                if val != sorted(val):
-                    raise ValueError(
-                        "LookupTable: Key values must be in ascending order!"
-                    )
-
-                self.key_values = tuple(val)
-                self.table_length = len(val)
-
-                if self.table_length < 2:
-                    raise ValueError("LookupTable: Should have more than one value!")
-
-                if self.table_length != len(set(val)):
-                    raise ValueError("LookupTable: Should have duplicate value in key!")
-
-                key_found = True
-                continue
-
             # Convert to tuple so values are immutable
             self.rows[key] = tuple(val)
 
