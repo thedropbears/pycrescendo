@@ -21,6 +21,9 @@ BLUE_SPEAKER_POSE = get_fiducial_pose(7)
 FIELD_WIDTH = 8.0161
 FIELD_LENGTH = RED_SPEAKER_POSE.x + BLUE_SPEAKER_POSE.x
 
+# Minimum height of the overhanging speaker hood as obtained from a field Onshape model.
+SPEAKER_HOOD_HEIGHT = 2.104883
+
 
 def field_flip_pose2d(p: Pose2d):
     return Pose2d(
