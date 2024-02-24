@@ -28,15 +28,15 @@ class ShooterComponent:
     INCLINATOR_OFFSET = 0.822 * math.tau - math.radians(20)
     INCLINATOR_SCALE_FACTOR = math.tau  # rps -> radians
 
-    FLYWHEEL_DISTANCE_LOOKUP = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
-    FLYWHEEL_SPEED_LOOKUP = [
+    FLYWHEEL_DISTANCE_LOOKUP = (0.0, 1.0, 2.0, 3.0, 4.0, 5.0)
+    FLYWHEEL_SPEED_LOOKUP = (
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
-    ]
+    )
 
     desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
     desired_flywheel_speed = tunable(0.0)
