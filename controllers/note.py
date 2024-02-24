@@ -52,7 +52,6 @@ class NoteManager(StateMachine):
 
     def on_enable(self) -> None:
         super().on_enable()
-        self.note_seen_time = math.inf
         if self.has_note():
             self.engage()
         else:
@@ -82,14 +81,17 @@ class NoteManager(StateMachine):
             self.next_state(self.idling)
 
     @state(must_finish=True)
-    def intaking(self):
+    def intaking(self, initial_call):
+        if initial_call:
+            self.note_seen_time = math.inf
+
         self.intake.intake()
         self.injector_component.intake()
 
         # Update range
         self.shooter_component.set_range(self.translation_to_goal().norm())
 
-        if self.injector_component.has_note():
+        if self.injector_component.has_note() and self.note_seen_time == math.inf:
             self.note_seen_time = time.monotonic()
 
         delay = 1  # seconds
@@ -117,7 +119,9 @@ class NoteManager(StateMachine):
         translation_to_goal = self.translation_to_goal()
 
         # Determine heading required for goal
-        bearing_to_speaker = math.atan2(translation_to_goal.y, translation_to_goal.x)
+        bearing_to_speaker = (
+            math.atan2(translation_to_goal.y, translation_to_goal.x) + math.pi
+        )
 
         # Update range
         self.shooter_component.set_range(translation_to_goal.norm())
@@ -127,6 +131,6 @@ class NoteManager(StateMachine):
         if self.chassis.at_desired_heading() and self.shooter_component.is_ready():
             self.next_state(self.firing)
 
-    @timed_state(duration=1, next_state=idling)
+    @timed_state(duration=1, next_state=idling, must_finish=True)
     def firing(self):
         self.injector_component.shoot()
