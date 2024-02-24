@@ -95,7 +95,7 @@ class PhysicsEngine:
         single_roller_moi = 0.00041  # measured from CAD
         self.flywheel = Falcon500MotorSim(
             robot.shooter_component.flywheel,
-            gearing=1 / ShooterComponent.FLYWHEEL_GEAR_RATIO,
+            gearing=ShooterComponent.FLYWHEEL_GEAR_RATIO,
             moi=2 * single_roller_moi,
         )
 
