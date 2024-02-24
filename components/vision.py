@@ -42,12 +42,14 @@ class VisualLocalizer:
         self.camera_to_robot = Transform3d(pos, rot).inverse()
         self.last_timestamp = -1
 
-        self.single_best_log = field.getObject("single_best_log")
-        self.single_alt_log = field.getObject("single_alt_log")
-        self.multi_best_log = field.getObject("multi_best_log")
-        self.multi_alt_log = field.getObject("multi_alt_log")
-        self.field_pos_obj = field.getObject("vision_pose")
-        self.pose_log_entry = wpiutil.log.FloatArrayLogEntry(data_log, "vision_pose")
+        self.single_best_log = field.getObject(name + "single_best_log")
+        self.single_alt_log = field.getObject(name + "single_alt_log")
+        self.multi_best_log = field.getObject(name + "multi_best_log")
+        self.multi_alt_log = field.getObject(name + "multi_alt_log")
+        self.field_pos_obj = field.getObject(name + "vision_pose")
+        self.pose_log_entry = wpiutil.log.FloatArrayLogEntry(
+            data_log, name + "vision_pose"
+        )
 
         self.chassis = chassis
 
@@ -64,8 +66,6 @@ class VisualLocalizer:
         # if we have already processed these results
         timestamp = results.getTimestamp()
 
-        # photonvision timestamp is in tenth of a nanosecond, converted to proper second
-        timestamp_sec = results.getTimestamp() / 1e12
         if timestamp == self.last_timestamp:
             return
         self.last_timestamp = timestamp
@@ -80,7 +80,7 @@ class VisualLocalizer:
             if self.add_to_estimator:
                 self.chassis.estimator.addVisionMeasurement(
                     pose,
-                    timestamp_sec,
+                    timestamp,
                     (reprojectionErr, reprojectionErr, reprojectionErr / 3),
                 )
 
@@ -118,7 +118,7 @@ class VisualLocalizer:
                 )
 
                 self.field_pos_obj.setPose(pose)
-                self.chassis.estimator.addVisionMeasurement(pose, timestamp_sec)
+                self.chassis.estimator.addVisionMeasurement(pose, timestamp)
 
                 if self.should_log:
                     self.single_best_log.setPose(
