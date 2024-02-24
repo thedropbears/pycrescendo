@@ -31,7 +31,7 @@ from magicbot import feedback
 from utilities.functions import rate_limit_module
 from utilities.game import is_red
 from utilities.ctre import FALCON_FREE_RPS
-from utilities.position import teamPoses
+from utilities.position import TeamPoses
 from ids import CancoderIds, TalonIds
 
 
@@ -293,7 +293,7 @@ class ChassisComponent:
         ).publish()
 
     def setup(self) -> None:
-        initial_pose = teamPoses.RED_TEST_POSE if is_red() else teamPoses.BLUE_TEST_POSE
+        initial_pose = TeamPoses.RED_TEST_POSE if is_red() else TeamPoses.BLUE_TEST_POSE
 
         self.estimator = SwerveDrive4PoseEstimator(
             self.kinematics,
@@ -402,9 +402,9 @@ class ChassisComponent:
         if is_red() != self.on_red_alliance:
             self.on_red_alliance = is_red()
             if self.on_red_alliance:
-                self.set_pose(teamPoses.RED_TEST_POSE)
+                self.set_pose(TeamPoses.RED_TEST_POSE)
             else:
-                self.set_pose(teamPoses.BLUE_TEST_POSE)
+                self.set_pose(TeamPoses.BLUE_TEST_POSE)
 
     def update_odometry(self) -> None:
         self.estimator.update(self.imu.getRotation2d(),
@@ -438,9 +438,9 @@ class ChassisComponent:
     def reset_odometry(self) -> None:
         """Reset odometry to current team's podium"""
         if is_red():
-            self.set_pose(teamPoses.RED_PODIUM)
+            self.set_pose(TeamPoses.RED_PODIUM)
         else:
-            self.set_pose(teamPoses.BLUE_PODIUM)
+            self.set_pose(TeamPoses.BLUE_PODIUM)
 
     def get_module_positions(
         self,
