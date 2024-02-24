@@ -42,6 +42,14 @@ class NoteManager(StateMachine):
             - self.chassis.get_pose().translation()
         )
 
+    def has_just_fired(self) -> bool:
+        """Intended to be polled by autonomous to tell when shooting is finished"""
+        return self.last_state == "firing" and self.current_state == "idling"
+
+    def execute(self):
+        self.last_state = self.current_state
+        super().execute()
+
     def on_enable(self) -> None:
         super().on_enable()
         self.note_seen_time = math.inf
