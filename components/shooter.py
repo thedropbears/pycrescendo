@@ -115,8 +115,8 @@ class ShooterComponent:
 
     def set_range(self, range: float) -> None:
         self.desired_inclinator_angle = math.atan2(SPEAKER_HOOD_HEIGHT, range)
-        self.desired_flywheel_speed = interp(
-            range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_SPEED_LOOKUP
+        self.desired_flywheel_speed = float(
+            interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_SPEED_LOOKUP)
         )
 
     def execute(self) -> None:
