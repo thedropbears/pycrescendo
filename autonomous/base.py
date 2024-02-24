@@ -65,6 +65,7 @@ class AutoBase(AutonomousStateMachine):
             )
 
         self.goal_heading: Rotation2d
+        self.trajectory_marker = self.field.getObject("auto_trajectory")
 
     def on_enable(self):
         # Setup starting position in the simulator
@@ -220,7 +221,6 @@ class AutoBase(AutonomousStateMachine):
         except Exception:
             return Trajectory([Trajectory.State(0, 0, 0, pose)])
 
-        self.trajectory_marker = self.field.getObject("auto_trajectory")
         self.trajectory_marker.setTrajectory(trajectory)
         return trajectory
 
