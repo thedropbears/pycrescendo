@@ -39,28 +39,30 @@ class SimpleTalonFXMotorSim:
 class Falcon500MotorSim:
     def __init__(
         self,
-        motor: phoenix6.hardware.TalonFX,
+        *motors: phoenix6.hardware.TalonFX,
         # Reduction between motor and encoder readings, as output over input.
         # If the mechanism spins slower than the motor, this number should be greater than one.
         gearing: float,
         moi: kilogram_square_meters,
     ):
         self.gearing = gearing
-        self.sim_state = motor.sim_state
-        self.sim_state.set_supply_voltage(12.0)
-        self.motor_sim = DCMotorSim(DCMotor.falcon500(), gearing, moi)
+        self.sim_states = [motor.sim_state for motor in motors]
+        for sim_state in self.sim_states:
+            sim_state.set_supply_voltage(12.0)
+        self.motor_sim = DCMotorSim(DCMotor.falcon500(len(motors)), gearing, moi)
 
     def update(self, dt: float) -> None:
-        voltage = self.sim_state.motor_voltage
+        voltage = self.sim_states[0].motor_voltage
         self.motor_sim.setInputVoltage(voltage)
         self.motor_sim.update(dt)
         motor_rev_per_mechanism_rad = self.gearing / math.tau
-        self.sim_state.set_raw_rotor_position(
-            self.motor_sim.getAngularPosition() * motor_rev_per_mechanism_rad
-        )
-        self.sim_state.set_rotor_velocity(
-            self.motor_sim.getAngularVelocity() * motor_rev_per_mechanism_rad
-        )
+        for sim_state in self.sim_states:
+            sim_state.set_raw_rotor_position(
+                self.motor_sim.getAngularPosition() * motor_rev_per_mechanism_rad
+            )
+            sim_state.set_rotor_velocity(
+                self.motor_sim.getAngularVelocity() * motor_rev_per_mechanism_rad
+            )
 
 
 class PhysicsEngine:
@@ -93,7 +95,7 @@ class PhysicsEngine:
         single_roller_moi = 0.00041  # measured from CAD
         self.flywheel = Falcon500MotorSim(
             robot.shooter_component.flywheel,
-            1 / ShooterComponent.FLYWHEEL_GEAR_RATIO,
+            gearing=1 / ShooterComponent.FLYWHEEL_GEAR_RATIO,
             moi=2 * single_roller_moi,
         )
 
