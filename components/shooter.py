@@ -4,7 +4,7 @@ from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
 
-from phoenix6.controls import VelocityVoltage
+from phoenix6.controls import VelocityVoltage, Follower
 from phoenix6.hardware import TalonFX
 from phoenix6.configs import (
     MotorOutputConfigs,
@@ -146,4 +146,4 @@ class ShooterComponent:
 
         flywheel_request = VelocityVoltage(self.desired_flywheel_speed)
         self.flywheel.set_control(flywheel_request)
-        self.flywheel1.set_control(flywheel_request)
+        self.flywheel1 = Follower(self.flywheel)
