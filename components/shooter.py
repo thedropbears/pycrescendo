@@ -10,18 +10,35 @@ from phoenix6.signals import NeutralModeValue
 from wpilib import DigitalInput, DutyCycle, SmartDashboard
 from wpimath.controller import PIDController
 
+from utilities.ctre import FALCON_FREE_RPS
 from utilities.functions import clamp
+from utilities.game import SPEAKER_HOOD_HEIGHT
+from utilities.lookup import LookupTable
 
 
 class ShooterComponent:
     FLYWHEEL_GEAR_RATIO = 24.0 / 18.0
     FLYWHEEL_TOLERANCE = 1  # rps
 
+    FLYWHEEL_MAX_SPEED = FALCON_FREE_RPS / FLYWHEEL_GEAR_RATIO
+
     MAX_INCLINE_ANGLE = 0.973  # ~55 degrees
     MIN_INCLINE_ANGLE = math.radians(20)
     INCLINATOR_TOLERANCE = math.radians(1)
     INCLINATOR_OFFSET = 0.822 * math.tau - math.radians(20)
     INCLINATOR_SCALE_FACTOR = math.tau  # rps -> radians
+
+    FLYWHEEL_SPEED_LOOKUP = LookupTable(
+        distance=[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
+        flywheel_speed=[
+            FLYWHEEL_MAX_SPEED,
+            FLYWHEEL_MAX_SPEED,
+            FLYWHEEL_MAX_SPEED,
+            FLYWHEEL_MAX_SPEED,
+            FLYWHEEL_MAX_SPEED,
+            FLYWHEEL_MAX_SPEED,
+        ],
+    )
 
     desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
     desired_flywheel_speed = tunable(0.0)
@@ -73,7 +90,10 @@ class ShooterComponent:
     @feedback
     def _at_inclination(self) -> bool:
         """Is the inclinator close to the correct angle?"""
-        return self.inclinator_controller.atSetpoint()
+        return (
+            abs(self.desired_inclinator_angle - self._inclination_angle())
+            < self.INCLINATOR_TOLERANCE
+        )
 
     @feedback
     def _flywheels_at_speed(self) -> bool:
@@ -96,10 +116,10 @@ class ShooterComponent:
         return self.flywheel.get_velocity().value
 
     def set_range(self, range: float) -> None:
-        pass
-        # TODO balistics / lookup table here
-        # self.desired_inclinator_angle = ???
-        # self.desired_flywheel_speed = ???
+        self.desired_inclinator_angle = math.atan2(SPEAKER_HOOD_HEIGHT, range)
+        self.desired_flywheel_speed = self.FLYWHEEL_SPEED_LOOKUP.lookup(
+            "flywheel_speed", range
+        )
 
     def execute(self) -> None:
         """This gets called at the end of the control loop"""

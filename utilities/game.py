@@ -2,7 +2,13 @@ import typing
 
 import robotpy_apriltag
 import wpilib
-from wpimath.geometry import Pose2d, Pose3d, Rotation2d, Translation2d, Translation3d
+from wpimath.geometry import (
+    Pose2d,
+    Pose3d,
+    Rotation2d,
+    Translation2d,
+    Translation3d,
+)
 
 apriltag_layout = robotpy_apriltag.loadAprilTagLayoutField(
     robotpy_apriltag.AprilTagField.k2024Crescendo
@@ -20,6 +26,19 @@ BLUE_SPEAKER_POSE = get_fiducial_pose(7)
 
 FIELD_WIDTH = 8.0161
 FIELD_LENGTH = RED_SPEAKER_POSE.x + BLUE_SPEAKER_POSE.x
+
+# Minimum height of the overhanging speaker hood as obtained from a field Onshape model.
+SPEAKER_HOOD_HEIGHT = 2.104883
+
+SPEAKER_HOOD_DEPTH = 0.456499
+
+BLUE_SPEAKER_TARGET_POSITION = BLUE_SPEAKER_POSE.translation() + Translation3d(
+    SPEAKER_HOOD_DEPTH, 0, 0
+)
+
+RED_SPEAKER_TARGET_POSITION = RED_SPEAKER_POSE.translation() - Translation3d(
+    SPEAKER_HOOD_DEPTH, 0, 0
+)
 
 
 def field_flip_pose2d(p: Pose2d):
@@ -48,6 +67,6 @@ def is_red() -> bool:
 
 def get_goal_speaker_position() -> Translation3d:
     if is_red():
-        return RED_SPEAKER_POSE.translation()
+        return RED_SPEAKER_TARGET_POSITION
 
-    return BLUE_SPEAKER_POSE.translation()
+    return BLUE_SPEAKER_TARGET_POSITION
