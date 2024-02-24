@@ -90,7 +90,10 @@ class ShooterComponent:
     @feedback
     def _at_inclination(self) -> bool:
         """Is the inclinator close to the correct angle?"""
-        return self.inclinator_controller.atSetpoint()
+        return (
+            abs(self.desired_inclinator_angle - self._inclination_angle())
+            < self.INCLINATOR_TOLERANCE
+        )
 
     @feedback
     def _flywheels_at_speed(self) -> bool:
@@ -113,11 +116,7 @@ class ShooterComponent:
         return self.flywheel.get_velocity().value
 
     def set_range(self, range: float) -> None:
-        self.desired_inclinator_angle = clamp(
-            math.atan2(SPEAKER_HOOD_HEIGHT, range),
-            self.MIN_INCLINE_ANGLE,
-            self.MAX_INCLINE_ANGLE,
-        )
+        self.desired_inclinator_angle = math.atan2(SPEAKER_HOOD_HEIGHT, range)
         self.desired_flywheel_speed = self.FLYWHEEL_SPEED_LOOKUP.lookup(
             "flywheel_speed", range
         )
