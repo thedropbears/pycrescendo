@@ -144,4 +144,4 @@ class ShooterComponent:
 
         flywheel_request = VelocityVoltage(self.desired_flywheel_speed)
         self.flywheel.set_control(flywheel_request)
-        self.flywheel1 = Follower(self.flywheel)
+        self.flywheel1 = Follower(TalonIds.shooter_flywheel, True)
