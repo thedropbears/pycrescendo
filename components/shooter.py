@@ -109,9 +109,7 @@ class ShooterComponent:
         """Are the flywheels close to thier target speed"""
         return (
             abs(self.desired_flywheel_speed - self.flywheel.get_velocity().value)
-            < self.FLYWHEEL_TOLERANCE,
-            abs(self.desired_flywheel_speed - self.flywheel1.get_velocity().value)
-            < self.FLYWHEEL_TOLERANCE,
+            < self.FLYWHEEL_TOLERANCE
         )
 
     @feedback
@@ -124,7 +122,7 @@ class ShooterComponent:
 
     @feedback
     def _flywheel_velocity(self) -> float:
-        return (self.flywheel.get_velocity().value, self.flywheel1.get_velocity().value)
+        return self.flywheel.get_velocity().value
 
     def set_range(self, range: float) -> None:
         self.desired_inclinator_angle = math.atan2(SPEAKER_HOOD_HEIGHT, range)
