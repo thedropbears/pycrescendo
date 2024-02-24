@@ -87,13 +87,9 @@ class AutoBase(AutonomousStateMachine):
 
     @state
     def shoot_note(self, initial_call: bool) -> None:
-        if initial_call:
-            # TODO Call the shooter state machine
-            # TODO Also get intake out at this time??
-            pass
+        self.note_manager.try_shoot()
 
-        if True:
-            # TODO This needs to check if the state machine has finished firing
+        if self.note_manager.has_just_fired():
             if len(self.note_paths_working_copy) == 0:
                 # Just shot the last note
                 self.done()
@@ -107,6 +103,8 @@ class AutoBase(AutonomousStateMachine):
             self.trajectory = self.calculate_trajectory(
                 self.note_paths_working_copy.pop(0)
             )
+
+        self.note_manager.try_intake()
 
         # Drive with the intake always facing the tangent
         self.drive_on_trajectory(state_tm, enforce_tangent_heading=True)
