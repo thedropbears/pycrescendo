@@ -44,4 +44,5 @@ class InjectorComponent:
             case Mode.SHOOT:
                 speed = self.shoot_speed
 
+        self._mode = Mode.IDLE
         self.injector.set(speed)

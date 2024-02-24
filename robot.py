@@ -15,7 +15,7 @@ from components.intake import IntakeComponent
 from components.climber import ClimberComponent
 from components.led import LightStrip
 
-from controllers.shooter import Shooter
+from controllers.note import NoteManager
 from controllers.climber import Climber
 
 from utilities.game import is_red
@@ -27,7 +27,7 @@ from utilities.scalers import rescale_js
 
 class MyRobot(magicbot.MagicRobot):
     # Controllers
-    shooter: Shooter
+    note_manager: NoteManager
     climber: Climber
 
     # Components
@@ -152,8 +152,6 @@ class MyRobot(magicbot.MagicRobot):
         # Cancel any running controllers
         if self.gamepad.getBackButtonPressed():
             self.cancel_controllers()
-
-        self.shooter.execute()
 
         self.intake.execute()
         self.shooter_component.execute()
