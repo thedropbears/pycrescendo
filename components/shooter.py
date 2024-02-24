@@ -6,7 +6,12 @@ from ids import SparkMaxIds, TalonIds, DioChannels
 
 from phoenix6.controls import VelocityVoltage
 from phoenix6.hardware import TalonFX
-from phoenix6.configs import MotorOutputConfigs, Slot0Configs, FeedbackConfigs
+from phoenix6.configs import (
+    MotorOutputConfigs,
+    Slot0Configs,
+    FeedbackConfigs,
+    config_groups,
+)
 from phoenix6.signals import NeutralModeValue
 from wpilib import DigitalInput, DutyCycle, SmartDashboard
 from wpimath.controller import PIDController
@@ -53,7 +58,11 @@ class ShooterComponent:
 
         flywheel_config = self.flywheel.configurator
         flywheel_motor_config = MotorOutputConfigs()
+        flywheel1_motor_config = MotorOutputConfigs()
         flywheel_motor_config.neutral_mode = NeutralModeValue.COAST
+        flywheel1_motor_config.inverted = (
+            config_groups.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+        )
 
         flywheel_pid = (
             Slot0Configs()
@@ -72,6 +81,7 @@ class ShooterComponent:
         flywheel_config.apply(flywheel_motor_config)
         flywheel_config.apply(flywheel_pid)
         flywheel_config.apply(flywheel_gear_ratio)
+        flywheel_config.apply(flywheel1_motor_config)
 
         self.inclinator_controller = PIDController(3, 0, 0)
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
