@@ -22,7 +22,7 @@ module = "photonlibpy.*"
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-addopts = "--strict-markers"
+addopts = "--strict-markers -v --maxfail=2"
 pythonpath = "."
 testpaths = ["tests"]
 xfail_strict = true
