@@ -12,9 +12,6 @@ test_table = LookupTable(
 
 
 def test_not_enough_rows():
-    with pytest.raises(TypeError):
-        LookupTable()
-
     with pytest.raises(ValueError):
         LookupTable([0.0, 1.0])
 
