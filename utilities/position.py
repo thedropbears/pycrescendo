@@ -41,5 +41,5 @@ class teamPoses:
     RED_TEST_POSE = Pose2d(15.1, 5.5, math.pi)
     BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
     stage_width = 16.541748046875
-    RED_PODIUM = Pose2d(Translation2d(3.367, 4.08455), Rotation2d(math.pi))
-    BLUE_PODIUM = field_flip_pose2d(RED_PODIUM)
+    BLUE_PODIUM = Pose2d(Translation2d(2.992, 4.08455), Rotation2d(math.pi))
+    RED_PODIUM = field_flip_pose2d(BLUE_PODIUM)

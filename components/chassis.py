@@ -437,7 +437,7 @@ class ChassisComponent:
 
     def reset_odometry(self) -> None:
         """Reset odometry to current team's podium"""
-        if self.on_red_alliance:
+        if is_red():
             self.set_pose(teamPoses.RED_PODIUM)
         else:
             self.set_pose(teamPoses.BLUE_PODIUM)
