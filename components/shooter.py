@@ -1,4 +1,5 @@
 import math
+from numpy import interp
 from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
@@ -13,7 +14,6 @@ from wpimath.controller import PIDController
 from utilities.ctre import FALCON_FREE_RPS
 from utilities.functions import clamp
 from utilities.game import SPEAKER_HOOD_HEIGHT
-from utilities.lookup import LookupTable
 
 
 class ShooterComponent:
@@ -28,17 +28,15 @@ class ShooterComponent:
     INCLINATOR_OFFSET = 0.822 * math.tau - math.radians(20)
     INCLINATOR_SCALE_FACTOR = math.tau  # rps -> radians
 
-    FLYWHEEL_SPEED_LOOKUP = LookupTable(
-        distance=[0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
-        flywheel_speed=[
-            FLYWHEEL_MAX_SPEED,
-            FLYWHEEL_MAX_SPEED,
-            FLYWHEEL_MAX_SPEED,
-            FLYWHEEL_MAX_SPEED,
-            FLYWHEEL_MAX_SPEED,
-            FLYWHEEL_MAX_SPEED,
-        ],
-    )
+    FLYWHEEL_DISTANCE_LOOKUP = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
+    FLYWHEEL_SPEED_LOOKUP = [
+        FLYWHEEL_MAX_SPEED,
+        FLYWHEEL_MAX_SPEED,
+        FLYWHEEL_MAX_SPEED,
+        FLYWHEEL_MAX_SPEED,
+        FLYWHEEL_MAX_SPEED,
+        FLYWHEEL_MAX_SPEED,
+    ]
 
     desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
     desired_flywheel_speed = tunable(0.0)
@@ -117,8 +115,8 @@ class ShooterComponent:
 
     def set_range(self, range: float) -> None:
         self.desired_inclinator_angle = math.atan2(SPEAKER_HOOD_HEIGHT, range)
-        self.desired_flywheel_speed = self.FLYWHEEL_SPEED_LOOKUP.lookup(
-            "flywheel_speed", range
+        self.desired_flywheel_speed = interp(
+            range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_SPEED_LOOKUP
         )
 
     def execute(self) -> None:
