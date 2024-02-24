@@ -106,7 +106,7 @@ class MyRobot(magicbot.MagicRobot):
                 self.chassis.snap_to_heading(-math.radians(dpad))
 
         # Set current robot direction to forward
-        if self.gamepad.getXButton():
+        if self.gamepad.getBButton():
             self.chassis.reset_yaw()
 
         # Reset Odometry
@@ -122,11 +122,11 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getRightBumperPressed():
             self.climber.try_toggle()
 
-        # Intake -> TODO: Tune trigger zone (0-1)
+        # Intake
         if self.gamepad.getLeftTriggerAxis() > 0.5:
             self.note_manager.try_intake()
 
-        # TODO: LB should retract intake
+        # Cancel intaking
         if self.gamepad.getLeftBumper():
             self.note_manager.cancel_intake()
 
