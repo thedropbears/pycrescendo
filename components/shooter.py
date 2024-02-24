@@ -1,5 +1,5 @@
 import math
-from numpy import interp
+import numpy as np
 from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
@@ -116,7 +116,7 @@ class ShooterComponent:
     def set_range(self, range: float) -> None:
         self.desired_inclinator_angle = math.atan2(SPEAKER_HOOD_HEIGHT, range)
         self.desired_flywheel_speed = float(
-            interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_SPEED_LOOKUP)
+            np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_SPEED_LOOKUP)
         )
 
     def execute(self) -> None:
