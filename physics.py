@@ -94,7 +94,7 @@ class PhysicsEngine:
         # TODO(davo): update CAD to include hex shaft and remeasure
         single_roller_moi = 0.00041  # measured from CAD
         self.flywheel = Falcon500MotorSim(
-            robot.shooter_component.flywheel,
+            robot.shooter_component.flywheel_left,
             gearing=ShooterComponent.FLYWHEEL_GEAR_RATIO,
             moi=2 * single_roller_moi,
         )
