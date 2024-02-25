@@ -4,9 +4,13 @@ from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
 
-from phoenix6.controls import VelocityVoltage
+from phoenix6.controls import VelocityVoltage, Follower
 from phoenix6.hardware import TalonFX
-from phoenix6.configs import MotorOutputConfigs, Slot0Configs, FeedbackConfigs
+from phoenix6.configs import (
+    MotorOutputConfigs,
+    Slot0Configs,
+    FeedbackConfigs,
+)
 from phoenix6.signals import NeutralModeValue
 from wpilib import DigitalInput, DutyCycle, SmartDashboard
 from wpimath.controller import PIDController
@@ -48,9 +52,12 @@ class ShooterComponent:
         self.inclinator_encoder = DutyCycle(
             DigitalInput(DioChannels.inclinator_encoder)
         )
-        self.flywheel = TalonFX(TalonIds.shooter_flywheel)
+        self.flywheel_left = TalonFX(TalonIds.shooter_flywheel_left)
+        self.flywheel_right = TalonFX(TalonIds.shooter_flywheel_right)
+        self.flywheel_right.set_control(Follower(TalonIds.shooter_flywheel_left, True))
 
-        flywheel_config = self.flywheel.configurator
+        flywheel_left_config = self.flywheel_left.configurator
+        flywheel_right_config = self.flywheel_right.configurator
         flywheel_motor_config = MotorOutputConfigs()
         flywheel_motor_config.neutral_mode = NeutralModeValue.COAST
 
@@ -68,9 +75,13 @@ class ShooterComponent:
             self.FLYWHEEL_GEAR_RATIO
         )
 
-        flywheel_config.apply(flywheel_motor_config)
-        flywheel_config.apply(flywheel_pid)
-        flywheel_config.apply(flywheel_gear_ratio)
+        flywheel_left_config.apply(flywheel_motor_config)
+        flywheel_left_config.apply(flywheel_pid)
+        flywheel_left_config.apply(flywheel_gear_ratio)
+
+        flywheel_right_config.apply(flywheel_motor_config)
+        flywheel_right_config.apply(flywheel_pid)
+        flywheel_right_config.apply(flywheel_gear_ratio)
 
         self.inclinator_controller = PIDController(3, 0, 0)
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
@@ -97,7 +108,7 @@ class ShooterComponent:
     def _flywheels_at_speed(self) -> bool:
         """Are the flywheels close to thier target speed"""
         return (
-            abs(self.desired_flywheel_speed - self.flywheel.get_velocity().value)
+            abs(self.desired_flywheel_speed - self.flywheel_left.get_velocity().value)
             < self.FLYWHEEL_TOLERANCE
         )
 
@@ -111,7 +122,7 @@ class ShooterComponent:
 
     @feedback
     def _flywheel_velocity(self) -> float:
-        return self.flywheel.get_velocity().value
+        return self.flywheel_left.get_velocity().value
 
     def set_range(self, range: float) -> None:
         self.desired_inclinator_angle = math.atan2(SPEAKER_HOOD_HEIGHT, range)
@@ -132,4 +143,4 @@ class ShooterComponent:
         self.inclinator.set(inclinator_speed)
 
         flywheel_request = VelocityVoltage(self.desired_flywheel_speed)
-        self.flywheel.set_control(flywheel_request)
+        self.flywheel_left.set_control(flywheel_request)
