@@ -91,12 +91,31 @@ class PhysicsEngine:
             for module in robot.chassis.modules
         ]
 
-        # TODO(davo): update CAD to include hex shaft and remeasure
-        single_roller_moi = 0.00041  # measured from CAD
+        g_mm2_to_kg_m2 = 1e-9
+        # The following moments of inertia were measured from the CAD on 2024-02-25.
+        single_wheel_moi = 106304.0223 * g_mm2_to_kg_m2
+        tiny_shafts_moi = 2 * 921.70073 * g_mm2_to_kg_m2
+        inverted_shafts_moi = 2 * (2516.60792 + 921.70073) * g_mm2_to_kg_m2
+        motor_pulleys_moi = (1115.67156 + 2782.3926) * g_mm2_to_kg_m2
+        motor_linkage_shafts_moi = 2 * 1126.02215 * g_mm2_to_kg_m2
+        top_roller_shaft_moi = 3291.67688 * g_mm2_to_kg_m2
+        inversing_shaft_moi = 8179.57108 * g_mm2_to_kg_m2
+        inversing_gears_moi = 4 * 42065.7167 * g_mm2_to_kg_m2
+
         self.flywheel = Falcon500MotorSim(
             robot.shooter_component.flywheel_left,
+            robot.shooter_component.flywheel_right,
             gearing=ShooterComponent.FLYWHEEL_GEAR_RATIO,
-            moi=2 * single_roller_moi,
+            moi=(
+                8 * single_wheel_moi
+                + tiny_shafts_moi
+                + inverted_shafts_moi
+                + 2 * motor_pulleys_moi
+                + motor_linkage_shafts_moi
+                + top_roller_shaft_moi
+                + inversing_shaft_moi
+                + inversing_gears_moi
+            ),
         )
 
         self.imu = SimDeviceSim("navX-Sensor", 4)
