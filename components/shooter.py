@@ -55,9 +55,9 @@ class ShooterComponent:
         self.flywheel_left = TalonFX(TalonIds.shooter_flywheel_left)
         self.flywheel_right = TalonFX(TalonIds.shooter_flywheel_right)
 
-        flywheel_config = self.flywheel_left.configurator
+        flywheel_left_config = self.flywheel_left.configurator
+        flywheel_right_config = self.flywheel_right.configurator
         flywheel_motor_config = MotorOutputConfigs()
-        flywheel1_motor_config = MotorOutputConfigs()
         flywheel_motor_config.neutral_mode = NeutralModeValue.COAST
 
         flywheel_pid = (
@@ -74,10 +74,13 @@ class ShooterComponent:
             self.FLYWHEEL_GEAR_RATIO
         )
 
-        flywheel_config.apply(flywheel_motor_config)
-        flywheel_config.apply(flywheel_pid)
-        flywheel_config.apply(flywheel_gear_ratio)
-        flywheel_config.apply(flywheel1_motor_config)
+        flywheel_left_config.apply(flywheel_motor_config)
+        flywheel_left_config.apply(flywheel_pid)
+        flywheel_left_config.apply(flywheel_gear_ratio)
+
+        flywheel_right_config.apply(flywheel_motor_config)
+        flywheel_right_config.apply(flywheel_pid)
+        flywheel_right_config.apply(flywheel_gear_ratio)
 
         self.inclinator_controller = PIDController(3, 0, 0)
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
