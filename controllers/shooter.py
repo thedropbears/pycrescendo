@@ -11,7 +11,6 @@ from utilities.game import get_goal_speaker_position
 
 
 class Shooter(StateMachine):
-
     shooter_component: ShooterComponent
     chassis: ChassisComponent
     intake: IntakeComponent
@@ -23,11 +22,11 @@ class Shooter(StateMachine):
         )
 
     @default_state
-    def idling(self):
+    def idling(self) -> None:
         self.shooter_component.set_range(self.translation_to_goal().norm())
 
     @state(first=True)
-    def aiming(self):
+    def aiming(self) -> None:
         self.shooter_component.set_range(self.translation_to_goal().norm())
 
         translation_to_goal = self.translation_to_goal()
@@ -46,6 +45,6 @@ class Shooter(StateMachine):
             self.next_state(self.firing)
 
     @timed_state(duration=1, must_finish=True)
-    def firing(self):
+    def firing(self) -> None:
         self.shooter_component.set_range(self.translation_to_goal().norm())
         self.intake.inject()

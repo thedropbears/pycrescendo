@@ -5,27 +5,25 @@ from controllers.shooter import Shooter
 
 
 class NoteManager(StateMachine):
-
     shooter: Shooter
-
     intake: IntakeComponent
 
     shot_desired = will_reset_to(False)
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.intake_desired = False
 
-    def try_intake(self):
+    def try_intake(self) -> None:
         self.intake_desired = True
 
-    def cancel_intake(self):
+    def cancel_intake(self) -> None:
         self.intake_desired = False
 
-    def try_shoot(self):
+    def try_shoot(self) -> None:
         self.shot_desired = True
 
     @feedback
-    def has_note(self):
+    def has_note(self) -> bool:
         return self.intake.has_note()
 
     def has_just_fired(self) -> bool:
@@ -35,7 +33,7 @@ class NoteManager(StateMachine):
             and self.current_state == "not_holding_note"
         )
 
-    def execute(self):
+    def execute(self) -> None:
         self.last_state = self.current_state
         super().execute()
 
@@ -47,7 +45,7 @@ class NoteManager(StateMachine):
             self.engage(self.not_holding_note)
 
     @state(must_finish=True, first=True)
-    def holding_note(self):
+    def holding_note(self) -> None:
         self.intake_desired = False
 
         if self.shot_desired:
@@ -57,7 +55,7 @@ class NoteManager(StateMachine):
             self.next_state(self.not_holding_note)
 
     @state(must_finish=True)
-    def not_holding_note(self):
+    def not_holding_note(self) -> None:
         if self.intake_desired:
             self.intake.deploy()
             self.intake.intake()
