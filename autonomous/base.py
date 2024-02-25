@@ -22,7 +22,6 @@ import utilities.game as game
 
 from components.chassis import ChassisComponent
 
-# Add controllers for intake and shooter when available
 from controllers.note import NoteManager
 
 
@@ -116,12 +115,15 @@ class AutoBase(AutonomousStateMachine):
             self.chassis.stop_snapping()
             self.next_state("drive_to_shoot")
         if self.is_at_goal():
-            if not self.note_manager.has_note():
-                pass  # TODO: do something if we don't have a note, e.g. go to next note position
-            # Check if we have a note collected
-            # Return heading control to the path controller
-            self.chassis.stop_snapping()
-            self.next_state("drive_to_shoot")
+            # we did not find a note on the path, look for the next note
+            if len(self.note_paths_working_copy) == 0:
+                # Couldn't find the last note
+                self.done()
+                return
+            self.trajectory = self.calculate_trajectory(
+                self.note_paths_working_copy.pop(0)
+            )
+            self.shoot_paths.pop(0)
 
     @state
     def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
@@ -129,6 +131,8 @@ class AutoBase(AutonomousStateMachine):
             self.trajectory = self.calculate_trajectory(
                 self.shoot_paths_working_copy.pop(0)
             )
+
+        self.note_manager.cancel_intake()
 
         # Do some driving...
         self.drive_on_trajectory(state_tm)
