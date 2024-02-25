@@ -27,17 +27,15 @@ class Shooter(StateMachine):
 
     @state(first=True)
     def aiming(self) -> None:
-        self.shooter_component.set_range(self.translation_to_goal().norm())
-
         translation_to_goal = self.translation_to_goal()
+
+        # Update range
+        self.shooter_component.set_range(translation_to_goal.norm())
 
         # Determine heading required for goal
         bearing_to_speaker = (
             math.atan2(translation_to_goal.y, translation_to_goal.x) + math.pi
         )
-
-        # Update range
-        self.shooter_component.set_range(translation_to_goal.norm())
 
         # Set to appropriate heading
         self.chassis.snap_to_heading(bearing_to_speaker)
