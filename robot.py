@@ -106,7 +106,7 @@ class MyRobot(magicbot.MagicRobot):
                 self.chassis.snap_to_heading(-math.radians(dpad))
 
         # Set current robot direction to forward
-        if self.gamepad.getBButton():
+        if self.gamepad.getBButtonPressed():
             self.chassis.reset_yaw()
 
         # Reset Odometry
