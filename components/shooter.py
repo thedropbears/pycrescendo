@@ -54,6 +54,7 @@ class ShooterComponent:
         )
         self.flywheel_left = TalonFX(TalonIds.shooter_flywheel_left)
         self.flywheel_right = TalonFX(TalonIds.shooter_flywheel_right)
+        self.flywheel_right.set_control(Follower(TalonIds.shooter_flywheel_left, True))
 
         flywheel_left_config = self.flywheel_left.configurator
         flywheel_right_config = self.flywheel_right.configurator
@@ -143,4 +144,3 @@ class ShooterComponent:
 
         flywheel_request = VelocityVoltage(self.desired_flywheel_speed)
         self.flywheel_left.set_control(flywheel_request)
-        self.flywheel_right.set_control(Follower(TalonIds.shooter_flywheel_left, True))
