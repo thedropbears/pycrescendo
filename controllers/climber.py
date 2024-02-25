@@ -5,7 +5,9 @@ from components.climber import ClimberComponent
 class Climber(StateMachine):
     climber_component: ClimberComponent
     should_climb = will_reset_to(False)
-    extended = False
+
+    def __init__(self) -> None:
+        self.extended = False
 
     def climb(self) -> None:
         self.should_climb = True
