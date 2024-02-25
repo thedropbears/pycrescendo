@@ -20,6 +20,14 @@ After installing `pdm`, use it to create a virtual environment and install our d
 pdm install
 ```
 
+```sh
+pdm run python -m ensurepip
+```
+
+```sh
+pdm run download
+```
+
 ### pre-commit
 
 [pre-commit][] is configured to run our formatters and linters.
