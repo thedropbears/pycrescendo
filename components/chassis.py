@@ -118,8 +118,7 @@ class SwerveModule:
 
         # configuration for motor pid and feedforward
         self.drive_pid = Slot0Configs().with_k_p(1.0868).with_k_i(0).with_k_d(0)
-        self.drive_ff = SimpleMotorFeedforwardMeters(
-            kS=0.15172, kV=2.8305, kA=0.082659)
+        self.drive_ff = SimpleMotorFeedforwardMeters(kS=0.15172, kV=2.8305, kA=0.082659)
 
         drive_config.apply(drive_motor_config)
         drive_config.apply(self.drive_pid, 0.01)
@@ -158,8 +157,7 @@ class SwerveModule:
 
         # smooth wheel velocity vector
         if self.do_smooth:
-            self.state = rate_limit_module(
-                self.state, desired_state, self.accel_limit)
+            self.state = rate_limit_module(self.state, desired_state, self.accel_limit)
         else:
             self.state = desired_state
         current_angle = self.get_rotation()
@@ -183,8 +181,7 @@ class SwerveModule:
 
         # original position change/100ms, new m/s -> rot/s
         self.drive.set_control(
-            self.drive_request.with_velocity(
-                target_speed).with_feed_forward(speed_volt)
+            self.drive_request.with_velocity(target_speed).with_feed_forward(speed_volt)
         )
 
     def sync_steer_encoder(self) -> None:
@@ -348,8 +345,7 @@ class ChassisComponent:
             desired_speed_translation = Translation2d(
                 self.chassis_speeds.vx, self.chassis_speeds.vy
             ).rotateBy(
-                Rotation2d(-self.chassis_speeds.omega *
-                           5 * self.control_loop_wait_time)
+                Rotation2d(-self.chassis_speeds.omega * 5 * self.control_loop_wait_time)
             )
             desired_speeds = ChassisSpeeds(
                 desired_speed_translation.x,
@@ -407,14 +403,11 @@ class ChassisComponent:
                 self.set_pose(TeamPoses.BLUE_TEST_POSE)
 
     def update_odometry(self) -> None:
-        self.estimator.update(self.imu.getRotation2d(),
-                              self.get_module_positions())
+        self.estimator.update(self.imu.getRotation2d(), self.get_module_positions())
         self.field_obj.setPose(self.get_pose())
         if self.send_modules:
-            self.setpoints_publisher.set(
-                [module.state for module in self.modules])
-            self.measurements_publisher.set(
-                [module.get() for module in self.modules])
+            self.setpoints_publisher.set([module.state for module in self.modules])
+            self.measurements_publisher.set([module.get() for module in self.modules])
 
     def sync_all(self) -> None:
         for m in self.modules:
@@ -431,8 +424,7 @@ class ChassisComponent:
         """Sets pose to current pose but with a heading of forwards"""
         cur_pose = self.estimator.getEstimatedPosition()
         self.set_pose(
-            Pose2d(cur_pose.translation(), Rotation2d(
-                math.pi if is_red() else 0))
+            Pose2d(cur_pose.translation(), Rotation2d(math.pi if is_red() else 0))
         )
 
     def reset_odometry(self) -> None:
