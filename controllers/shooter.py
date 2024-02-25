@@ -2,7 +2,7 @@ import math
 
 from wpimath.geometry import Translation2d
 
-from magicbot import StateMachine, state, timed_state
+from magicbot import StateMachine, state, timed_state, default_state
 
 from components.chassis import ChassisComponent
 from components.intake import IntakeComponent
@@ -22,8 +22,14 @@ class Shooter(StateMachine):
             - self.chassis.get_pose().translation()
         )
 
+    @default_state
+    def idling(self):
+        self.shooter_component.set_range(self.translation_to_goal().norm())
+
     @state(first=True)
     def aiming(self):
+        self.shooter_component.set_range(self.translation_to_goal().norm())
+
         translation_to_goal = self.translation_to_goal()
 
         # Determine heading required for goal
@@ -41,4 +47,5 @@ class Shooter(StateMachine):
 
     @timed_state(duration=1, must_finish=True)
     def firing(self):
+        self.shooter_component.set_range(self.translation_to_goal().norm())
         self.intake.inject()
