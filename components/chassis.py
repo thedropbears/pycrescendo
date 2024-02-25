@@ -29,8 +29,9 @@ from wpimath.controller import ProfiledPIDControllerRadians
 from magicbot import feedback
 
 from utilities.functions import rate_limit_module
-from utilities.game import is_red, field_flip_pose2d
+from utilities.game import is_red
 from utilities.ctre import FALCON_FREE_RPS
+from utilities.position import TeamPoses
 from ids import CancoderIds, TalonIds
 
 
@@ -221,8 +222,7 @@ class ChassisComponent:
     do_smooth = magicbot.tunable(True)
     swerve_lock = magicbot.tunable(False)
 
-    RED_TEST_POSE = Pose2d(15.1, 5.5, math.pi)
-    BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
+    # TODO: Read from positions.py once autonomous is finished
 
     def __init__(self) -> None:
         self.imu = navx.AHRS.create_spi()
@@ -290,11 +290,8 @@ class ChassisComponent:
         ).publish()
 
     def setup(self) -> None:
-        initial_pose = (
-            ChassisComponent.RED_TEST_POSE
-            if is_red()
-            else ChassisComponent.BLUE_TEST_POSE
-        )
+        initial_pose = TeamPoses.RED_TEST_POSE if is_red() else TeamPoses.BLUE_TEST_POSE
+
         self.estimator = SwerveDrive4PoseEstimator(
             self.kinematics,
             self.imu.getRotation2d(),
@@ -401,9 +398,9 @@ class ChassisComponent:
         if is_red() != self.on_red_alliance:
             self.on_red_alliance = is_red()
             if self.on_red_alliance:
-                self.set_pose(ChassisComponent.RED_TEST_POSE)
+                self.set_pose(TeamPoses.RED_TEST_POSE)
             else:
-                self.set_pose(ChassisComponent.BLUE_TEST_POSE)
+                self.set_pose(TeamPoses.BLUE_TEST_POSE)
 
     def update_odometry(self) -> None:
         self.estimator.update(self.imu.getRotation2d(), self.get_module_positions())
@@ -429,6 +426,13 @@ class ChassisComponent:
         self.set_pose(
             Pose2d(cur_pose.translation(), Rotation2d(math.pi if is_red() else 0))
         )
+
+    def reset_odometry(self) -> None:
+        """Reset odometry to current team's podium"""
+        if is_red():
+            self.set_pose(TeamPoses.RED_PODIUM)
+        else:
+            self.set_pose(TeamPoses.BLUE_PODIUM)
 
     def get_module_positions(
         self,

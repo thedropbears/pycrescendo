@@ -67,8 +67,11 @@ class LightStrip:
     def want_note(self) -> None:
         self.pattern = Flash(HsvColour.MAGENTA)
 
-    def holding_note(self) -> None:
+    def in_range(self) -> None:
         self.pattern = Solid(HsvColour.GREEN)
+
+    def not_in_range(self) -> None:
+        self.pattern = Solid(HsvColour.RED)
 
     def shooting(self) -> None:
         self.pattern = Solid(HsvColour.ORANGE)
@@ -87,8 +90,6 @@ class LightStrip:
 
     def disabled(self) -> None:
         self.pattern = Solid(HsvColour.WHITE)
-
-    # --------------------------------------------------------------------
 
     def execute(self) -> None:
         colour = self.pattern.update()

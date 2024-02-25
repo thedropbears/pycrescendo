@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import math
 import wpilib
 import wpilib.event
 from wpimath.geometry import Rotation3d, Translation3d
@@ -20,7 +20,6 @@ from controllers.climber import Climber
 
 from utilities.game import is_red
 
-import math
 
 from utilities.scalers import rescale_js
 
@@ -39,6 +38,9 @@ class MyRobot(magicbot.MagicRobot):
     lights: LightStrip
 
     max_speed = magicbot.tunable(4)  # m/s
+    lower_max_speed = magicbot.tunable(2)  # m/s
+    max_spin_rate = magicbot.tunable(4)  # m/s
+    lower_max_spin_rate = magicbot.tunable(2)  # m/s
     inclination_angle = tunable(0.0)
     vision_port: VisualLocalizer
     vision_starboard: VisualLocalizer
@@ -47,10 +49,6 @@ class MyRobot(magicbot.MagicRobot):
         self.data_log = wpilib.DataLogManager.getLog()
 
         self.gamepad = wpilib.XboxController(0)
-
-        self.rumble_timer = wpilib.Timer()
-        self.rumble_timer.start()
-        self.rumble_duration = 0.0
 
         self.field = wpilib.Field2d()
         wpilib.SmartDashboard.putData(self.field)
@@ -69,26 +67,23 @@ class MyRobot(magicbot.MagicRobot):
             0, -math.radians(20), math.radians(180) + math.radians(90 - 71.252763)
         )
 
-    def rumble_for(self, intensity: float, duration: float):
-        self.rumble_duration = duration
-        self.rumble_timer.reset()
-        self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, intensity)
-
-    def short_rumble(self):
-        self.rumble_for(0.4, 0.1)
-
-    def long_rumble(self):
-        self.rumble_for(0.8, 0.3)
-
     def teleopInit(self) -> None:
         pass
 
     def teleopPeriodic(self) -> None:
+        # Set max speed
+        max_speed = self.max_speed
+        max_spin_rate = self.max_spin_rate
+        if self.gamepad.getXButton():
+            max_speed = self.lower_max_speed
+            max_spin_rate = self.lower_max_spin_rate
+
         # Driving
-        spin_rate = 4
-        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * self.max_speed
-        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * self.max_speed
-        drive_z = -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * spin_rate
+        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * max_speed
+        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * max_speed
+        drive_z = (
+            -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * max_spin_rate
+        )
         local_driving = self.gamepad.getYButton()
 
         if local_driving:
@@ -99,7 +94,7 @@ class MyRobot(magicbot.MagicRobot):
                 drive_y = -drive_y
             self.chassis.drive_field(drive_x, drive_y, drive_z)
 
-        # give rotational access to the driver
+        # Give rotational access to the driver
         if drive_z != 0:
             self.chassis.stop_snapping()
 
@@ -111,20 +106,33 @@ class MyRobot(magicbot.MagicRobot):
                 self.chassis.snap_to_heading(-math.radians(dpad))
 
         # Set current robot direction to forward
-        if self.gamepad.getXButton():
+        if self.gamepad.getBButtonPressed():
             self.chassis.reset_yaw()
 
-        # stop rumble after time
-        if self.rumble_timer.hasElapsed(self.rumble_duration):
-            self.gamepad.setRumble(wpilib.XboxController.RumbleType.kBothRumble, 0)
+        # Reset Odometry
+        if self.gamepad.getStartButtonPressed():
+            self.chassis.reset_odometry()
 
-        # Climbing arm controls
+        # Reverse intake and shoot shooter
+        if self.gamepad.getBackButton():
+            # TODO add this capability to note manager
+            pass
 
+        # Climbing arm controls. Toggles!
+        if self.gamepad.getRightBumperPressed():
+            self.climber.try_toggle()
+
+        # Intake
+        if self.gamepad.getLeftTriggerAxis() > 0.5:
+            self.note_manager.try_intake()
+
+        # Cancel intaking
         if self.gamepad.getLeftBumper():
-            self.climber.deploy()
+            self.note_manager.cancel_intake()
 
-        if self.gamepad.getRightBumper():
-            self.climber.climb()
+        # Shoot
+        if self.gamepad.getRightTriggerAxis() > 0.5:
+            self.note_manager.try_shoot()
 
     def testInit(self) -> None:
         pass
@@ -143,6 +151,7 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getXButton():
             self.intake.intake()
 
+        # Climbing arm controls
         if self.gamepad.getLeftBumper():
             self.climber_component.deploy()
 
