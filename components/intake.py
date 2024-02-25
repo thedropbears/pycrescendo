@@ -7,12 +7,15 @@ from rev import CANSparkMax
 from phoenix6.configs import MotorOutputConfigs, config_groups
 from phoenix6.controls import VoltageOut
 from phoenix6.hardware import TalonFX
+from wpilib import DigitalInput
 
-from ids import TalonIds, SparkMaxIds
+from ids import TalonIds, SparkMaxIds, DioChannels
 
 
 class IntakeComponent:
     motor_speed = tunable(1.0)
+    inject_intake_speed = tunable(0.5)
+    inject_shoot_speed = tunable(1.0)
 
     GEAR_RATIO = (1 / 5) * (1 / 4) * (24 / 72)
     MOTOR_REV_TO_SHAFT_RADIANS = GEAR_RATIO * math.tau
@@ -124,6 +127,15 @@ class IntakeComponent:
 
         self.deploy_motor_r.follow(self.deploy_motor_l, True)
 
+        self.injector = rev.CANSparkMax(
+            SparkMaxIds.shooter_injector, rev.CANSparkMax.MotorType.kBrushless
+        )
+        self.injector.setInverted(False)
+
+        self.break_beam = DigitalInput(DioChannels.injector_break_beam)
+
+        self.desired_injector_speed = 0.0
+
     def _at_retract_hard_limit(self) -> bool:
         return self.retract_limit_switch.get()
 
@@ -140,9 +152,15 @@ class IntakeComponent:
 
     def intake(self) -> None:
         self.direction = self.Direction.FORWARD
+        self.desired_injector_speed = (
+            0.0 if self.has_note() else self.inject_intake_speed
+        )
 
     def outtake(self) -> None:
         self.direction = self.Direction.BACKWARD
+
+    def inject(self) -> None:
+        self.desired_injector_speed = self.inject_shoot_speed
 
     @feedback
     def is_fully_retracted(self) -> bool:
@@ -169,6 +187,10 @@ class IntakeComponent:
         if self._at_deploy_hard_limit():
             self.deploy_encoder.setPosition(self.SHAFT_REV_DEPLOY_HARD_LIMIT)
 
+    @feedback
+    def has_note(self) -> bool:
+        return not self.break_beam.get()
+
     def execute(self) -> None:
         self.maybe_reindex_deployment_encoder()
 
@@ -182,4 +204,7 @@ class IntakeComponent:
             pidSlot=self.pid_slot,
         )
 
+        self.injector.set(self.desired_injector_speed)
+
         self.direction = self.Direction.STOPPED
+        self.desired_injector_speed = 0.0

@@ -7,15 +7,14 @@ import magicbot
 from magicbot import tunable
 
 from components.chassis import ChassisComponent
-from components.injector import InjectorComponent
 from components.vision import VisualLocalizer
-
 from components.shooter import ShooterComponent
 from components.intake import IntakeComponent
 from components.climber import ClimberComponent
 from components.led import LightStrip
 
 from controllers.note import NoteManager
+from controllers.shooter import Shooter
 from controllers.climber import Climber
 
 from utilities.game import is_red
@@ -27,11 +26,11 @@ from utilities.scalers import rescale_js
 class MyRobot(magicbot.MagicRobot):
     # Controllers
     note_manager: NoteManager
+    shooter: Shooter
     climber: Climber
 
     # Components
     chassis: ChassisComponent
-    injector_component: InjectorComponent
     shooter_component: ShooterComponent
     intake: IntakeComponent
     climber_component: ClimberComponent
@@ -146,7 +145,7 @@ class MyRobot(magicbot.MagicRobot):
 
         # injecting
         if self.gamepad.getBButton():
-            self.injector_component.shoot()
+            self.intake.inject()
 
         if self.gamepad.getXButton():
             self.intake.intake()
