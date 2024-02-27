@@ -134,7 +134,12 @@ class ShooterComponent:
             np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_ANGLE_LOOKUP)
         )
         self.desired_flywheel_speed = float(
-            np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_SPEED_LOOKUP)
+            np.interp(
+                range,
+                self.FLYWHEEL_DISTANCE_LOOKUP,
+                self.FLYWHEEL_SPEED_LOOKUP,
+                right=0.0,
+            )
         )
 
     def execute(self) -> None:
