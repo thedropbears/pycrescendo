@@ -34,11 +34,15 @@ class IntakeComponent:
     def __init__(self) -> None:
         self.motor = TalonFX(TalonIds.intake)
 
-        self.deploy_motor = CANSparkMax(
-            SparkMaxIds.intake_deploy, CANSparkMax.MotorType.kBrushless
+        self.deploy_motor_l = CANSparkMax(
+            SparkMaxIds.intake_deploy_l, CANSparkMax.MotorType.kBrushless
         )
-        self.pid_controller = self.deploy_motor.getPIDController()
-        self.deploy_encoder = self.deploy_motor.getEncoder()
+        self.deploy_motor_r = CANSparkMax(
+            SparkMaxIds.intake_deploy_r, CANSparkMax.MotorType.kBrushless
+        )
+
+        self.pid_controller = self.deploy_motor_l.getPIDController()
+        self.deploy_encoder = self.deploy_motor_l.getEncoder()
         self.deploy_encoder.setVelocityConversionFactor(
             self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC
         )
@@ -98,17 +102,17 @@ class IntakeComponent:
         self.deploy_setpoint = self.SHAFT_REV_RETRACT_HARD_LIMIT
         self.deploy_encoder.setPosition(self.deploy_setpoint)
 
-        self.deploy_limit_switch = self.deploy_motor.getForwardLimitSwitch(
+        self.deploy_limit_switch = self.deploy_motor_l.getForwardLimitSwitch(
             rev.SparkLimitSwitch.Type.kNormallyOpen
         )
-        self.retract_limit_switch = self.deploy_motor.getReverseLimitSwitch(
+        self.retract_limit_switch = self.deploy_motor_l.getReverseLimitSwitch(
             rev.SparkLimitSwitch.Type.kNormallyOpen
         )
 
-        self.deploy_motor.setSoftLimit(
+        self.deploy_motor_l.setSoftLimit(
             CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_DEPLOY_HARD_LIMIT
         )
-        self.deploy_motor.setSoftLimit(
+        self.deploy_motor_l.setSoftLimit(
             CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_RETRACT_HARD_LIMIT
         )
 
@@ -117,6 +121,8 @@ class IntakeComponent:
         motor_config.inverted = config_groups.InvertedValue.CLOCKWISE_POSITIVE
 
         motor_configurator.apply(motor_config)
+
+        self.deploy_motor_r.follow(self.deploy_motor_l, True)
 
     def _at_retract_hard_limit(self) -> bool:
         return self.retract_limit_switch.get()
