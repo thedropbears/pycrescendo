@@ -9,14 +9,13 @@ class Intake(StateMachine):
     intake_component: IntakeComponent
 
     cancel_desired = will_reset_to(False)
+    outtake_desired = will_reset_to(False)
 
     def try_cancel_intake(self) -> None:
         self.cancel_desired = True
 
-    def outtake(self) -> None:
-        # Black hole if in intaking state
-        force = self.current_state == "intaking"
-        self.engage(self.dropping_to_outtake, force=force)
+    def try_outtake(self) -> None:
+        self.outtake_desired = True
 
     @default_state
     def idling(self) -> None:
@@ -31,22 +30,16 @@ class Intake(StateMachine):
         if self.intake_component.has_intake_stalled():
             self.next_state(self.unstall_intake)
 
+        if self.outtake_desired:
+            self.next_state(self.outtaking)
+
         if self.intake_component.has_note() or self.cancel_desired:
             self.done()
 
     @state
-    def dropping_to_outtake(self) -> None:
-        # we cannot run the injector backwards until the intake is down
-        self.intake_component.deploy()
-        if self.intake_component.is_fully_deployed():
-            self.next_state(self.outtaking)
-
-    @state
     def outtaking(self) -> None:
         self.intake_component.backdrive_intake()
-        self.intake_component.backdrive_injector()
 
     @timed_state(duration=1, must_finish=False)
     def unstall_intake(self) -> None:
-        self.intake_component.deploy()
         self.intake_component.backdrive_intake()

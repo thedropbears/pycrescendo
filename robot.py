@@ -117,8 +117,8 @@ class MyRobot(magicbot.MagicRobot):
 
         # Reverse intake and shoot shooter
         if self.gamepad.getBackButton():
-            # TODO add this capability to the shooter
-            self.intake.outtake()
+            self.shooter.try_jettison()
+            self.intake.try_outtake()
 
         # Climbing arm controls. Toggles!
         if self.gamepad.getRightBumperPressed():
