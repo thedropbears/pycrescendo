@@ -182,7 +182,7 @@ class IntakeComponent:
     def has_intake_stalled(self) -> bool:
         return (
             self.motor.get_velocity().value < self.INTAKE_STALL_VELOCITY
-            and self.direction.value != self.Direction.STOPPED
+            and self.direction != self.Direction.STOPPED
         )
 
     @feedback
