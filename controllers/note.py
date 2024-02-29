@@ -4,31 +4,34 @@ import wpilib
 from components.intake import IntakeComponent
 from components.led import LightStrip
 from controllers.shooter import Shooter
+from controllers.intake import Intake
 
 
 class NoteManager(StateMachine):
     shooter: Shooter
-    intake: IntakeComponent
+    intake_component: IntakeComponent
+    intake: Intake
     status_lights: LightStrip
 
     shot_desired = will_reset_to(False)
+    intake_desired = will_reset_to(False)
+    cancel_intake_desired = will_reset_to(False)
 
     def __init__(self) -> None:
-        self.intake_desired = False
         self.last_state = ""
 
     def try_intake(self) -> None:
         self.intake_desired = True
 
-    def cancel_intake(self) -> None:
-        self.intake_desired = False
+    def try_cancel_intake(self) -> None:
+        self.cancel_intake_desired = True
 
     def try_shoot(self) -> None:
         self.shot_desired = True
 
     @feedback
     def has_note(self) -> bool:
-        return self.intake.has_note()
+        return self.intake_component.has_note()
 
     def has_just_fired(self) -> bool:
         """Intended to be polled by autonomous to tell when shooting is finished"""
@@ -51,19 +54,14 @@ class NoteManager(StateMachine):
 
     @state(must_finish=True, first=True)
     def holding_note(self) -> None:
-        self.intake_desired = False
         self.shooter.update_range()
 
         if self.shooter.in_range():
             self.status_lights.in_range()
+            if self.shot_desired:
+                self.shooter.engage()
         else:
             self.status_lights.not_in_range()
-
-        if not wpilib.DriverStation.isAutonomous():
-            self.intake.retract()
-
-        if self.shot_desired and self.shooter.in_range():
-            self.shooter.engage()
 
         if not self.has_note():
             self.next_state(self.not_holding_note)
@@ -76,12 +74,11 @@ class NoteManager(StateMachine):
         self.shooter.coast_down()
         if self.intake_desired:
             self.shooter.update_range()
-            self.intake.deploy()
-            self.intake.intake()
-            # NOTE: Flash won't work cause it is called every tick
             self.status_lights.intake_deployed()
-        elif not wpilib.DriverStation.isAutonomous():
-            self.intake.retract()
+            self.intake.engage()
 
-        if self.has_note():
+        elif self.cancel_intake_desired:
+            self.intake.try_cancel_intake()
+
+        elif self.has_note():
             self.next_state(self.holding_note)

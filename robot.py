@@ -14,6 +14,7 @@ from components.climber import ClimberComponent
 from components.led import LightStrip
 
 from controllers.note import NoteManager
+from controllers.intake import Intake
 from controllers.shooter import Shooter
 from controllers.climber import Climber
 
@@ -28,13 +29,14 @@ class MyRobot(magicbot.MagicRobot):
     # Controllers
     note_manager: NoteManager
     shooter: Shooter
+    intake: Intake
     climber: Climber
 
     # Components
     status_lights: LightStrip
     chassis: ChassisComponent
     shooter_component: ShooterComponent
-    intake: IntakeComponent
+    intake_component: IntakeComponent
     climber_component: ClimberComponent
 
     max_speed = magicbot.tunable(4)  # m/s
@@ -115,8 +117,8 @@ class MyRobot(magicbot.MagicRobot):
 
         # Reverse intake and shoot shooter
         if self.gamepad.getBackButton():
-            # TODO add this capability to note manager
-            pass
+            # TODO add this capability to the shooter
+            self.intake.outtake()
 
         # Climbing arm controls. Toggles!
         if self.gamepad.getRightBumperPressed():
@@ -128,7 +130,7 @@ class MyRobot(magicbot.MagicRobot):
 
         # Cancel intaking
         if self.gamepad.getLeftBumper():
-            self.note_manager.cancel_intake()
+            self.note_manager.try_cancel_intake()
 
         # Shoot
         if self.gamepad.getRightTriggerAxis() > 0.5:
@@ -140,16 +142,16 @@ class MyRobot(magicbot.MagicRobot):
     def testPeriodic(self) -> None:
         # moving arm
         if self.gamepad.getAButton():
-            self.intake.deploy()
+            self.intake_component.deploy()
         elif self.gamepad.getYButton():
-            self.intake.retract()
+            self.intake_component.retract()
 
         # injecting
         if self.gamepad.getBButton():
-            self.intake.inject()
+            self.intake_component.feed_shooter()
 
         if self.gamepad.getXButton():
-            self.intake.intake()
+            self.intake_component.intake()
 
         # Climbing arm controls
         if self.gamepad.getLeftBumper():
@@ -192,7 +194,7 @@ class MyRobot(magicbot.MagicRobot):
         self.chassis.update_alliance()
         self.chassis.update_odometry()
 
-        self.intake.maybe_reindex_deployment_encoder()
+        self.intake_component.maybe_reindex_deployment_encoder()
         self.status_lights.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()
