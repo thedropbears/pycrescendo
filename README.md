@@ -71,6 +71,17 @@ pdm run deploy
 pdm run test
 ```
 
+### Type checking
+
+We use mypy to check our type hints in CI. You can install and run mypy locally:
+
+```sh
+pdm install --group typing
+```
+
+```sh
+pdm run mypy .
+```
 
 ## Code Structure
 
