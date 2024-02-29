@@ -35,7 +35,7 @@ jobs:
           cache: true
       - name: Install dependencies
         run: |
-          pdm install --group typeck
+          pdm install --group typing
       - name: mypy
         uses: liskin/gh-problem-matcher-wrap@v2
         with:

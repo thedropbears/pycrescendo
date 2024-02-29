@@ -68,7 +68,7 @@ dev = [
     "pytest>=7.2.0",
     "pytest-integration>=0.2.3",
 ]
-typeck = [
+typing = [
     "mypy>=1.8.0",
 ]
 

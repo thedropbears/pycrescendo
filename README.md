@@ -76,7 +76,7 @@ pdm run test
 We use mypy to check our type hints in CI. You can install and run mypy locally:
 
 ```sh
-pdm install --group typeck
+pdm install --group typing
 ```
 
 ```sh
