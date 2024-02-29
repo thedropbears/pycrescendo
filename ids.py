@@ -35,7 +35,6 @@ class SparkMaxIds(enum.IntEnum):
     shooter_inclinator = 2
     climber = 3
     intake_deploy_l = 4
-    # TODO Figure out the ID
     intake_deploy_r = 5
 
 
