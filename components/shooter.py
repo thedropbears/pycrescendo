@@ -15,6 +15,7 @@ from phoenix6.signals import NeutralModeValue
 from wpilib import DigitalInput, DutyCycle, SmartDashboard
 from wpimath.controller import PIDController
 
+from utilities.functions import clamp
 from utilities.ctre import FALCON_FREE_RPS
 
 
@@ -140,7 +141,11 @@ class ShooterComponent:
         """This gets called at the end of the control loop"""
         inclinator_speed = self.inclinator_controller.calculate(
             self._inclination_angle(),
-            self.desired_inclinator_angle,
+            clamp(
+                self.desired_inclinator_angle,
+                ShooterComponent.MIN_INCLINE_ANGLE,
+                ShooterComponent.MAX_INCLINE_ANGLE,
+            ),
         )
         self.inclinator.set(inclinator_speed)
 
