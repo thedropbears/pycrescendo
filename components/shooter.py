@@ -15,9 +15,8 @@ from phoenix6.signals import NeutralModeValue
 from wpilib import DigitalInput, DutyCycle, SmartDashboard
 from wpimath.controller import PIDController
 
-from utilities.ctre import FALCON_FREE_RPS
 from utilities.functions import clamp
-from utilities.game import SPEAKER_HOOD_HEIGHT
+from utilities.ctre import FALCON_FREE_RPS
 
 
 class ShooterComponent:
@@ -32,14 +31,20 @@ class ShooterComponent:
     INCLINATOR_OFFSET = 0.822 * math.tau - math.radians(20)
     INCLINATOR_SCALE_FACTOR = math.tau  # rps -> radians
 
-    FLYWHEEL_DISTANCE_LOOKUP = (0.0, 1.0, 2.0, 3.0, 4.0, 5.0)
+    FLYWHEEL_DISTANCE_LOOKUP = (1.43, 2.0, 3.0, 4.0, 5.75)
     FLYWHEEL_SPEED_LOOKUP = (
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
-        FLYWHEEL_MAX_SPEED,
+    )
+    FLYWHEEL_ANGLE_LOOKUP = (
+        MAX_INCLINE_ANGLE,
+        0.81,
+        0.61,
+        0.48,
+        MIN_INCLINE_ANGLE,
     )
 
     desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
@@ -125,7 +130,9 @@ class ShooterComponent:
         return self.flywheel_left.get_velocity().value
 
     def set_range(self, range: float) -> None:
-        self.desired_inclinator_angle = math.atan2(SPEAKER_HOOD_HEIGHT, range)
+        self.desired_inclinator_angle = float(
+            np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_ANGLE_LOOKUP)
+        )
         self.desired_flywheel_speed = float(
             np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_SPEED_LOOKUP)
         )
