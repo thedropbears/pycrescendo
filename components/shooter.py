@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from magicbot import tunable, feedback
+from magicbot import tunable, feedback, will_reset_to
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
 
@@ -31,13 +31,15 @@ class ShooterComponent:
     INCLINATOR_OFFSET = 0.822 * math.tau - math.radians(20)
     INCLINATOR_SCALE_FACTOR = math.tau  # rps -> radians
 
-    FLYWHEEL_DISTANCE_LOOKUP = (1.43, 2.0, 3.0, 4.0, 5.75)
+    # Add extra point outside our range to ramp speed down too zero
+    FLYWHEEL_DISTANCE_LOOKUP = (1.43, 2.0, 3.0, 4.0, 5.75, 7.75)
     FLYWHEEL_SPEED_LOOKUP = (
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
+        0,
     )
     FLYWHEEL_ANGLE_LOOKUP = (
         MAX_INCLINE_ANGLE,
@@ -45,10 +47,13 @@ class ShooterComponent:
         0.61,
         0.48,
         MIN_INCLINE_ANGLE,
+        MIN_INCLINE_ANGLE,
     )
 
     desired_inclinator_angle = tunable((MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2)
     desired_flywheel_speed = tunable(0.0)
+
+    last_range_valid = will_reset_to(False)
 
     def __init__(self) -> None:
         self.inclinator = CANSparkMax(
@@ -99,7 +104,7 @@ class ShooterComponent:
     def is_ready(self) -> bool:
         """Is the shooter ready to fire?"""
         return True
-        # return self._flywheels_at_speed() and self._at_inclination()
+        # return self._flywheels_at_speed() and self._at_inclination() and self.last_range_valid
 
     @feedback
     def _at_inclination(self) -> bool:
@@ -125,11 +130,17 @@ class ShooterComponent:
             - self.INCLINATOR_OFFSET
         )
 
+    def is_range_in_bounds(self, range) -> bool:
+        return (
+            self.FLYWHEEL_DISTANCE_LOOKUP[0] < range < self.FLYWHEEL_DISTANCE_LOOKUP[-1]
+        )
+
     @feedback
     def _flywheel_velocity(self) -> float:
         return self.flywheel_left.get_velocity().value
 
     def set_range(self, range: float) -> None:
+
         self.desired_inclinator_angle = float(
             np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_ANGLE_LOOKUP)
         )
