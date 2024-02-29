@@ -31,19 +31,22 @@ class ShooterComponent:
     INCLINATOR_OFFSET = 0.822 * math.tau - math.radians(20)
     INCLINATOR_SCALE_FACTOR = math.tau  # rps -> radians
 
-    FLYWHEEL_DISTANCE_LOOKUP = (1.43, 2.0, 3.0, 4.0, 5.75)
+    # Add extra point outside our range to ramp speed down to zero
+    FLYWHEEL_DISTANCE_LOOKUP = (1.43, 2.0, 3.0, 4.0, 5.75, 7.75)
     FLYWHEEL_SPEED_LOOKUP = (
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
         FLYWHEEL_MAX_SPEED,
+        0,
     )
     FLYWHEEL_ANGLE_LOOKUP = (
         MAX_INCLINE_ANGLE,
         0.81,
         0.61,
         0.48,
+        MIN_INCLINE_ANGLE,
         MIN_INCLINE_ANGLE,
     )
 
@@ -125,16 +128,27 @@ class ShooterComponent:
             - self.INCLINATOR_OFFSET
         )
 
+    def is_range_in_bounds(self, range) -> bool:
+        return (
+            self.FLYWHEEL_DISTANCE_LOOKUP[0] < range < self.FLYWHEEL_DISTANCE_LOOKUP[-1]
+        )
+
     @feedback
     def _flywheel_velocity(self) -> float:
         return self.flywheel_left.get_velocity().value
 
     def set_range(self, range: float) -> None:
+
         self.desired_inclinator_angle = float(
             np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_ANGLE_LOOKUP)
         )
         self.desired_flywheel_speed = float(
-            np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_SPEED_LOOKUP)
+            np.interp(
+                range,
+                self.FLYWHEEL_DISTANCE_LOOKUP,
+                self.FLYWHEEL_SPEED_LOOKUP,
+                right=0.0,
+            )
         )
 
     def execute(self) -> None:
