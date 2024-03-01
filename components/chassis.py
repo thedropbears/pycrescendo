@@ -298,7 +298,7 @@ class ChassisComponent:
             self.get_module_positions(),
             initial_pose,
             stateStdDevs=(0.05, 0.05, 0.01),
-            visionMeasurementStdDevs=(0.25, 0.25, 50),
+            visionMeasurementStdDevs=(0.4, 0.4, 50),
         )
         self.field_obj = self.field.getObject("fused_pose")
         self.set_pose(initial_pose)
