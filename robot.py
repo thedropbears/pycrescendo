@@ -21,6 +21,7 @@ from utilities.game import is_red
 
 
 from utilities.scalers import rescale_js
+from utilities.functions import clamp
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -55,13 +56,13 @@ class MyRobot(magicbot.MagicRobot):
         self.lights_strip_length = 144  # TODO Change to correct length
 
         self.vision_port_name = "ardu_cam_port"
-        self.vision_port_pos = Translation3d(0.005, 0.161, 0.503)
+        self.vision_port_pos = Translation3d(0.005, 0.221, 0.503)
         self.vision_port_rot = Rotation3d(
             0, -math.radians(20), math.radians(180) - math.radians(90 - 71.252763)
         )
 
         self.vision_starboard_name = "ardu_cam_starboard"
-        self.vision_starboard_pos = Translation3d(0.005, 0.221, 0.503)
+        self.vision_starboard_pos = Translation3d(0.005, 0.161, 0.503)
         self.vision_starboard_rot = Rotation3d(
             0, -math.radians(20), math.radians(180) + math.radians(90 - 71.252763)
         )
@@ -137,6 +138,25 @@ class MyRobot(magicbot.MagicRobot):
         pass
 
     def testPeriodic(self) -> None:
+        max_speed = self.max_speed
+        max_spin_rate = self.max_spin_rate
+
+        # Driving
+        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * max_speed
+        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * max_speed
+        drive_z = (
+            -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * max_spin_rate
+        )
+        local_driving = self.gamepad.getYButton()
+
+        if local_driving:
+            self.chassis.drive_local(drive_x, drive_y, drive_z)
+        else:
+            if is_red():
+                drive_x = -drive_x
+                drive_y = -drive_y
+            self.chassis.drive_field(drive_x, drive_y, drive_z)
+
         # moving arm
         if self.gamepad.getAButton():
             self.intake.deploy()
@@ -161,11 +181,26 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getBackButtonPressed():
             self.cancel_controllers()
 
+        if self.gamepad.getLeftTriggerAxis() > 0.5:
+            self.shooter_component.desired_inclinator_angle = clamp(
+                self.shooter_component.desired_inclinator_angle + 0.01,
+                self.shooter_component.MIN_INCLINE_ANGLE,
+                self.shooter_component.MAX_INCLINE_ANGLE,
+            )
+
+        if self.gamepad.getRightTriggerAxis() > 0.5:
+            self.shooter_component.desired_inclinator_angle = clamp(
+                self.shooter_component.desired_inclinator_angle - 0.01,
+                self.shooter_component.MIN_INCLINE_ANGLE,
+                self.shooter_component.MAX_INCLINE_ANGLE,
+            )
+
         self.intake.execute()
         self.shooter_component.execute()
         self.climber_component.execute()
 
         self.chassis.update_odometry()
+        self.chassis.execute()
 
         self.vision_port.execute()
         self.vision_starboard.execute()

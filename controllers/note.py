@@ -48,6 +48,7 @@ class NoteManager(StateMachine):
     @state(must_finish=True, first=True)
     def holding_note(self) -> None:
         self.intake_desired = False
+        self.intake.retract()
 
         if self.shot_desired:
             self.shooter.engage()

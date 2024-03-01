@@ -14,7 +14,7 @@ from ids import TalonIds, SparkMaxIds, DioChannels
 
 class IntakeComponent:
     motor_speed = tunable(1.0)
-    inject_intake_speed = tunable(0.5)
+    inject_intake_speed = tunable(0.3)
     inject_shoot_speed = tunable(1.0)
 
     GEAR_RATIO = (1 / 5) * (1 / 4) * (24 / 72)
@@ -43,6 +43,8 @@ class IntakeComponent:
         self.deploy_motor_r = CANSparkMax(
             SparkMaxIds.intake_deploy_r, CANSparkMax.MotorType.kBrushless
         )
+        self.deploy_motor_l.setIdleMode(CANSparkMax.IdleMode.kBrake)
+        self.deploy_motor_r.setIdleMode(CANSparkMax.IdleMode.kBrake)
 
         self.pid_controller = self.deploy_motor_l.getPIDController()
         self.deploy_encoder = self.deploy_motor_l.getEncoder()
@@ -60,6 +62,7 @@ class IntakeComponent:
         self.pid_controller.setP(0.08, self.retract_pid_slot)
         self.pid_controller.setI(0, self.retract_pid_slot)
         self.pid_controller.setD(0.4, self.retract_pid_slot)
+        self.pid_controller.setFF(0.02, self.retract_pid_slot)
         self.pid_controller.setOutputRange(-1, 1, self.retract_pid_slot)
 
         self.pid_controller.setSmartMotionMaxVelocity(
@@ -113,12 +116,12 @@ class IntakeComponent:
             rev.SparkLimitSwitch.Type.kNormallyOpen
         )
 
-        self.deploy_motor_l.setSoftLimit(
-            CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_DEPLOY_HARD_LIMIT
-        )
-        self.deploy_motor_l.setSoftLimit(
-            CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_RETRACT_HARD_LIMIT
-        )
+        # self.deploy_motor_l.setSoftLimit(
+        #     CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_DEPLOY_HARD_LIMIT
+        # )
+        # self.deploy_motor_l.setSoftLimit(
+        #     CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_RETRACT_HARD_LIMIT
+        # )
 
         motor_configurator = self.motor.configurator
         motor_config = MotorOutputConfigs()
@@ -136,10 +139,13 @@ class IntakeComponent:
         self.break_beam = DigitalInput(DioChannels.injector_break_beam)
 
         self.desired_injector_speed = 0.0
+        self.has_indexed = False
 
+    @feedback
     def _at_retract_hard_limit(self) -> bool:
         return self.retract_limit_switch.get()
 
+    @feedback
     def _at_deploy_hard_limit(self) -> bool:
         return self.deploy_limit_switch.get()
 
@@ -184,16 +190,19 @@ class IntakeComponent:
     def maybe_reindex_deployment_encoder(self) -> None:
         if self._at_retract_hard_limit():
             self.deploy_encoder.setPosition(self.SHAFT_REV_RETRACT_HARD_LIMIT)
+            self.has_indexed = True
 
         if self._at_deploy_hard_limit():
             self.deploy_encoder.setPosition(self.SHAFT_REV_DEPLOY_HARD_LIMIT)
+            self.has_indexed = True
 
     @feedback
     def has_note(self) -> bool:
         return not self.break_beam.get()
 
     def execute(self) -> None:
-        self.maybe_reindex_deployment_encoder()
+        if not self.has_indexed:
+            self.maybe_reindex_deployment_encoder()
 
         intake_request = VoltageOut(self.direction.value * self.motor_speed * 12.0)
 

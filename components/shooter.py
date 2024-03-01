@@ -20,10 +20,10 @@ from utilities.ctre import FALCON_FREE_RPS
 
 
 class ShooterComponent:
-    FLYWHEEL_GEAR_RATIO = 22.0 / 18.0
+    FLYWHEEL_GEAR_RATIO = 18.0 / 24.0
     FLYWHEEL_TOLERANCE = 1  # rps
 
-    FLYWHEEL_MAX_SPEED = FALCON_FREE_RPS / FLYWHEEL_GEAR_RATIO
+    FLYWHEEL_SHOOTING_SPEED = FALCON_FREE_RPS / FLYWHEEL_GEAR_RATIO
 
     MAX_INCLINE_ANGLE = 1.045  # ~60 degrees
     MIN_INCLINE_ANGLE = 0.354  # ~20 degrees
@@ -41,11 +41,11 @@ class ShooterComponent:
     # Add extra point outside our range to ramp speed down to zero
     FLYWHEEL_DISTANCE_LOOKUP = (1.43, 2.0, 3.0, 4.0, 5.75, 7.75)
     FLYWHEEL_SPEED_LOOKUP = (
-        FLYWHEEL_MAX_SPEED,
-        FLYWHEEL_MAX_SPEED,
-        FLYWHEEL_MAX_SPEED,
-        FLYWHEEL_MAX_SPEED,
-        FLYWHEEL_MAX_SPEED,
+        FLYWHEEL_SHOOTING_SPEED,
+        FLYWHEEL_SHOOTING_SPEED,
+        FLYWHEEL_SHOOTING_SPEED,
+        FLYWHEEL_SHOOTING_SPEED,
+        FLYWHEEL_SHOOTING_SPEED,
         0,
     )
     FLYWHEEL_ANGLE_LOOKUP = (

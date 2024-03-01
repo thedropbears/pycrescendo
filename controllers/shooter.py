@@ -31,7 +31,20 @@ class Shooter(StateMachine):
         self.shooter_component.set_range(self.translation_to_goal().norm())
 
     @state(first=True)
-    def aiming(self) -> None:
+    def aiming(self, initial_call) -> None:
+        if initial_call:
+            self.aim()
+        else:
+            if (
+                # self.chassis.at_desired_heading()
+                self.shooter_component.is_ready()
+                and self.in_range()
+            ):
+                self.next_state(self.firing)
+            else:
+                self.aim()
+
+    def aim(self) -> None:
         translation_to_goal = self.translation_to_goal()
 
         # Update range
@@ -44,12 +57,6 @@ class Shooter(StateMachine):
 
         # Set to appropriate heading
         self.chassis.snap_to_heading(bearing_to_speaker)
-        if (
-            self.chassis.at_desired_heading()
-            and self.shooter_component.is_ready()
-            and self.in_range()
-        ):
-            self.next_state(self.firing)
 
     @timed_state(duration=1, must_finish=True)
     def firing(self) -> None:
