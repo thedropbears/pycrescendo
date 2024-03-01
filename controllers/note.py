@@ -1,4 +1,5 @@
 from magicbot import StateMachine, state, feedback, will_reset_to
+import wpilib
 
 from components.intake import IntakeComponent
 from controllers.shooter import Shooter
@@ -59,7 +60,7 @@ class NoteManager(StateMachine):
         if self.intake_desired:
             self.intake.deploy()
             self.intake.intake()
-        else:
+        elif not wpilib.DriverStation.isAutonomous():
             self.intake.retract()
 
         if self.has_note():
