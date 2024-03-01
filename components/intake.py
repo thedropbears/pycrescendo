@@ -22,7 +22,7 @@ class IntakeComponent:
     MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = MOTOR_REV_TO_SHAFT_RADIANS / 60
 
     SHAFT_REV_RETRACT_HARD_LIMIT = 0.0
-    SHAFT_REV_DEPLOY_HARD_LIMIT = 1.8675022996
+    SHAFT_REV_DEPLOY_HARD_LIMIT = 1.353
 
     ALLOWABLE_ERROR = 0.01
 
@@ -49,6 +49,7 @@ class IntakeComponent:
         self.deploy_encoder.setVelocityConversionFactor(
             self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC
         )
+        self.deploy_motor_l.setInverted(True)
         self.deploy_encoder.setPositionConversionFactor(self.MOTOR_REV_TO_SHAFT_RADIANS)
 
         # Retract PID Controller
