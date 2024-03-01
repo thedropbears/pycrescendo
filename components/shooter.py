@@ -65,6 +65,7 @@ class ShooterComponent:
             SparkMaxIds.shooter_inclinator, CANSparkMax.MotorType.kBrushless
         )
         self.inclinator.setInverted(True)
+        self.inclinator.setIdleMode(CANSparkMax.IdleMode.kBrake)
         self.absolute_inclinator_encoder = DutyCycle(
             DigitalInput(DioChannels.inclinator_encoder)
         )
