@@ -27,11 +27,11 @@ class AmpCentre1(AutoBase):
     def __init__(self) -> None:
         note_paths = [
             Path([NotePositions.amp]),
-            Path([NotePositions.Centre1]),
+            Path([PathPositions.avoid_wall, NotePositions.Centre1]),
         ]
         shoot_paths = [
             Path([NotePositions.amp]),
-            Path([NotePositions.amp]),
+            Path([PathPositions.avoid_wall, NotePositions.amp]),
         ]
         super().__init__(note_paths, shoot_paths)
 

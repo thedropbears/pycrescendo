@@ -21,6 +21,7 @@ from utilities.position import Path
 import utilities.game as game
 
 from components.chassis import ChassisComponent
+from components.intake import IntakeComponent
 
 from controllers.note import NoteManager
 
@@ -30,8 +31,10 @@ class AutoBase(AutonomousStateMachine):
     note_manager: NoteManager
     field: Field2d
 
-    POSITION_TOLERANCE = 0.025
-    ANGLE_TOLERANCE = math.radians(2)
+    intake: IntakeComponent
+
+    POSITION_TOLERANCE = 0.05
+    ANGLE_TOLERANCE = math.radians(5)
     MAX_VEL = 3
     MAX_ACCEL = 2
     ENFORCE_HEADING_SPEED = MAX_VEL / 6
@@ -81,6 +84,8 @@ class AutoBase(AutonomousStateMachine):
         # This isn't necessary but makes testing better because we can re-run auto routines
         self.note_paths_working_copy = list(self.note_paths)
         self.shoot_paths_working_copy = list(self.shoot_paths)
+
+        self.intake.deploy()
 
         # We always start ready to shoot, so fire straight away
         self.next_state("shoot_note")

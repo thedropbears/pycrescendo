@@ -47,7 +47,10 @@ class TeamPoses:
     BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
     BLUE_PODIUM = Pose2d(Translation2d(2.992, 4.08455), Rotation2d(math.pi))
     RED_PODIUM = field_flip_pose2d(BLUE_PODIUM)
+
+
 class PathPositions:
     stage_transition_N = Translation2d(11.4, 4.5)
     stage_transition_S = Translation2d(11.4, 3.74)
     stage_transition_S_entry = Translation2d(13.0, 2.5)
+    avoid_wall = Translation2d(10.80, 6.55)
