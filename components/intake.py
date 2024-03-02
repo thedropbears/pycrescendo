@@ -116,12 +116,12 @@ class IntakeComponent:
             rev.SparkLimitSwitch.Type.kNormallyOpen
         )
 
-        # self.deploy_motor_l.setSoftLimit(
-        #     CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_DEPLOY_HARD_LIMIT
-        # )
-        # self.deploy_motor_l.setSoftLimit(
-        #     CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_RETRACT_HARD_LIMIT
-        # )
+        self.deploy_motor_l.setSoftLimit(
+            CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_DEPLOY_HARD_LIMIT
+        )
+        self.deploy_motor_l.setSoftLimit(
+            CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_RETRACT_HARD_LIMIT
+        )
 
         motor_configurator = self.motor.configurator
         motor_config = MotorOutputConfigs()

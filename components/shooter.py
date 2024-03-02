@@ -116,7 +116,6 @@ class ShooterComponent:
     @feedback
     def is_ready(self) -> bool:
         """Is the shooter ready to fire?"""
-
         return self._flywheels_at_speed() and self._at_inclination()
 
     @feedback

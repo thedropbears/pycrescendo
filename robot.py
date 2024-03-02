@@ -138,25 +138,6 @@ class MyRobot(magicbot.MagicRobot):
         pass
 
     def testPeriodic(self) -> None:
-        max_speed = self.max_speed
-        max_spin_rate = self.max_spin_rate
-
-        # Driving
-        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * max_speed
-        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * max_speed
-        drive_z = (
-            -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * max_spin_rate
-        )
-        local_driving = self.gamepad.getYButton()
-
-        if local_driving:
-            self.chassis.drive_local(drive_x, drive_y, drive_z)
-        else:
-            if is_red():
-                drive_x = -drive_x
-                drive_y = -drive_y
-            self.chassis.drive_field(drive_x, drive_y, drive_z)
-
         # moving arm
         if self.gamepad.getAButton():
             self.intake.deploy()
@@ -200,7 +181,6 @@ class MyRobot(magicbot.MagicRobot):
         self.climber_component.execute()
 
         self.chassis.update_odometry()
-        self.chassis.execute()
 
         self.vision_port.execute()
         self.vision_starboard.execute()
