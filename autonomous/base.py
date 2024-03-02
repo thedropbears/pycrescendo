@@ -91,7 +91,7 @@ class AutoBase(AutonomousStateMachine):
         self.next_state("shoot_note")
 
     @state
-    def shoot_note(self, initial_call: bool) -> None:
+    def shoot_note(self) -> None:
         self.note_manager.try_shoot()
 
         if self.note_manager.has_just_fired():
@@ -99,7 +99,12 @@ class AutoBase(AutonomousStateMachine):
                 # Just shot the last note
                 self.done()
             else:
-                self.next_state("pick_up")
+                self.next_state(self.ensure_robot_config)
+
+    @state
+    def ensure_robot_config(self):
+        if self.intake.is_fully_deployed():
+            self.next_state(self.pick_up)
 
     @state
     def pick_up(self, state_tm: float, initial_call: bool) -> None:
