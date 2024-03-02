@@ -19,7 +19,7 @@ from utilities.functions import clamp
 
 
 class ShooterComponent:
-    FLYWHEEL_GEAR_RATIO = 22.0 / 18.0
+    FLYWHEEL_GEAR_RATIO = 1 / (22.0 / 18.0)
     FLYWHEEL_TOLERANCE = 1  # rps
 
     FLYWHEEL_SHOOTING_SPEED = 100
@@ -38,7 +38,7 @@ class ShooterComponent:
     )  # rpm -> radians/s
 
     # Add extra point outside our range to ramp speed down to zero
-    FLYWHEEL_DISTANCE_LOOKUP = (1.43, 2.0, 3.0, 4.0, 5.75, 7.75)
+    FLYWHEEL_DISTANCE_LOOKUP = (0, 2.0, 3.0, 4.0, 5.75, 7.75)
     FLYWHEEL_SPEED_LOOKUP = (
         FLYWHEEL_SHOOTING_SPEED,
         FLYWHEEL_SHOOTING_SPEED,
@@ -86,12 +86,12 @@ class ShooterComponent:
 
         flywheel_pid = (
             Slot0Configs()
-            .with_k_p(0.72058)
+            .with_k_p(0.26727)
             .with_k_i(0)
             .with_k_d(0)
-            .with_k_s(0.31412)
-            .with_k_v(0.14227)
-            .with_k_a(0.016013)
+            .with_k_s(0.30982)
+            .with_k_v(0.095403)
+            .with_k_a(0.011232)
         )
 
         flywheel_gear_ratio = FeedbackConfigs().with_sensor_to_mechanism_ratio(
@@ -116,8 +116,8 @@ class ShooterComponent:
     @feedback
     def is_ready(self) -> bool:
         """Is the shooter ready to fire?"""
-        return True
-        # return self._flywheels_at_speed() and self._at_inclination()
+
+        return self._flywheels_at_speed() and self._at_inclination()
 
     @feedback
     def _at_inclination(self) -> bool:
