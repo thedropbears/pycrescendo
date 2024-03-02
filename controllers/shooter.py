@@ -36,8 +36,8 @@ class Shooter(StateMachine):
             self.aim()
         else:
             if (
-                # self.chassis.at_desired_heading()
-                self.shooter_component.is_ready()
+                self.chassis.at_desired_heading()
+                and self.shooter_component.is_ready()
                 and self.in_range()
             ):
                 self.next_state(self.firing)
