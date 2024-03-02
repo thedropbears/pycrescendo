@@ -40,7 +40,7 @@ class NoteManager(StateMachine):
 
     def on_enable(self) -> None:
         super().on_enable()
-        if self.has_note():
+        if self.has_note() or wpilib.DriverStation.isAutonomous():
             self.engage()
         else:
             self.engage(self.not_holding_note)
@@ -48,7 +48,6 @@ class NoteManager(StateMachine):
     @state(must_finish=True, first=True)
     def holding_note(self) -> None:
         self.intake_desired = False
-        self.intake.retract()
 
         if self.shot_desired:
             self.shooter.engage()
