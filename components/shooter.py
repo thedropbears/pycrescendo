@@ -16,14 +16,13 @@ from wpilib import DigitalInput, DutyCycle, SmartDashboard
 from wpimath.controller import PIDController
 
 from utilities.functions import clamp
-from utilities.ctre import FALCON_FREE_RPS
 
 
 class ShooterComponent:
-    FLYWHEEL_GEAR_RATIO = 18.0 / 24.0
+    FLYWHEEL_GEAR_RATIO = 22.0 / 18.0
     FLYWHEEL_TOLERANCE = 1  # rps
 
-    FLYWHEEL_SHOOTING_SPEED = FALCON_FREE_RPS / FLYWHEEL_GEAR_RATIO
+    FLYWHEEL_SHOOTING_SPEED = 100
 
     MAX_INCLINE_ANGLE = 1.045  # ~60 degrees
     MIN_INCLINE_ANGLE = 0.354  # ~20 degrees
@@ -87,12 +86,12 @@ class ShooterComponent:
 
         flywheel_pid = (
             Slot0Configs()
-            .with_k_p(0.3514)
+            .with_k_p(0.72058)
             .with_k_i(0)
             .with_k_d(0)
-            .with_k_s(0.19469)
-            .with_k_v(0.15649)
-            .with_k_a(0.017639)
+            .with_k_s(0.31412)
+            .with_k_v(0.14227)
+            .with_k_a(0.016013)
         )
 
         flywheel_gear_ratio = FeedbackConfigs().with_sensor_to_mechanism_ratio(
