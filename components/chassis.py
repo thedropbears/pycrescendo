@@ -206,7 +206,7 @@ class ChassisComponent:
 
     DRIVE_CURRENT_THRESHOLD = 35
 
-    HEADING_TOLERANCE = math.radians(5)
+    HEADING_TOLERANCE = math.radians(1)
 
     # maxiumum speed for any wheel
     max_wheel_speed = FALCON_FREE_RPS * SwerveModule.DRIVE_MOTOR_REV_TO_METRES
