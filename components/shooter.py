@@ -16,29 +16,35 @@ from wpilib import DigitalInput, DutyCycle, SmartDashboard
 from wpimath.controller import PIDController
 
 from utilities.functions import clamp
-from utilities.ctre import FALCON_FREE_RPS
 
 
 class ShooterComponent:
-    FLYWHEEL_GEAR_RATIO = 24.0 / 18.0
+    FLYWHEEL_GEAR_RATIO = 1 / (22.0 / 18.0)
     FLYWHEEL_TOLERANCE = 1  # rps
 
-    FLYWHEEL_MAX_SPEED = FALCON_FREE_RPS / FLYWHEEL_GEAR_RATIO
+    FLYWHEEL_SHOOTING_SPEED = 100
 
-    MAX_INCLINE_ANGLE = 0.973  # ~55 degrees
-    MIN_INCLINE_ANGLE = math.radians(20)
+    MAX_INCLINE_ANGLE = 1.045  # ~60 degrees
+    MIN_INCLINE_ANGLE = 0.354  # ~20 degrees
     INCLINATOR_TOLERANCE = math.radians(1)
-    INCLINATOR_OFFSET = 0.822 * math.tau - math.radians(20)
+    INCLINATOR_OFFSET = 3.972 - math.radians(60)
     INCLINATOR_SCALE_FACTOR = math.tau  # rps -> radians
+    INCLINATOR_GEAR_RATIO = 18 / 24 * 26 / 300
+    INCLINATOR_POSITION_CONVERSION_FACTOR = (
+        INCLINATOR_GEAR_RATIO * math.tau
+    )  # motor rotations -> mech rads
+    INCLINATOR_VELOCITY_CONVERSION_FACTOR = (
+        INCLINATOR_POSITION_CONVERSION_FACTOR / 60
+    )  # rpm -> radians/s
 
     # Add extra point outside our range to ramp speed down to zero
-    FLYWHEEL_DISTANCE_LOOKUP = (1.43, 2.0, 3.0, 4.0, 5.75, 7.75)
+    FLYWHEEL_DISTANCE_LOOKUP = (0, 2.0, 3.0, 4.0, 5.75, 7.75)
     FLYWHEEL_SPEED_LOOKUP = (
-        FLYWHEEL_MAX_SPEED,
-        FLYWHEEL_MAX_SPEED,
-        FLYWHEEL_MAX_SPEED,
-        FLYWHEEL_MAX_SPEED,
-        FLYWHEEL_MAX_SPEED,
+        FLYWHEEL_SHOOTING_SPEED,
+        FLYWHEEL_SHOOTING_SPEED,
+        FLYWHEEL_SHOOTING_SPEED,
+        FLYWHEEL_SHOOTING_SPEED,
+        FLYWHEEL_SHOOTING_SPEED,
         0,
     )
     FLYWHEEL_ANGLE_LOOKUP = (
@@ -57,8 +63,17 @@ class ShooterComponent:
         self.inclinator = CANSparkMax(
             SparkMaxIds.shooter_inclinator, CANSparkMax.MotorType.kBrushless
         )
-        self.inclinator_encoder = DutyCycle(
+        self.inclinator.setInverted(True)
+        self.inclinator.setIdleMode(CANSparkMax.IdleMode.kBrake)
+        self.absolute_inclinator_encoder = DutyCycle(
             DigitalInput(DioChannels.inclinator_encoder)
+        )
+        self.inclinator_encoder = self.inclinator.getEncoder()
+        self.inclinator_encoder.setPositionConversionFactor(
+            self.INCLINATOR_POSITION_CONVERSION_FACTOR
+        )
+        self.inclinator_encoder.setVelocityConversionFactor(
+            self.INCLINATOR_VELOCITY_CONVERSION_FACTOR
         )
         self.flywheel_left = TalonFX(TalonIds.shooter_flywheel_left)
         self.flywheel_right = TalonFX(TalonIds.shooter_flywheel_right)
@@ -71,12 +86,12 @@ class ShooterComponent:
 
         flywheel_pid = (
             Slot0Configs()
-            .with_k_p(0.3514)
+            .with_k_p(0.26727)
             .with_k_i(0)
             .with_k_d(0)
-            .with_k_s(0.19469)
-            .with_k_v(0.15649)
-            .with_k_a(0.017639)
+            .with_k_s(0.30982)
+            .with_k_v(0.095403)
+            .with_k_a(0.011232)
         )
 
         flywheel_gear_ratio = FeedbackConfigs().with_sensor_to_mechanism_ratio(
@@ -101,8 +116,7 @@ class ShooterComponent:
     @feedback
     def is_ready(self) -> bool:
         """Is the shooter ready to fire?"""
-        return True
-        # return self._flywheels_at_speed() and self._at_inclination()
+        return self._flywheels_at_speed() and self._at_inclination()
 
     @feedback
     def _at_inclination(self) -> bool:
@@ -124,7 +138,7 @@ class ShooterComponent:
     def _inclination_angle(self) -> float:
         """Get the angle of the mechanism in radians measured positive upwards from zero parellel to the ground."""
         return (
-            self.inclinator_encoder.getOutput() * self.INCLINATOR_SCALE_FACTOR
+            self.absolute_inclinator_encoder.getOutput() * self.INCLINATOR_SCALE_FACTOR
             - self.INCLINATOR_OFFSET
         )
 

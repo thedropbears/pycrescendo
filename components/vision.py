@@ -81,7 +81,7 @@ class VisualLocalizer:
                 self.chassis.estimator.addVisionMeasurement(
                     pose,
                     timestamp,
-                    (reprojectionErr, reprojectionErr, reprojectionErr / 3),
+                    (reprojectionErr * 1.5, reprojectionErr * 1.5, reprojectionErr / 2),
                 )
 
             if self.should_log:

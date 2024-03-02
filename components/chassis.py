@@ -206,7 +206,7 @@ class ChassisComponent:
 
     DRIVE_CURRENT_THRESHOLD = 35
 
-    HEADING_TOLERANCE = math.radians(5)
+    HEADING_TOLERANCE = math.radians(1)
 
     # maxiumum speed for any wheel
     max_wheel_speed = FALCON_FREE_RPS * SwerveModule.DRIVE_MOTOR_REV_TO_METRES
@@ -298,7 +298,7 @@ class ChassisComponent:
             self.get_module_positions(),
             initial_pose,
             stateStdDevs=(0.05, 0.05, 0.01),
-            visionMeasurementStdDevs=(0.25, 0.25, 50),
+            visionMeasurementStdDevs=(0.4, 0.4, 50),
         )
         self.field_obj = self.field.getObject("fused_pose")
         self.set_pose(initial_pose)
