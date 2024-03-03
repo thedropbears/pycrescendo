@@ -64,6 +64,6 @@ class Shooter(StateMachine):
     @timed_state(duration=1, must_finish=True)
     def firing(self, initial_call) -> None:
         if initial_call:
-            self.status_lights.shooting()
+            self.status_lights.shoot()
         self.update_range()
         self.intake.inject()

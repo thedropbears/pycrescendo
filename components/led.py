@@ -73,16 +73,13 @@ class LightStrip:
     def holding_note(self) -> None:
         self.pattern = Flash(HsvColour.CYAN)
 
-    def intaking(self) -> None:
-        self.pattern = Flash(HsvColour.MAGENTA)
-
     def in_range(self) -> None:
         self.pattern = Solid(HsvColour.GREEN)
 
     def not_in_range(self) -> None:
         self.pattern = Solid(HsvColour.RED)
 
-    def shooting(self) -> None:
+    def shoot(self) -> None:
         self.pattern = Solid(HsvColour.ORANGE)
 
     def climbing_arm_extended(self) -> None:
@@ -94,7 +91,7 @@ class LightStrip:
     def morse(self) -> None:
         self.pattern = Morse(HsvColour.YELLOW)
 
-    def idle(self) -> None:
+    def rainbow(self) -> None:
         self.pattern = Rainbow(HsvColour.RED)
 
     def disabled(self) -> None:
