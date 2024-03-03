@@ -54,6 +54,11 @@ class NoteManager(StateMachine):
         self.intake_desired = False
         self.shooter.update_range()
 
+        if self.shooter.in_range():
+            self.status_lights.in_range()
+        else:
+            self.status_lights.not_in_range()
+
         if not wpilib.DriverStation.isAutonomous():
             self.intake.retract()
 

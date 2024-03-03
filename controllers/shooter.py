@@ -39,13 +39,14 @@ class Shooter(StateMachine):
         if initial_call:
             self.aim()
         else:
-            if self.chassis.at_desired_heading():
-                self.status_lights.in_range()
-                if self.shooter_component.is_ready() and self.in_range():
-                    self.next_state(self.firing)
+            if (
+                self.chassis.at_desired_heading()
+                and self.shooter_component.is_ready()
+                and self.in_range()
+            ):
+                self.next_state(self.firing)
             else:
                 self.aim()
-                self.status_lights.not_in_range()
 
     def aim(self) -> None:
         translation_to_goal = self.translation_to_goal()
