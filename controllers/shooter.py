@@ -22,7 +22,7 @@ class Shooter(StateMachine):
         )
 
     def set_stop(self) -> None:
-        self.shooter_component.set_stop()
+        self.shooter_component.stop()
 
     @feedback
     def in_range(self):

@@ -167,7 +167,7 @@ class ShooterComponent:
             )
         )
 
-    def set_stop(self) -> None:
+    def stop(self) -> None:
         self.desire_stop = True
 
     def execute(self) -> None:
