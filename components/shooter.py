@@ -182,9 +182,7 @@ class ShooterComponent:
         )
         self.inclinator.set(inclinator_speed)
 
-        flywheel_request = (
-            VelocityVoltage(self.desired_flywheel_speed)
-            if not self.desireStop
-            else VoltageOut(0)
-        )
-        self.flywheel_left.set_control(flywheel_request)
+        if self.desireStop:
+            self.flywheel_left.set_control(VoltageOut(0))
+        else:
+            self.flywheel_left.set_control(VelocityVoltage(self.desired_flywheel_speed))
