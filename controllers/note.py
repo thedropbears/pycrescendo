@@ -62,6 +62,7 @@ class NoteManager(StateMachine):
 
     @state(must_finish=True)
     def not_holding_note(self) -> None:
+        self.shooter.set_stop()
         if self.intake_desired:
             self.intake.deploy()
             self.intake.intake()

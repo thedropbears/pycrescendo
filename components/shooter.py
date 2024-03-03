@@ -4,7 +4,7 @@ from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
 
-from phoenix6.controls import VelocityVoltage, Follower
+from phoenix6.controls import VelocityVoltage, Follower, VoltageOut
 from phoenix6.hardware import TalonFX
 from phoenix6.configs import (
     MotorOutputConfigs,
@@ -110,6 +110,8 @@ class ShooterComponent:
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
         SmartDashboard.putData(self.inclinator_controller)
 
+        self.desireStop = False
+
     def on_enable(self) -> None:
         self.inclinator_controller.reset()
 
@@ -152,7 +154,7 @@ class ShooterComponent:
         return self.flywheel_left.get_velocity().value
 
     def set_range(self, range: float) -> None:
-
+        self.desireStop = False
         self.desired_inclinator_angle = float(
             np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_ANGLE_LOOKUP)
         )
@@ -164,6 +166,9 @@ class ShooterComponent:
                 right=0.0,
             )
         )
+
+    def set_stop(self) -> None:
+        self.desireStop = True
 
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
@@ -177,5 +182,9 @@ class ShooterComponent:
         )
         self.inclinator.set(inclinator_speed)
 
-        flywheel_request = VelocityVoltage(self.desired_flywheel_speed)
+        flywheel_request = (
+            VelocityVoltage(self.desired_flywheel_speed)
+            if not self.desireStop
+            else VoltageOut(0)
+        )
         self.flywheel_left.set_control(flywheel_request)

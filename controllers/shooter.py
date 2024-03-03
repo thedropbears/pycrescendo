@@ -21,6 +21,9 @@ class Shooter(StateMachine):
             - self.chassis.get_pose().translation()
         )
 
+    def set_stop(self) -> None:
+        self.shooter_component.set_stop()
+
     @feedback
     def in_range(self):
         range = self.translation_to_goal().norm()
