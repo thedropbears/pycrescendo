@@ -37,17 +37,14 @@ class Shooter(StateMachine):
     @state(first=True)
     def aiming(self, initial_call) -> None:
         if initial_call:
+            self.status_lights.not_in_range()
             self.aim()
         else:
-            if (
-                self.chassis.at_desired_heading()
-                and self.shooter_component.is_ready()
-                and self.in_range()
-            ):
-                self.status_lights.shooting()
-                self.next_state(self.firing)
+            if self.chassis.at_desired_heading():
+                self.status_lights.in_range()
+                if self.shooter_component.is_ready() and self.in_range():
+                    self.next_state(self.firing)
             else:
-                self.status_lights.not_in_range()
                 self.aim()
 
     def aim(self) -> None:
@@ -65,6 +62,8 @@ class Shooter(StateMachine):
         self.chassis.snap_to_heading(bearing_to_speaker)
 
     @timed_state(duration=1, must_finish=True)
-    def firing(self) -> None:
+    def firing(self, initial_call) -> None:
+        if initial_call:
+            self.status_lights.shooting()
         self.update_range()
         self.intake.inject()

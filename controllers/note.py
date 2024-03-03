@@ -64,8 +64,10 @@ class NoteManager(StateMachine):
             self.next_state(self.not_holding_note)
 
     @state(must_finish=True)
-    def not_holding_note(self) -> None:
-        self.status_lights.want_note()
+    def not_holding_note(self, initial_call) -> None:
+        if initial_call:
+            self.status_lights.no_note()
+
         self.shooter.coast_down()
         if self.intake_desired:
             self.shooter.update_range()
