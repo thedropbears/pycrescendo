@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 from magicbot.state_machine import AutonomousStateMachine, state
 from wpimath.trajectory import (
     TrajectoryConfig,
@@ -12,16 +13,16 @@ from wpimath.controller import (
     HolonomicDriveController,
     PIDController,
 )
-from wpilib import Field2d
+from wpilib import Field2d, RobotBase
+from wpimath.geometry import Rotation2d, Translation2d, Pose2d
 from wpimath.spline import Spline3
-from wpimath.geometry import Rotation2d, Translation2d
 
 from utilities.position import Path
 import utilities.game as game
 
 from components.chassis import ChassisComponent
+from components.intake import IntakeComponent
 
-# Add controllers for intake and shooter when available
 from controllers.note import NoteManager
 
 
@@ -30,15 +31,24 @@ class AutoBase(AutonomousStateMachine):
     note_manager: NoteManager
     field: Field2d
 
-    POSITION_TOLERANCE = 0.025
-    ANGLE_TOLERANCE = math.radians(2)
-    MAX_VEL = 1
-    MAX_ACCEL = 0.5
+    intake: IntakeComponent
 
-    def __init__(self):
+    POSITION_TOLERANCE = 0.05
+    ANGLE_TOLERANCE = math.radians(5)
+    MAX_VEL = 3
+    MAX_ACCEL = 2
+    ENFORCE_HEADING_SPEED = MAX_VEL / 6
+
+    def __init__(
+        self,
+        note_paths: list[Path],
+        shoot_paths: list[Path],
+        starting_pose: Optional[Pose2d] = None,
+    ):
         """Should be overloaded by subclass method with paths"""
-        self.note_paths: list[Path] = []
-        self.shoot_paths: list[Path] = []
+        self.note_paths = note_paths
+        self.shoot_paths = shoot_paths
+        self.starting_pose = starting_pose
 
     def setup(self) -> None:
         x_controller = PIDController(2.5, 0, 0)
@@ -57,6 +67,16 @@ class AutoBase(AutonomousStateMachine):
             )
 
         self.goal_heading: Rotation2d
+        self.trajectory_marker = self.field.getObject("auto_trajectory")
+
+    def on_enable(self):
+        # Setup starting position in the simulator
+        if RobotBase.isSimulation() and self.starting_pose is not None:
+            starting_pose = self.starting_pose
+            if not game.is_red():
+                starting_pose = game.field_flip_pose2d(self.starting_pose)
+            self.chassis.set_pose(starting_pose)
+        super().on_enable()
 
     @state(first=True)
     def initialise(self) -> None:
@@ -65,23 +85,26 @@ class AutoBase(AutonomousStateMachine):
         self.note_paths_working_copy = list(self.note_paths)
         self.shoot_paths_working_copy = list(self.shoot_paths)
 
+        self.intake.deploy()
+
         # We always start ready to shoot, so fire straight away
         self.next_state("shoot_note")
 
     @state
-    def shoot_note(self, initial_call: bool) -> None:
-        if initial_call:
-            # TODO Call the shooter state machine
-            # TODO Also get intake out at this time??
-            pass
+    def shoot_note(self) -> None:
+        self.note_manager.try_shoot()
 
-        if True:
-            # TODO This needs to check if the state machine has finished firing
+        if self.note_manager.has_just_fired() or RobotBase.isSimulation():
             if len(self.note_paths_working_copy) == 0:
                 # Just shot the last note
                 self.done()
             else:
-                self.next_state("pick_up")
+                self.next_state(self.ensure_robot_config)
+
+    @state
+    def ensure_robot_config(self):
+        if self.intake.is_fully_deployed() or RobotBase.isSimulation():
+            self.next_state(self.pick_up)
 
     @state
     def pick_up(self, state_tm: float, initial_call: bool) -> None:
@@ -90,6 +113,8 @@ class AutoBase(AutonomousStateMachine):
             self.trajectory = self.calculate_trajectory(
                 self.note_paths_working_copy.pop(0)
             )
+
+        self.note_manager.try_intake()
 
         # Drive with the intake always facing the tangent
         self.drive_on_trajectory(state_tm, enforce_tangent_heading=True)
@@ -100,12 +125,17 @@ class AutoBase(AutonomousStateMachine):
             self.chassis.stop_snapping()
             self.next_state("drive_to_shoot")
         if self.is_at_goal():
-            if not self.note_manager.has_note():
-                pass  # TODO: do something if we don't have a note, e.g. go to next note position
-            # Check if we have a note collected
-            # Return heading control to the path controller
-            self.chassis.stop_snapping()
-            self.next_state("drive_to_shoot")
+            if RobotBase.isSimulation():
+                self.next_state(self.drive_to_shoot)
+                return
+            # we did not find a note on the path, look for the next note
+            if len(self.note_paths_working_copy) == 0:
+                # Couldn't find the last note
+                self.done()
+                return
+            self.shoot_paths_working_copy.pop(0)
+            # reset the clock
+            self.next_state(self.pick_up)
 
     @state
     def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
@@ -113,6 +143,8 @@ class AutoBase(AutonomousStateMachine):
             self.trajectory = self.calculate_trajectory(
                 self.shoot_paths_working_copy.pop(0)
             )
+
+        self.note_manager.cancel_intake()
 
         # Do some driving...
         self.drive_on_trajectory(state_tm)
@@ -141,12 +173,14 @@ class AutoBase(AutonomousStateMachine):
 
         # if we are enforcing heading, hijack rotational control from the main controller
         if enforce_tangent_heading:
-            field_chassis_speeds = self.chassis.to_field_oriented(chassis_speed)
-            heading_target = math.atan2(
-                field_chassis_speeds.vy, field_chassis_speeds.vx
-            )
-            self.goal_heading = Rotation2d(heading_target)
-            self.chassis.snap_to_heading(heading_target)
+            speed = Translation2d(chassis_speed.vx, chassis_speed.vy).norm()
+            if speed > self.ENFORCE_HEADING_SPEED:
+                field_chassis_speeds = self.chassis.to_field_oriented(chassis_speed)
+                heading_target = math.atan2(
+                    field_chassis_speeds.vy, field_chassis_speeds.vx
+                )
+                self.goal_heading = Rotation2d(heading_target)
+                self.chassis.snap_to_heading(heading_target)
 
     def calculate_trajectory(self, path: Path) -> Trajectory:
         pose = self.chassis.get_pose()
@@ -203,18 +237,16 @@ class AutoBase(AutonomousStateMachine):
         except Exception:
             return Trajectory([Trajectory.State(0, 0, 0, pose)])
 
-        self.trajectory_marker = self.field.getObject("auto_trajectory")
         self.trajectory_marker.setTrajectory(trajectory)
         return trajectory
 
     def is_at_goal(self) -> bool:
         return (
             self.goal - self.chassis.get_pose().translation()
-        ).norm() < self.POSITION_TOLERANCE and abs(
-            (self.goal_heading - self.chassis.get_rotation()).radians()
-        ) < self.ANGLE_TOLERANCE
+        ).norm() < self.POSITION_TOLERANCE
 
     def done(self):
+        self.chassis.stop_snapping()
         self.trajectory_marker.setPoses([])
         super().done()
 
