@@ -1,6 +1,7 @@
 import math
 from enum import Enum
 import rev
+import time
 
 from magicbot import tunable, feedback
 from rev import CANSparkMax
@@ -8,6 +9,8 @@ from phoenix6.configs import MotorOutputConfigs, config_groups
 from phoenix6.controls import VoltageOut
 from phoenix6.hardware import TalonFX
 from wpilib import DigitalInput
+from wpimath.controller import ArmFeedforward
+from wpimath.trajectory import TrapezoidProfile
 
 from ids import TalonIds, SparkMaxIds, DioChannels
 
@@ -17,17 +20,17 @@ class IntakeComponent:
     inject_intake_speed = tunable(0.3)
     inject_shoot_speed = tunable(1.0)
 
-    GEAR_RATIO = (1 / 5) * (1 / 4) * (24 / 72)
+    GEAR_RATIO = (1 / 5) * (1 / 3) * (24 / 72)
     MOTOR_REV_TO_SHAFT_RADIANS = GEAR_RATIO * math.tau
     MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = MOTOR_REV_TO_SHAFT_RADIANS / 60
 
-    SHAFT_REV_RETRACT_HARD_LIMIT = 0.0
-    SHAFT_REV_DEPLOY_HARD_LIMIT = 1.353
+    SHAFT_REV_RETRACT_HARD_LIMIT = 1.778579
+    SHAFT_REV_DEPLOY_HARD_LIMIT = 0.0
 
     ALLOWABLE_ERROR = 0.01
 
-    # TODO REMOVE THIS WHEN WE HAVE REMADE THE MECHANISM AND ARENT AS AFRAID OF BREAKING IT
-    SAFETY_SCALE = 0.4
+    RETRACTED_STATE = TrapezoidProfile.State(SHAFT_REV_RETRACT_HARD_LIMIT, 0.0)
+    DEPLOYED_STATE = TrapezoidProfile.State(SHAFT_REV_DEPLOY_HARD_LIMIT, 0.0)
 
     class Direction(Enum):
         BACKWARD = -1
@@ -46,12 +49,29 @@ class IntakeComponent:
         self.deploy_motor_l.setIdleMode(CANSparkMax.IdleMode.kBrake)
         self.deploy_motor_r.setIdleMode(CANSparkMax.IdleMode.kBrake)
 
+        # running the controller on the rio rather than on the motor controller
+        # to allow access to the velocity setpoint for feedforward
+        arm_constraints = TrapezoidProfile.Constraints(
+            maxVelocity=6.0, maxAcceleration=math.pi
+        )
+
+        self.arm_profile = TrapezoidProfile(arm_constraints)
+
+        # Recalc with some modifications
+        # ratio step up 0.016666667
+        # COM 0.3m
+        # Arm Mass 4kg
+        # start ang 0 deg
+        # stop ang 78 deg
+        # kG was then lowered after testing
+        self.feed_forward_calculator = ArmFeedforward(kS=0.0, kG=0.16, kV=1.17, kA=0.02)
+
         self.pid_controller = self.deploy_motor_l.getPIDController()
         self.deploy_encoder = self.deploy_motor_l.getEncoder()
         self.deploy_encoder.setVelocityConversionFactor(
             self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC
         )
-        self.deploy_motor_l.setInverted(True)
+        self.deploy_motor_l.setInverted(False)
         self.deploy_encoder.setPositionConversionFactor(self.MOTOR_REV_TO_SHAFT_RADIANS)
 
         # Retract PID Controller
@@ -59,60 +79,37 @@ class IntakeComponent:
         self.pid_controller.setFF(
             1 / (5700.0 * self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC), self.retract_pid_slot
         )
-        self.pid_controller.setP(0.08, self.retract_pid_slot)
+        self.pid_controller.setP(0.2, self.retract_pid_slot)
         self.pid_controller.setI(0, self.retract_pid_slot)
         self.pid_controller.setD(0.4, self.retract_pid_slot)
-        self.pid_controller.setFF(0.02, self.retract_pid_slot)
         self.pid_controller.setOutputRange(-1, 1, self.retract_pid_slot)
-
-        self.pid_controller.setSmartMotionMaxVelocity(
-            self.SAFETY_SCALE * 6, self.retract_pid_slot
-        )  # rad/s
-        self.pid_controller.setSmartMotionMinOutputVelocity(
-            0, self.retract_pid_slot
-        )  # rad/s
-        self.pid_controller.setSmartMotionMaxAccel(
-            self.SAFETY_SCALE * math.pi, self.retract_pid_slot
-        )  # rad/s^2
-        self.pid_controller.setSmartMotionAllowedClosedLoopError(
-            self.ALLOWABLE_ERROR, self.retract_pid_slot
-        )  # Max allowed error
 
         # Deploy PID Controller
         self.deploy_pid_slot = 1
         self.pid_controller.setFF(
             1 / (5700.0 * self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC), self.deploy_pid_slot
         )
-        self.pid_controller.setP(0.06, self.deploy_pid_slot)
+        self.pid_controller.setP(0.6, self.deploy_pid_slot)
         self.pid_controller.setI(0, self.deploy_pid_slot)
-        self.pid_controller.setD(0.4, self.deploy_pid_slot)
+        self.pid_controller.setD(0.6, self.deploy_pid_slot)
         self.pid_controller.setOutputRange(-1, 1, self.deploy_pid_slot)
-
-        self.pid_controller.setSmartMotionMaxVelocity(
-            self.SAFETY_SCALE * 6, self.deploy_pid_slot
-        )  # rad/s
-        self.pid_controller.setSmartMotionMinOutputVelocity(
-            0, self.deploy_pid_slot
-        )  # rad/s
-        self.pid_controller.setSmartMotionMaxAccel(
-            self.SAFETY_SCALE * math.pi, self.deploy_pid_slot
-        )  # rad/s^2
-        self.pid_controller.setSmartMotionAllowedClosedLoopError(
-            self.ALLOWABLE_ERROR, self.deploy_pid_slot
-        )  # Max allowed error
 
         self.pid_slot = self.retract_pid_slot
 
         self.direction = self.Direction.STOPPED
 
         # Intake should begin raised...
-        self.deploy_setpoint = self.SHAFT_REV_RETRACT_HARD_LIMIT
-        self.deploy_encoder.setPosition(self.deploy_setpoint)
+        self.target_deployment_state = TrapezoidProfile.State(
+            self.SHAFT_REV_RETRACT_HARD_LIMIT, 0.0
+        )
+        self.last_setpoint_update_time = time.monotonic()
 
-        self.deploy_limit_switch = self.deploy_motor_l.getForwardLimitSwitch(
+        self.deploy_encoder.setPosition(self.target_deployment_state.position)
+
+        self.deploy_limit_switch = self.deploy_motor_l.getReverseLimitSwitch(
             rev.SparkLimitSwitch.Type.kNormallyOpen
         )
-        self.retract_limit_switch = self.deploy_motor_l.getReverseLimitSwitch(
+        self.retract_limit_switch = self.deploy_motor_l.getForwardLimitSwitch(
             rev.SparkLimitSwitch.Type.kNormallyOpen
         )
 
@@ -150,12 +147,16 @@ class IntakeComponent:
         return self.deploy_limit_switch.get()
 
     def deploy(self) -> None:
-        self.deploy_setpoint = self.SHAFT_REV_DEPLOY_HARD_LIMIT
-        self.pid_slot = self.deploy_pid_slot
+        if self.target_deployment_state is not self.DEPLOYED_STATE:
+            self.last_setpoint_update_time = time.monotonic()
+            self.target_deployment_state = self.DEPLOYED_STATE
+            self.pid_slot = self.deploy_pid_slot
 
     def retract(self) -> None:
-        self.deploy_setpoint = self.SHAFT_REV_RETRACT_HARD_LIMIT
-        self.pid_slot = self.retract_pid_slot
+        if self.target_deployment_state is not self.RETRACTED_STATE:
+            self.last_setpoint_update_time = time.monotonic()
+            self.target_deployment_state = self.RETRACTED_STATE
+            self.pid_slot = self.retract_pid_slot
 
     def intake(self) -> None:
         self.direction = self.Direction.FORWARD
@@ -208,11 +209,30 @@ class IntakeComponent:
 
         self.motor.set_control(intake_request)
 
-        self.pid_controller.setReference(
-            self.deploy_setpoint,
-            CANSparkMax.ControlType.kSmartMotion,
-            pidSlot=self.pid_slot,
+        desired_state = self.arm_profile.calculate(
+            time.monotonic() - self.last_setpoint_update_time,
+            TrapezoidProfile.State(
+                self.deploy_encoder.getPosition(), self.deploy_encoder.getVelocity()
+            ),
+            self.target_deployment_state,
         )
+
+        ff = self.feed_forward_calculator.calculate(
+            desired_state.position, desired_state.velocity
+        )
+        if self.target_deployment_state is self.DEPLOYED_STATE:
+            self.pid_controller.setReference(
+                desired_state.position,
+                CANSparkMax.ControlType.kPosition,
+                pidSlot=self.pid_slot,
+            )
+        elif self.target_deployment_state is self.RETRACTED_STATE:
+            self.pid_controller.setReference(
+                desired_state.position,
+                CANSparkMax.ControlType.kPosition,
+                pidSlot=self.pid_slot,
+                arbFeedforward=ff,
+            )
 
         self.injector.set(self.desired_injector_speed)
 
