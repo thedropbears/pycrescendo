@@ -94,7 +94,7 @@ class AutoBase(AutonomousStateMachine):
     def shoot_note(self) -> None:
         self.note_manager.try_shoot()
 
-        if self.note_manager.has_just_fired():
+        if self.note_manager.has_just_fired() or RobotBase.isSimulation():
             if len(self.note_paths_working_copy) == 0:
                 # Just shot the last note
                 self.done()
@@ -125,6 +125,9 @@ class AutoBase(AutonomousStateMachine):
             self.chassis.stop_snapping()
             self.next_state("drive_to_shoot")
         if self.is_at_goal():
+            if RobotBase.isSimulation():
+                self.next_state(self.drive_to_shoot)
+                return
             # we did not find a note on the path, look for the next note
             if len(self.note_paths_working_copy) == 0:
                 # Couldn't find the last note
