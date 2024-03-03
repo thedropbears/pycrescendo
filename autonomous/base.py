@@ -243,9 +243,7 @@ class AutoBase(AutonomousStateMachine):
     def is_at_goal(self) -> bool:
         return (
             self.goal - self.chassis.get_pose().translation()
-        ).norm() < self.POSITION_TOLERANCE and abs(
-            (self.goal_heading - self.chassis.get_rotation()).radians()
-        ) < self.ANGLE_TOLERANCE
+        ).norm() < self.POSITION_TOLERANCE
 
     def done(self):
         self.chassis.stop_snapping()
