@@ -21,8 +21,8 @@ class IntakeComponent:
     MOTOR_REV_TO_SHAFT_RADIANS = GEAR_RATIO * math.tau
     MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = MOTOR_REV_TO_SHAFT_RADIANS / 60
 
-    SHAFT_REV_RETRACT_HARD_LIMIT = 0.0
-    SHAFT_REV_DEPLOY_HARD_LIMIT = 1.353
+    SHAFT_REV_RETRACT_HARD_LIMIT = 1.778579
+    SHAFT_REV_DEPLOY_HARD_LIMIT = 0.0
 
     ALLOWABLE_ERROR = 0.01
 
@@ -51,7 +51,7 @@ class IntakeComponent:
         self.deploy_encoder.setVelocityConversionFactor(
             self.MOTOR_RPM_TO_SHAFT_RAD_PER_SEC
         )
-        self.deploy_motor_l.setInverted(True)
+        self.deploy_motor_l.setInverted(False)
         self.deploy_encoder.setPositionConversionFactor(self.MOTOR_REV_TO_SHAFT_RADIANS)
 
         # Retract PID Controller
@@ -109,10 +109,10 @@ class IntakeComponent:
         self.deploy_setpoint = self.SHAFT_REV_RETRACT_HARD_LIMIT
         self.deploy_encoder.setPosition(self.deploy_setpoint)
 
-        self.deploy_limit_switch = self.deploy_motor_l.getForwardLimitSwitch(
+        self.deploy_limit_switch = self.deploy_motor_l.getReverseLimitSwitch(
             rev.SparkLimitSwitch.Type.kNormallyOpen
         )
-        self.retract_limit_switch = self.deploy_motor_l.getReverseLimitSwitch(
+        self.retract_limit_switch = self.deploy_motor_l.getForwardLimitSwitch(
             rev.SparkLimitSwitch.Type.kNormallyOpen
         )
 
