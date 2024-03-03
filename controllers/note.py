@@ -50,6 +50,7 @@ class NoteManager(StateMachine):
     @state(must_finish=True, first=True)
     def holding_note(self) -> None:
         self.intake_desired = False
+        self.shooter.update_range()
 
         if not wpilib.DriverStation.isAutonomous():
             self.intake.retract()
@@ -62,7 +63,9 @@ class NoteManager(StateMachine):
 
     @state(must_finish=True)
     def not_holding_note(self) -> None:
+        self.shooter.coast_down()
         if self.intake_desired:
+            self.shooter.update_range()
             self.intake.deploy()
             self.intake.intake()
         elif not wpilib.DriverStation.isAutonomous():
