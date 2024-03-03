@@ -1,5 +1,4 @@
 from magicbot import AutonomousStateMachine, timed_state
-from wpilib import RobotBase
 
 from components.chassis import ChassisComponent
 from controllers.note import NoteManager
@@ -18,7 +17,7 @@ class SimpleAuto(AutonomousStateMachine):
     def shoot_note(self) -> None:
         self.note_manager.try_shoot()
 
-        if self.note_manager.has_just_fired() or RobotBase.isSimulation():
+        if self.note_manager.has_just_fired():
             self.next_state(self.drive_forward)
 
     @timed_state(duration=4)
