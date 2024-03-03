@@ -2,12 +2,14 @@ from magicbot import StateMachine, state, feedback, will_reset_to
 import wpilib
 
 from components.intake import IntakeComponent
+from components.led import LightStrip
 from controllers.shooter import Shooter
 
 
 class NoteManager(StateMachine):
     shooter: Shooter
     intake: IntakeComponent
+    status_lights: LightStrip
 
     shot_desired = will_reset_to(False)
 
@@ -63,6 +65,7 @@ class NoteManager(StateMachine):
 
     @state(must_finish=True)
     def not_holding_note(self) -> None:
+        self.status_lights.want_note()
         self.shooter.coast_down()
         if self.intake_desired:
             self.shooter.update_range()

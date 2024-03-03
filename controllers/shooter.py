@@ -7,6 +7,7 @@ from magicbot import StateMachine, state, timed_state, feedback
 from components.chassis import ChassisComponent
 from components.intake import IntakeComponent
 from components.shooter import ShooterComponent
+from components.led import LightStrip
 from utilities.game import get_goal_speaker_position
 
 
@@ -14,6 +15,7 @@ class Shooter(StateMachine):
     shooter_component: ShooterComponent
     chassis: ChassisComponent
     intake: IntakeComponent
+    status_lights: LightStrip
 
     def translation_to_goal(self) -> Translation2d:
         return (
@@ -42,8 +44,10 @@ class Shooter(StateMachine):
                 and self.shooter_component.is_ready()
                 and self.in_range()
             ):
+                self.status_lights.shooting()
                 self.next_state(self.firing)
             else:
+                self.status_lights.not_in_range()
                 self.aim()
 
     def aim(self) -> None:

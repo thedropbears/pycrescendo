@@ -1,9 +1,11 @@
 from magicbot import StateMachine, state, will_reset_to
 from components.climber import ClimberComponent
+from components.led import LightStrip
 
 
 class Climber(StateMachine):
     climber_component: ClimberComponent
+    status_lights: LightStrip
     should_climb = will_reset_to(False)
 
     def __init__(self) -> None:
@@ -19,6 +21,7 @@ class Climber(StateMachine):
         self.done()
 
     def try_toggle(self) -> None:
+        self.status_lights.climbing()
         if self.extended:
             self.climb()
         else:
