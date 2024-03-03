@@ -69,7 +69,6 @@ class NoteManager(StateMachine):
             self.intake.deploy()
             self.intake.intake()
         elif not wpilib.DriverStation.isAutonomous():
-            self.shooter.set_stop()
             self.intake.retract()
 
         if self.has_note():
