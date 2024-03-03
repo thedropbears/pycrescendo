@@ -86,12 +86,12 @@ class ShooterComponent:
 
         flywheel_pid = (
             Slot0Configs()
-            .with_k_p(0.26727)
+            .with_k_p(0.41377)
             .with_k_i(0)
             .with_k_d(0)
-            .with_k_s(0.30982)
-            .with_k_v(0.095403)
-            .with_k_a(0.011232)
+            .with_k_s(0.31461)
+            .with_k_v(0.097173)
+            .with_k_a(0.013103)
         )
 
         flywheel_gear_ratio = FeedbackConfigs().with_sensor_to_mechanism_ratio(
