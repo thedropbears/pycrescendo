@@ -21,7 +21,7 @@ class Climber(StateMachine):
         self.done()
 
     def try_toggle(self) -> None:
-        self.status_lights.climbing()
+        self.status_lights.climbing_arm_extended()
         if self.extended:
             self.climb()
         else:

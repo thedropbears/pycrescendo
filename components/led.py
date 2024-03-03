@@ -77,9 +77,12 @@ class LightStrip:
         self.pattern = Solid(HsvColour.ORANGE)
 
     def intaking(self) -> None:
-        self.pattern = Solid(HsvColour.CYAN)
+        self.pattern = Solid(HsvColour.MAGENTA)
 
-    def climbing(self) -> None:
+    def climbing_arm_extended(self) -> None:
+        self.pattern = Flash(HsvColour.YELLOW)
+
+    def climbing_arm_fully_extended(self) -> None:
         self.pattern = Solid(HsvColour.YELLOW)
 
     def morse(self) -> None:
