@@ -55,6 +55,8 @@ class SpeakerCentre3(AutoBase):
 class Centre3Centre5(AutoBase):
     # Stay in the south of the field to avoid interfering with allies using the close notes
     MODE_NAME = "3 notes: internal, center 3, center 5"
+    # Not yet tested
+    DISABLED = True
 
     def __init__(self) -> None:
         note_paths = [
