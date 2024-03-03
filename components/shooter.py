@@ -110,8 +110,6 @@ class ShooterComponent:
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
         SmartDashboard.putData(self.inclinator_controller)
 
-        self.desire_stop = False
-
     def on_enable(self) -> None:
         self.inclinator_controller.reset()
 
@@ -154,7 +152,6 @@ class ShooterComponent:
         return self.flywheel_left.get_velocity().value
 
     def set_range(self, range: float) -> None:
-        self.desire_stop = False
         self.desired_inclinator_angle = float(
             np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_ANGLE_LOOKUP)
         )
@@ -167,8 +164,8 @@ class ShooterComponent:
             )
         )
 
-    def stop(self) -> None:
-        self.desire_stop = True
+    def coast_down(self) -> None:
+        self.desired_flywheel_speed = 0
 
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
@@ -182,7 +179,7 @@ class ShooterComponent:
         )
         self.inclinator.set(inclinator_speed)
 
-        if self.desire_stop:
+        if self.desired_flywheel_speed == 0:
             self.flywheel_left.set_control(VoltageOut(0))
         else:
             self.flywheel_left.set_control(VelocityVoltage(self.desired_flywheel_speed))
