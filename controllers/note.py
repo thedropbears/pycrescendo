@@ -40,6 +40,7 @@ class NoteManager(StateMachine):
 
     def on_enable(self) -> None:
         super().on_enable()
+        self.last_state = None
         if self.has_note() or wpilib.DriverStation.isAutonomous():
             self.engage()
         else:

@@ -1,5 +1,6 @@
 from utilities.position import NotePositions, Path, ShootingPositions, PathPositions
 from autonomous.base import AutoBase, rotation_to_red_speaker
+from autonomous.simple import SimpleAuto
 from wpimath.geometry import Pose2d, Translation2d
 
 
@@ -84,3 +85,9 @@ class Centre3Centre5(AutoBase):
         rotation = rotation_to_red_speaker(sim_start_pos)
         sim_start_pose = Pose2d(sim_start_pos, rotation)
         super().__init__(note_paths, shoot_paths, sim_start_pose)
+
+
+class OnlyShoot(SimpleAuto):
+    # Incase drivers forget to select anything
+    MODE_NAME = "DEFAULT - PLEASE SELECT A REAL MODE"
+    DEFAULT = True
