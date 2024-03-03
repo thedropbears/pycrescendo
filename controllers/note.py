@@ -13,6 +13,7 @@ class NoteManager(StateMachine):
 
     def __init__(self) -> None:
         self.intake_desired = False
+        self.last_state = ""
 
     def try_intake(self) -> None:
         self.intake_desired = True
@@ -40,7 +41,7 @@ class NoteManager(StateMachine):
 
     def on_enable(self) -> None:
         super().on_enable()
-        self.last_state = None
+        self.last_state = ""
         if self.has_note() or wpilib.DriverStation.isAutonomous():
             self.engage()
         else:
