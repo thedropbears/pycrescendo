@@ -50,7 +50,10 @@ class NoteManager(StateMachine):
             self.engage(self.not_holding_note)
 
     @state(must_finish=True, first=True)
-    def holding_note(self) -> None:
+    def holding_note(self, initial_call) -> None:
+        if initial_call:
+            self.status_lights.holding_note()
+
         self.intake_desired = False
         self.shooter.update_range()
 
@@ -73,6 +76,8 @@ class NoteManager(StateMachine):
             self.shooter.update_range()
             self.intake.deploy()
             self.intake.intake()
+            # NOTE: Flash won't work cause it is called every tick
+            self.status_lights.intake_deployed()
         elif not wpilib.DriverStation.isAutonomous():
             self.intake.retract()
 
