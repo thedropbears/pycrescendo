@@ -14,8 +14,8 @@ from wpimath.controller import (
     PIDController,
 )
 from wpilib import Field2d, RobotBase
-from wpimath.spline import Spline3
 from wpimath.geometry import Rotation2d, Translation2d, Pose2d
+from wpimath.spline import Spline3
 
 from utilities.position import Path
 import utilities.game as game
@@ -103,7 +103,7 @@ class AutoBase(AutonomousStateMachine):
 
     @state
     def ensure_robot_config(self):
-        if self.intake.is_fully_deployed():
+        if self.intake.is_fully_deployed() or RobotBase.isSimulation():
             self.next_state(self.pick_up)
 
     @state
@@ -130,10 +130,9 @@ class AutoBase(AutonomousStateMachine):
                 # Couldn't find the last note
                 self.done()
                 return
-            self.trajectory = self.calculate_trajectory(
-                self.note_paths_working_copy.pop(0)
-            )
-            self.shoot_paths.pop(0)
+            self.shoot_paths_working_copy.pop(0)
+            # reset the clock
+            self.next_state(self.pick_up)
 
     @state
     def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
