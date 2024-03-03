@@ -2,7 +2,7 @@ import math
 
 from wpimath.geometry import Translation2d
 
-from magicbot import StateMachine, state, timed_state, default_state, feedback
+from magicbot import StateMachine, state, timed_state, feedback
 
 from components.chassis import ChassisComponent
 from components.intake import IntakeComponent
@@ -24,14 +24,13 @@ class Shooter(StateMachine):
     def set_stop(self) -> None:
         self.shooter_component.stop()
 
+    def update_range(self) -> None:
+        self.shooter_component.set_range(self.translation_to_goal().norm())
+
     @feedback
     def in_range(self):
         range = self.translation_to_goal().norm()
         return self.shooter_component.is_range_in_bounds(range)
-
-    @default_state
-    def idling(self) -> None:
-        self.shooter_component.set_range(self.translation_to_goal().norm())
 
     @state(first=True)
     def aiming(self, initial_call) -> None:
@@ -51,7 +50,7 @@ class Shooter(StateMachine):
         translation_to_goal = self.translation_to_goal()
 
         # Update range
-        self.shooter_component.set_range(translation_to_goal.norm())
+        self.update_range()
 
         # Determine heading required for goal
         bearing_to_speaker = (
@@ -63,5 +62,5 @@ class Shooter(StateMachine):
 
     @timed_state(duration=1, must_finish=True)
     def firing(self) -> None:
-        self.shooter_component.set_range(self.translation_to_goal().norm())
+        self.update_range()
         self.intake.inject()
