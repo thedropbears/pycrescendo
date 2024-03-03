@@ -65,22 +65,16 @@ class LightStrip:
         self.leds.start()
 
     def no_note(self) -> None:
-        self.pattern = Breathe(HsvColour.WHITE)
+        self.pattern = Breathe(HsvColour.OFF)
 
     def intake_deployed(self) -> None:
-        self.pattern = Solid(HsvColour.MAGENTA)
-
-    def holding_note(self) -> None:
-        self.pattern = Flash(HsvColour.CYAN)
+        self.pattern = Flash(HsvColour.MAGENTA)
 
     def in_range(self) -> None:
         self.pattern = Solid(HsvColour.GREEN)
 
     def not_in_range(self) -> None:
         self.pattern = Solid(HsvColour.RED)
-
-    def shoot(self) -> None:
-        self.pattern = Solid(HsvColour.ORANGE)
 
     def climbing_arm_extended(self) -> None:
         self.pattern = Flash(HsvColour.YELLOW)
