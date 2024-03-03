@@ -29,9 +29,6 @@ class IntakeComponent:
 
     ALLOWABLE_ERROR = 0.01
 
-    # TODO REMOVE THIS WHEN WE HAVE REMADE THE MECHANISM AND ARENT AS AFRAID OF BREAKING IT
-    SAFETY_SCALE = 0.4
-
     RETRACTED_STATE = TrapezoidProfile.State(SHAFT_REV_RETRACT_HARD_LIMIT, 0.0)
     DEPLOYED_STATE = TrapezoidProfile.State(SHAFT_REV_DEPLOY_HARD_LIMIT, 0.0)
 
@@ -87,19 +84,6 @@ class IntakeComponent:
         self.pid_controller.setD(0.4, self.retract_pid_slot)
         self.pid_controller.setOutputRange(-1, 1, self.retract_pid_slot)
 
-        self.pid_controller.setSmartMotionMaxVelocity(
-            self.SAFETY_SCALE * 6, self.retract_pid_slot
-        )  # rad/s
-        self.pid_controller.setSmartMotionMinOutputVelocity(
-            0, self.retract_pid_slot
-        )  # rad/s
-        self.pid_controller.setSmartMotionMaxAccel(
-            self.SAFETY_SCALE * math.pi, self.retract_pid_slot
-        )  # rad/s^2
-        self.pid_controller.setSmartMotionAllowedClosedLoopError(
-            self.ALLOWABLE_ERROR, self.retract_pid_slot
-        )  # Max allowed error
-
         # Deploy PID Controller
         self.deploy_pid_slot = 1
         self.pid_controller.setFF(
@@ -109,19 +93,6 @@ class IntakeComponent:
         self.pid_controller.setI(0, self.deploy_pid_slot)
         self.pid_controller.setD(0.6, self.deploy_pid_slot)
         self.pid_controller.setOutputRange(-1, 1, self.deploy_pid_slot)
-
-        self.pid_controller.setSmartMotionMaxVelocity(
-            self.SAFETY_SCALE * 6, self.deploy_pid_slot
-        )  # rad/s
-        self.pid_controller.setSmartMotionMinOutputVelocity(
-            0, self.deploy_pid_slot
-        )  # rad/s
-        self.pid_controller.setSmartMotionMaxAccel(
-            self.SAFETY_SCALE * math.pi, self.deploy_pid_slot
-        )  # rad/s^2
-        self.pid_controller.setSmartMotionAllowedClosedLoopError(
-            self.ALLOWABLE_ERROR, self.deploy_pid_slot
-        )  # Max allowed error
 
         self.pid_slot = self.retract_pid_slot
 
