@@ -27,7 +27,7 @@ class ShooterComponent:
     MAX_INCLINE_ANGLE = 1.045  # ~60 degrees
     MIN_INCLINE_ANGLE = 0.354  # ~20 degrees
     INCLINATOR_TOLERANCE = math.radians(1)
-    INCLINATOR_OFFSET = 3.972 - math.radians(60)
+    INCLINATOR_OFFSET = 4.023 - MIN_INCLINE_ANGLE
     INCLINATOR_SCALE_FACTOR = math.tau  # rps -> radians
     INCLINATOR_GEAR_RATIO = 18 / 24 * 26 / 300
     INCLINATOR_POSITION_CONVERSION_FACTOR = (
@@ -86,12 +86,12 @@ class ShooterComponent:
 
         flywheel_pid = (
             Slot0Configs()
-            .with_k_p(0.26727)
+            .with_k_p(0.41377)
             .with_k_i(0)
             .with_k_d(0)
-            .with_k_s(0.30982)
-            .with_k_v(0.095403)
-            .with_k_a(0.011232)
+            .with_k_s(0.31461)
+            .with_k_v(0.097173)
+            .with_k_a(0.013103)
         )
 
         flywheel_gear_ratio = FeedbackConfigs().with_sensor_to_mechanism_ratio(
