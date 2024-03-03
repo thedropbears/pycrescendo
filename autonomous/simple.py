@@ -8,6 +8,8 @@ from utilities.game import is_red
 
 
 class SimpleAuto(AutonomousStateMachine):
+    MODE_NAME = "DEFAULT - PLEASE SELECT A REAL MODE"
+    DEFAULT = True
 
     chassis: ChassisComponent
     note_manager: NoteManager
