@@ -24,8 +24,8 @@ class Shooter(StateMachine):
     RANGES = (0, 5)
 
     def __init__(self):
-        self.range = 0
-        self.bearing_to_speaker = 0
+        self.range = 0.0
+        self.bearing_to_speaker = 0.0
 
     def translation_to_goal(self) -> Translation2d:
         return (
@@ -37,7 +37,7 @@ class Shooter(StateMachine):
     def is_aiming_finished(self) -> bool:
         tolerance = float(np.interp((self.range), self.RANGES, self.ANGLE_TOLERANCES))
         heading = self.chassis.get_rotation().radians()
-        return abs(self.bearing_to_speaker - heading) < tolerance
+        return abs(constrain_angle(self.bearing_to_speaker - heading)) < tolerance
 
     def coast_down(self) -> None:
         self.shooter_component.coast_down()
