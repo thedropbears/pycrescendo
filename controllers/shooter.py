@@ -77,7 +77,14 @@ class Shooter(StateMachine):
         # Set to appropriate heading
         self.chassis.snap_to_heading(self.bearing_to_speaker)
 
-    @timed_state(duration=1, must_finish=True)
+    @state(must_finish=True)
     def firing(self) -> None:
+        self.update_range()
+        self.intake.inject()
+        if not self.intake.has_note():
+            self.next_state(self.waiting_for_shot_to_complete)
+
+    @timed_state(duration=0.2, must_finish=True)
+    def waiting_for_shot_to_complete(self):
         self.update_range()
         self.intake.inject()
