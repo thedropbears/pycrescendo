@@ -74,7 +74,6 @@ class NoteManager(StateMachine):
         self.shooter.coast_down()
         if self.intake_desired:
             self.shooter.update_range()
-            self.status_lights.intake_deployed()
             self.intake.engage()
 
         elif self.cancel_intake_desired:

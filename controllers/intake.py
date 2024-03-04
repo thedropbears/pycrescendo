@@ -2,11 +2,13 @@ from magicbot import StateMachine, state, timed_state, default_state, will_reset
 from wpilib import DriverStation
 
 from components.intake import IntakeComponent
+from components.led import LightStrip
 
 
 class Intake(StateMachine):
 
     intake_component: IntakeComponent
+    status_lights: LightStrip
 
     cancel_desired = will_reset_to(False)
     outtake_desired = will_reset_to(False)
@@ -23,8 +25,10 @@ class Intake(StateMachine):
             self.intake_component.retract()
 
     @state(first=True, must_finish=True)
-    def intaking(self) -> None:
-        self.intake_component.deploy()
+    def intaking(self, initial_call) -> None:
+        if initial_call:
+            self.status_lights.intake_deployed()
+            self.intake_component.deploy()
         self.intake_component.intake()
 
         if self.intake_component.has_intake_stalled():
