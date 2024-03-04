@@ -10,13 +10,12 @@ from components.chassis import ChassisComponent
 from components.vision import VisualLocalizer
 from components.shooter import ShooterComponent
 from components.intake import IntakeComponent
-from components.climber import ClimberComponent
+from components.climber import Climber
 from components.led import LightStrip
 
 from controllers.note import NoteManager
 from controllers.intake import Intake
 from controllers.shooter import Shooter
-from controllers.climber import Climber
 
 from utilities.game import is_red
 
@@ -30,14 +29,14 @@ class MyRobot(magicbot.MagicRobot):
     note_manager: NoteManager
     shooter: Shooter
     intake: Intake
-    climber: Climber
 
     # Components
-    status_lights: LightStrip
     chassis: ChassisComponent
+    climber: Climber
     shooter_component: ShooterComponent
     intake_component: IntakeComponent
-    climber_component: ClimberComponent
+
+    status_lights: LightStrip
 
     max_speed = magicbot.tunable(4)  # m/s
     lower_max_speed = magicbot.tunable(2)  # m/s
@@ -101,11 +100,11 @@ class MyRobot(magicbot.MagicRobot):
             self.chassis.stop_snapping()
 
         dpad = self.gamepad.getPOV()
-        if dpad != -1:
-            if is_red():
-                self.chassis.snap_to_heading(-math.radians(dpad) + math.pi)
-            else:
-                self.chassis.snap_to_heading(-math.radians(dpad))
+        # dpad upwards
+        if dpad in (0, 45, 315):
+            self.climber.deploy()
+        elif dpad in (135, 180, 235):
+            self.climber.retract()
 
         # Set current robot direction to forward
         if self.gamepad.getBButtonPressed():
@@ -119,10 +118,6 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getBackButton():
             self.shooter.try_jettison()
             self.intake.try_outtake()
-
-        # Climbing arm controls. Toggles!
-        if self.gamepad.getRightBumperPressed():
-            self.climber.try_toggle()
 
         # Intake
         if self.gamepad.getLeftTriggerAxis() > 0.5:
@@ -155,14 +150,10 @@ class MyRobot(magicbot.MagicRobot):
 
         # Climbing arm controls
         if self.gamepad.getLeftBumper():
-            self.climber_component.deploy()
+            self.climber.deploy()
 
         if self.gamepad.getRightBumper():
-            self.climber_component.retract()
-
-        # Cancel any running controllers
-        if self.gamepad.getBackButtonPressed():
-            self.cancel_controllers()
+            self.climber.retract()
 
         if self.gamepad.getLeftTriggerAxis() > 0.5:
             self.shooter_component.desired_inclinator_angle = clamp(
@@ -180,15 +171,13 @@ class MyRobot(magicbot.MagicRobot):
 
         self.intake.execute()
         self.shooter_component.execute()
-        self.climber_component.execute()
+        self.climber.execute()
 
         self.chassis.update_odometry()
 
+        self.status_lights.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()
-
-    def cancel_controllers(self):
-        self.climber.stop()
 
     def disabledPeriodic(self) -> None:
         self.chassis.update_alliance()

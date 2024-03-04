@@ -1,13 +1,23 @@
 import wpilib
+from enum import Enum
 from magicbot import feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, DioChannels
 
+from components.led import LightStrip
 
-class ClimberComponent:
+
+class Climber:
     GEAR_RATIO = 1 / 48  # using a Neo with 4:1 4:1 3:1 ratio
     SHAFT_REV_TOP_LIMIT = 7.110515
     SHAFT_REV_BOTTOM_LIMIT = 0
+
+    status_led: LightStrip
+
+    class POSITION(Enum):
+        RETRACTED = 0
+        DEPLOYING = 1
+        DEPLOYED = 2
 
     def __init__(self) -> None:
         self.climbing_motor = CANSparkMax(
@@ -36,6 +46,7 @@ class ClimberComponent:
         self.climbing_motor.enableSoftLimit(
             CANSparkMax.SoftLimitDirection.kReverse, False
         )
+        self.last_position = self.POSITION.RETRACTED
 
     @feedback
     def has_climb_finished(self) -> bool:
@@ -82,6 +93,15 @@ class ClimberComponent:
                 self.enable_soft_limits()
                 self.encoder_limit_enabled = True
                 self.climb_encoder.setPosition(self.SHAFT_REV_TOP_LIMIT)
+
+        if self.has_climb_finished():
+            if self.last_position is not self.POSITION.RETRACTED:
+                self.status_led.no_note()
+        elif self.has_deploy_finished():
+            if self.last_position is not self.POSITION.DEPLOYED:
+                self.status_led.climbing_arm_fully_extended()
+        elif self.last_position is not self.POSITION.DEPLOYING:
+            self.status_led.climbing_arm_extended()
 
         self.climbing_motor.set(self.speed)
         self.speed = 0.0
