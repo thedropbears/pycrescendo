@@ -1,5 +1,4 @@
 import math
-import numpy as np
 
 from wpimath.geometry import Translation2d
 
@@ -9,7 +8,7 @@ from components.chassis import ChassisComponent
 from components.intake import IntakeComponent
 from components.shooter import ShooterComponent
 from components.led import LightStrip
-from utilities.game import get_goal_speaker_position
+from utilities.game import get_goal_speaker_position, NOTE_DIAMETER, SPEAKER_HOOD_WIDTH
 from utilities.functions import constrain_angle
 
 
@@ -25,6 +24,7 @@ class Shooter(StateMachine):
 
     def __init__(self):
         self.range = 0.0
+        self.bearing_tolerance = 0.0
         self.bearing_to_speaker = 0.0
 
     def translation_to_goal(self) -> Translation2d:
@@ -35,9 +35,12 @@ class Shooter(StateMachine):
 
     @feedback
     def is_aiming_finished(self) -> bool:
-        tolerance = float(np.interp(self.range, self.RANGES, self.ANGLE_TOLERANCES))
         heading = self.chassis.get_rotation().radians()
-        return abs(constrain_angle(self.bearing_to_speaker - heading)) < tolerance
+        # Check that we are greater than the min angle, and smaller than max. We might wrap past zero, so use the constrain_angle function
+        return (
+            abs(constrain_angle(self.bearing_to_speaker - heading))
+            < self.bearing_tolerance
+        )
 
     def coast_down(self) -> None:
         self.shooter_component.coast_down()
@@ -68,14 +71,25 @@ class Shooter(StateMachine):
                 self.aim()
 
     def aim(self) -> None:
-        translation_to_goal = self.translation_to_goal()
-
         # Update range
         self.update_range()
 
         # Determine heading required for goal
+        translation_to_goal = self.translation_to_goal()
+
+        # We need to aim at least a note's radius inside the outer bounds of the goal. Also add a safety margin
+        margin = 0.05
+        offset = (SPEAKER_HOOD_WIDTH - NOTE_DIAMETER) / 2.0 - margin
+        offset_bearing = constrain_angle(
+            math.atan2(translation_to_goal.y + offset, translation_to_goal.x) + math.pi
+        )
+
         self.bearing_to_speaker = constrain_angle(
             math.atan2(translation_to_goal.y, translation_to_goal.x) + math.pi
+        )
+
+        self.bearing_tolerance = abs(
+            constrain_angle(self.bearing_to_speaker - offset_bearing)
         )
 
         # Set to appropriate heading

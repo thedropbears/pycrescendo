@@ -29,7 +29,7 @@ FIELD_LENGTH = RED_SPEAKER_POSE.x + BLUE_SPEAKER_POSE.x
 
 # Minimum height of the overhanging speaker hood as obtained from a field Onshape model.
 SPEAKER_HOOD_HEIGHT = 2.104883
-
+SPEAKER_HOOD_WIDTH = 1.05
 SPEAKER_HOOD_DEPTH = 0.456499
 
 BLUE_SPEAKER_TARGET_POSITION = BLUE_SPEAKER_POSE.translation() + Translation3d(
@@ -39,6 +39,8 @@ BLUE_SPEAKER_TARGET_POSITION = BLUE_SPEAKER_POSE.translation() + Translation3d(
 RED_SPEAKER_TARGET_POSITION = RED_SPEAKER_POSE.translation() - Translation3d(
     SPEAKER_HOOD_DEPTH, 0, 0
 )
+
+NOTE_DIAMETER = 0.0254 * 14
 
 
 def field_flip_pose2d(p: Pose2d):
