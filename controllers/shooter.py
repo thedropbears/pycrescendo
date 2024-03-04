@@ -35,7 +35,7 @@ class Shooter(StateMachine):
 
     @feedback
     def is_aiming_finished(self) -> bool:
-        tolerance = float(np.interp((self.range), self.RANGES, self.ANGLE_TOLERANCES))
+        tolerance = float(np.interp(self.range, self.RANGES, self.ANGLE_TOLERANCES))
         heading = self.chassis.get_rotation().radians()
         return abs(constrain_angle(self.bearing_to_speaker - heading)) < tolerance
 
