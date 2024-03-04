@@ -40,6 +40,6 @@ class Intake(StateMachine):
     def outtaking(self) -> None:
         self.intake_component.backdrive_intake()
 
-    @timed_state(duration=1, must_finish=False)
+    @timed_state(duration=0.5, next_state="intaking", must_finish=True)
     def unstall_intake(self) -> None:
         self.intake_component.backdrive_intake()

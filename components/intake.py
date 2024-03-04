@@ -33,6 +33,7 @@ class IntakeComponent:
     RETRACTED_STATE = TrapezoidProfile.State(SHAFT_REV_RETRACT_HARD_LIMIT, 0.0)
     DEPLOYED_STATE = TrapezoidProfile.State(SHAFT_REV_DEPLOY_HARD_LIMIT, 0.0)
     INTAKE_STALL_VELOCITY = 1  # rot/s below which we consider mechanism stalled
+    INTAKE_RUNNING_VELOCITY = 3  # rot/s above which stall detection is enabled
 
     class Direction(Enum):
         BACKWARD = -1
@@ -143,6 +144,7 @@ class IntakeComponent:
 
         self.desired_injector_speed = 0.0
         self.has_indexed = False
+        self.stall_detection_enabled = False
 
     @feedback
     def _at_retract_hard_limit(self) -> bool:
@@ -183,6 +185,7 @@ class IntakeComponent:
         return (
             self.motor.get_velocity().value < self.INTAKE_STALL_VELOCITY
             and self.direction != self.Direction.STOPPED
+            and self.stall_detection_enabled
         )
 
     @feedback
@@ -219,6 +222,12 @@ class IntakeComponent:
     def execute(self) -> None:
         if not self.has_indexed:
             self.maybe_reindex_deployment_encoder()
+
+        # stall detection gating
+        if self.direction == self.Direction.STOPPED:
+            self.stall_detection_enabled = False
+        elif self.motor.get_velocity().value > self.INTAKE_RUNNING_VELOCITY:
+            self.stall_detection_enabled = True
 
         intake_request = VoltageOut(self.direction.value * self.motor_speed * 12.0)
 
