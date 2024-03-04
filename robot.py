@@ -31,11 +31,11 @@ class MyRobot(magicbot.MagicRobot):
     climber: Climber
 
     # Components
+    status_lights: LightStrip
     chassis: ChassisComponent
     shooter_component: ShooterComponent
     intake: IntakeComponent
     climber_component: ClimberComponent
-    lights: LightStrip
 
     max_speed = magicbot.tunable(4)  # m/s
     lower_max_speed = magicbot.tunable(2)  # m/s
@@ -53,7 +53,7 @@ class MyRobot(magicbot.MagicRobot):
         self.field = wpilib.Field2d()
         wpilib.SmartDashboard.putData(self.field)
 
-        self.lights_strip_length = 144  # TODO Change to correct length
+        self.status_lights_strip_length = 144
 
         self.vision_port_name = "ardu_cam_port"
         self.vision_port_pos = Translation3d(0.005, 0.221, 0.503)
@@ -193,7 +193,7 @@ class MyRobot(magicbot.MagicRobot):
         self.chassis.update_odometry()
 
         self.intake.maybe_reindex_deployment_encoder()
-        self.lights.execute()
+        self.status_lights.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()
 

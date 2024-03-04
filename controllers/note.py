@@ -2,12 +2,14 @@ from magicbot import StateMachine, state, feedback, will_reset_to
 import wpilib
 
 from components.intake import IntakeComponent
+from components.led import LightStrip
 from controllers.shooter import Shooter
 
 
 class NoteManager(StateMachine):
     shooter: Shooter
     intake: IntakeComponent
+    status_lights: LightStrip
 
     shot_desired = will_reset_to(False)
 
@@ -52,6 +54,11 @@ class NoteManager(StateMachine):
         self.intake_desired = False
         self.shooter.update_range()
 
+        if self.shooter.in_range():
+            self.status_lights.in_range()
+        else:
+            self.status_lights.not_in_range()
+
         if not wpilib.DriverStation.isAutonomous():
             self.intake.retract()
 
@@ -62,12 +69,17 @@ class NoteManager(StateMachine):
             self.next_state(self.not_holding_note)
 
     @state(must_finish=True)
-    def not_holding_note(self) -> None:
+    def not_holding_note(self, initial_call) -> None:
+        if initial_call:
+            self.status_lights.no_note()
+
         self.shooter.coast_down()
         if self.intake_desired:
             self.shooter.update_range()
             self.intake.deploy()
             self.intake.intake()
+            # NOTE: Flash won't work cause it is called every tick
+            self.status_lights.intake_deployed()
         elif not wpilib.DriverStation.isAutonomous():
             self.intake.retract()
 

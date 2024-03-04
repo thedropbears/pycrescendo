@@ -48,4 +48,4 @@ class DioChannels(enum.IntEnum):
 
 @enum.unique
 class PwmChannels(enum.IntEnum):
-    led_strip = 1
+    led_strip = 0
