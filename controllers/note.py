@@ -62,7 +62,7 @@ class NoteManager(StateMachine):
         if not wpilib.DriverStation.isAutonomous():
             self.intake.retract()
 
-        if self.shot_desired:
+        if self.shot_desired and self.shooter.in_range():
             self.shooter.engage()
 
         if not self.has_note():
