@@ -21,7 +21,7 @@ class IntakeComponent:
     inject_shoot_speed = tunable(1.0)
 
     INTAKE_GEAR_RATIO = 2
-    DEPLOY_GEAR_RATIO  = (1 / 5) * (1 / 3) * (24 / 72)
+    DEPLOY_GEAR_RATIO = (1 / 5) * (1 / 3) * (24 / 72)
     MOTOR_REV_TO_SHAFT_RADIANS = DEPLOY_GEAR_RATIO * math.tau
     MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = MOTOR_REV_TO_SHAFT_RADIANS / 60
 
