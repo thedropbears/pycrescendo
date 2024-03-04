@@ -20,7 +20,7 @@ class Shooter(StateMachine):
     status_lights: LightStrip
 
     # make sure this is always > chassis heading tolerance
-    ANGLE_TOLERANCES = (math.radians(1), math.radians(5))
+    ANGLE_TOLERANCES = (math.radians(5), math.radians(1))
     RANGES = (0, 5)
 
     def __init__(self):
@@ -33,8 +33,9 @@ class Shooter(StateMachine):
             - self.chassis.get_pose().translation()
         )
 
+    @feedback
     def is_aiming_finished(self) -> bool:
-        tolerance = np.interp((self.range), self.ANGLE_TOLERANCES, self.RANGES)[0]
+        tolerance = float(np.interp((self.range), self.RANGES, self.ANGLE_TOLERANCES))
         heading = self.chassis.get_rotation().radians()
         return abs(self.bearing_to_speaker - heading) < tolerance
 
