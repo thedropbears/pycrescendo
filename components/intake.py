@@ -5,7 +5,7 @@ import time
 
 from magicbot import tunable, feedback
 from rev import CANSparkMax
-from phoenix6.configs import MotorOutputConfigs, config_groups
+from phoenix6.configs import MotorOutputConfigs, FeedbackConfigs, config_groups
 from phoenix6.controls import VoltageOut
 from phoenix6.hardware import TalonFX
 from wpilib import DigitalInput
@@ -20,8 +20,9 @@ class IntakeComponent:
     inject_intake_speed = tunable(0.3)
     inject_shoot_speed = tunable(1.0)
 
-    GEAR_RATIO = (1 / 5) * (1 / 3) * (24 / 72)
-    MOTOR_REV_TO_SHAFT_RADIANS = GEAR_RATIO * math.tau
+    INTAKE_GEAR_RATIO = 2
+    DEPLOY_GEAR_RATIO = (1 / 5) * (1 / 3) * (24 / 72)
+    MOTOR_REV_TO_SHAFT_RADIANS = DEPLOY_GEAR_RATIO * math.tau
     MOTOR_RPM_TO_SHAFT_RAD_PER_SEC = MOTOR_REV_TO_SHAFT_RADIANS / 60
 
     SHAFT_REV_RETRACT_HARD_LIMIT = 1.778579
@@ -31,6 +32,8 @@ class IntakeComponent:
 
     RETRACTED_STATE = TrapezoidProfile.State(SHAFT_REV_RETRACT_HARD_LIMIT, 0.0)
     DEPLOYED_STATE = TrapezoidProfile.State(SHAFT_REV_DEPLOY_HARD_LIMIT, 0.0)
+    INTAKE_STALL_VELOCITY = 1  # rot/s below which we consider mechanism stalled
+    INTAKE_RUNNING_VELOCITY = 3  # rot/s above which stall detection is enabled
 
     class Direction(Enum):
         BACKWARD = -1
@@ -121,10 +124,14 @@ class IntakeComponent:
         )
 
         motor_configurator = self.motor.configurator
+        intake_gear_ratio = FeedbackConfigs().with_sensor_to_mechanism_ratio(
+            self.INTAKE_GEAR_RATIO
+        )
         motor_config = MotorOutputConfigs()
         motor_config.inverted = config_groups.InvertedValue.CLOCKWISE_POSITIVE
 
         motor_configurator.apply(motor_config)
+        motor_configurator.apply(intake_gear_ratio)
 
         self.deploy_motor_r.follow(self.deploy_motor_l, True)
 
@@ -137,6 +144,7 @@ class IntakeComponent:
 
         self.desired_injector_speed = 0.0
         self.has_indexed = False
+        self.stall_detection_enabled = False
 
     @feedback
     def _at_retract_hard_limit(self) -> bool:
@@ -164,11 +172,21 @@ class IntakeComponent:
             0.0 if self.has_note() else self.inject_intake_speed
         )
 
-    def outtake(self) -> None:
+    def backdrive_intake(self) -> None:
         self.direction = self.Direction.BACKWARD
 
-    def inject(self) -> None:
+    def backdrive_injector(self) -> None:
+        self.desired_injector_speed = -self.inject_intake_speed
+
+    def feed_shooter(self) -> None:
         self.desired_injector_speed = self.inject_shoot_speed
+
+    def has_intake_stalled(self) -> bool:
+        return (
+            self.motor.get_velocity().value < self.INTAKE_STALL_VELOCITY
+            and self.direction is not self.Direction.STOPPED
+            and self.stall_detection_enabled
+        )
 
     @feedback
     def is_fully_retracted(self) -> bool:
@@ -204,6 +222,12 @@ class IntakeComponent:
     def execute(self) -> None:
         if not self.has_indexed:
             self.maybe_reindex_deployment_encoder()
+
+        # stall detection gating
+        if self.direction is self.Direction.STOPPED:
+            self.stall_detection_enabled = False
+        elif self.motor.get_velocity().value > self.INTAKE_RUNNING_VELOCITY:
+            self.stall_detection_enabled = True
 
         intake_request = VoltageOut(self.direction.value * self.motor_speed * 12.0)
 

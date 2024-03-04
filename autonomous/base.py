@@ -31,7 +31,7 @@ class AutoBase(AutonomousStateMachine):
     note_manager: NoteManager
     field: Field2d
 
-    intake: IntakeComponent
+    intake_component: IntakeComponent
 
     POSITION_TOLERANCE = 0.05
     ANGLE_TOLERANCE = math.radians(5)
@@ -85,7 +85,7 @@ class AutoBase(AutonomousStateMachine):
         self.note_paths_working_copy = list(self.note_paths)
         self.shoot_paths_working_copy = list(self.shoot_paths)
 
-        self.intake.deploy()
+        self.intake_component.deploy()
 
         # We always start ready to shoot, so fire straight away
         self.next_state("shoot_note")
@@ -103,7 +103,7 @@ class AutoBase(AutonomousStateMachine):
 
     @state
     def ensure_robot_config(self):
-        if self.intake.is_fully_deployed() or RobotBase.isSimulation():
+        if self.intake_component.is_fully_deployed() or RobotBase.isSimulation():
             self.next_state(self.pick_up)
 
     @state
@@ -144,7 +144,7 @@ class AutoBase(AutonomousStateMachine):
                 self.shoot_paths_working_copy.pop(0)
             )
 
-        self.note_manager.cancel_intake()
+        self.note_manager.try_cancel_intake()
 
         # Do some driving...
         self.drive_on_trajectory(state_tm)

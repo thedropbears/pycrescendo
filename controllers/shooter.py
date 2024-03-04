@@ -16,7 +16,7 @@ from utilities.functions import constrain_angle
 class Shooter(StateMachine):
     shooter_component: ShooterComponent
     chassis: ChassisComponent
-    intake: IntakeComponent
+    intake_component: IntakeComponent
     status_lights: LightStrip
 
     # make sure this is always > chassis heading tolerance
@@ -81,11 +81,11 @@ class Shooter(StateMachine):
     @state(must_finish=True)
     def firing(self) -> None:
         self.update_range()
-        self.intake.inject()
-        if not self.intake.has_note():
+        self.intake_component.feed_shooter()
+        if not self.intake_component.has_note():
             self.next_state(self.waiting_for_shot_to_complete)
 
     @timed_state(duration=0.2, must_finish=True)
     def waiting_for_shot_to_complete(self):
         self.update_range()
-        self.intake.inject()
+        self.intake_component.feed_shooter()
