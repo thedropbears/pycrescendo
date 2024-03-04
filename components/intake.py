@@ -184,7 +184,7 @@ class IntakeComponent:
     def has_intake_stalled(self) -> bool:
         return (
             self.motor.get_velocity().value < self.INTAKE_STALL_VELOCITY
-            and self.direction != self.Direction.STOPPED
+            and self.direction is not self.Direction.STOPPED
             and self.stall_detection_enabled
         )
 
@@ -224,7 +224,7 @@ class IntakeComponent:
             self.maybe_reindex_deployment_encoder()
 
         # stall detection gating
-        if self.direction == self.Direction.STOPPED:
+        if self.direction is self.Direction.STOPPED:
             self.stall_detection_enabled = False
         elif self.motor.get_velocity().value > self.INTAKE_RUNNING_VELOCITY:
             self.stall_detection_enabled = True
