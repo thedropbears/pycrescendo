@@ -22,7 +22,7 @@ class ShooterComponent:
     FLYWHEEL_GEAR_RATIO = 1 / (22.0 / 18.0)
     FLYWHEEL_TOLERANCE = 1  # rps
 
-    FLYWHEEL_SHOOTING_SPEED = 100
+    FLYWHEEL_SHOOTING_SPEED = 75
 
     MAX_INCLINE_ANGLE = 1.045  # ~60 degrees
     MIN_INCLINE_ANGLE = 0.354  # ~20 degrees
