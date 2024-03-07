@@ -24,6 +24,7 @@ class ShooterComponent:
     FLYWHEEL_TOLERANCE = 1  # rps
 
     FLYWHEEL_SHOOTING_SPEED = 75
+    FLYWHEEL_JETTISON_SPEED = 10
     FLYWHEEL_RAMP_TIME = 1
 
     MAX_INCLINE_ANGLE = 1.045  # ~60 degrees

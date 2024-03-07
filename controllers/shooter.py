@@ -81,14 +81,18 @@ class Shooter(StateMachine):
         # Set to appropriate heading
         self.chassis.snap_to_heading(self.bearing_to_speaker)
 
+    @state
+    def preparing_to_jettison(self) -> None:
+        self.shooter_component.prepare_to_jettison()
+        if self.shooter_component.is_ready():
+            self.next_state(self.firing)
+
     @state(must_finish=True)
     def firing(self) -> None:
-        self.update_range()
         self.intake_component.feed_shooter()
         if not self.intake_component.has_note():
             self.next_state(self.waiting_for_shot_to_complete)
 
     @timed_state(duration=0.2, must_finish=True)
     def waiting_for_shot_to_complete(self):
-        self.update_range()
         self.intake_component.feed_shooter()
