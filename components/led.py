@@ -4,7 +4,7 @@ import math
 import random
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Callable, Protocol
+from typing import Callable, Protocol, Optional
 
 import wpilib
 from ids import PwmChannels
@@ -60,12 +60,13 @@ class LightStrip:
         self.strip_data = [self.led_data] * strip_length
 
         self.pattern: Pattern = Rainbow(HsvColour.MAGENTA)
+        self.high_priority_pattern: Optional[Pattern | None] = None
 
         self.leds.setData(self.strip_data)
         self.leds.start()
 
     def no_note(self) -> None:
-        self.pattern = Breathe(HsvColour.OFF)
+        self.pattern = Solid(HsvColour.OFF)
 
     def intake_deployed(self) -> None:
         self.pattern = Flash(HsvColour.MAGENTA)
@@ -77,10 +78,13 @@ class LightStrip:
         self.pattern = Solid(HsvColour.RED)
 
     def climbing_arm_extended(self) -> None:
-        self.pattern = Flash(HsvColour.YELLOW)
+        self.high_priority_pattern = Flash(HsvColour.YELLOW)
 
-    def climbing_arm_fully_extended(self) -> None:
-        self.pattern = Solid(HsvColour.YELLOW)
+    def climbing_arm_fully_extended(self) -> None:  # Called every tick
+        self.high_priority_pattern = Solid(HsvColour.YELLOW)
+
+    def climbing_arm_retracted(self) -> None:
+        self.high_priority_pattern = None
 
     def morse(self) -> None:
         self.pattern = Morse(HsvColour.YELLOW)
@@ -92,7 +96,10 @@ class LightStrip:
         self.pattern = Solid(HsvColour.WHITE)
 
     def execute(self) -> None:
-        colour = self.pattern.update()
+        if self.high_priority_pattern is None:
+            colour = self.pattern.update()
+        else:
+            colour = self.high_priority_pattern.update()
         self.led_data.setHSV(*colour)
         self.leds.setData(self.strip_data)
 
