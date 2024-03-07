@@ -4,7 +4,7 @@ import math
 import random
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Callable, Protocol, Optional
+from typing import Callable, Protocol
 
 import wpilib
 from ids import PwmChannels
@@ -60,7 +60,7 @@ class LightStrip:
         self.strip_data = [self.led_data] * strip_length
 
         self.pattern: Pattern = Rainbow(HsvColour.MAGENTA)
-        self.high_priority_pattern: Optional[Pattern | None] = None
+        self.high_priority_pattern: Pattern | None = None
 
         self.leds.setData(self.strip_data)
         self.leds.start()
