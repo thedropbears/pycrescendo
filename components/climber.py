@@ -50,6 +50,9 @@ class Climber:
 
         self.seen_deploy_limit_switch = False
 
+    def on_disable(self) -> None:
+        self.seen_deploy_limit_switch = False
+
     @feedback
     def has_climb_finished(self) -> bool:
         return not self.retract_limit_switch.get() or (
