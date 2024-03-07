@@ -10,6 +10,7 @@ from phoenix6.configs import (
     MotorOutputConfigs,
     Slot0Configs,
     FeedbackConfigs,
+    ClosedLoopRampsConfigs,
 )
 from phoenix6.signals import NeutralModeValue
 from wpilib import DigitalInput, DutyCycle, SmartDashboard
@@ -23,6 +24,7 @@ class ShooterComponent:
     FLYWHEEL_TOLERANCE = 1  # rps
 
     FLYWHEEL_SHOOTING_SPEED = 75
+    FLYWHEEL_RAMP_TIME = 1
 
     MAX_INCLINE_ANGLE = 1.045  # ~60 degrees
     MIN_INCLINE_ANGLE = 0.354  # ~20 degrees
@@ -98,6 +100,13 @@ class ShooterComponent:
             self.FLYWHEEL_GEAR_RATIO
         )
 
+        flywheel_left_closed_loop_ramp_config = (
+            ClosedLoopRampsConfigs().with_voltage_closed_loop_ramp_period(
+                self.FLYWHEEL_RAMP_TIME
+            )
+        )
+
+        flywheel_left_config.apply(flywheel_left_closed_loop_ramp_config)
         flywheel_left_config.apply(flywheel_motor_config)
         flywheel_left_config.apply(flywheel_pid)
         flywheel_left_config.apply(flywheel_gear_ratio)
