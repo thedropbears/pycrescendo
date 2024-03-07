@@ -12,7 +12,7 @@ class Climber:
     SHAFT_REV_TOP_LIMIT = 7.110515
     SHAFT_REV_BOTTOM_LIMIT = 0
 
-    status_led: LightStrip
+    status_lights: LightStrip
 
     class POSITION(Enum):
         RETRACTED = 0
@@ -96,12 +96,12 @@ class Climber:
 
         if self.has_climb_finished():
             if self.last_position is not self.POSITION.RETRACTED:
-                self.status_led.no_note()
+                self.status_lights.no_note()
         elif self.has_deploy_finished():
             if self.last_position is not self.POSITION.DEPLOYED:
-                self.status_led.climbing_arm_fully_extended()
+                self.status_lights.climbing_arm_fully_extended()
         elif self.last_position is not self.POSITION.DEPLOYING:
-            self.status_led.climbing_arm_extended()
+            self.status_lights.climbing_arm_extended()
 
         self.climbing_motor.set(self.speed)
         self.speed = 0.0
