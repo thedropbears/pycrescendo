@@ -17,9 +17,13 @@ from wpilib import DigitalInput, DutyCycle, SmartDashboard
 from wpimath.controller import PIDController
 
 from utilities.functions import clamp
+from components.climber import Climber
 
 
 class ShooterComponent:
+
+    climber: Climber
+
     FLYWHEEL_GEAR_RATIO = 1 / (22.0 / 18.0)
     FLYWHEEL_TOLERANCE = 1  # rps
 
@@ -204,6 +208,10 @@ class ShooterComponent:
             ),
         )
         self.inclinator.set(inclinator_speed)
+
+        # stop the flywheels while climbing or permenantly after a complete climb
+        if self.climber.should_lock_mechanisms():
+            self.desired_flywheel_speed = 0
 
         if self.desired_flywheel_speed == 0:
             self.flywheel_left.set_control(NeutralOut())

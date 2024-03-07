@@ -48,6 +48,8 @@ class Climber:
         )
         self.last_position = self.POSITION.RETRACTED
 
+        self.seen_deploy_limit_switch = False
+
     @feedback
     def has_climb_finished(self) -> bool:
         return not self.retract_limit_switch.get() or (
@@ -69,6 +71,15 @@ class Climber:
         self.climbing_motor.enableSoftLimit(
             CANSparkMax.SoftLimitDirection.kReverse, True
         )
+
+    def is_real_climb(self) -> bool:
+        # Climbs in the last 20 seconds are real climbs...
+        return (
+            wpilib.DriverStation.getMatchTime() < 20 and self.seen_deploy_limit_switch
+        )
+
+    def should_lock_mechanisms(self) -> bool:
+        return self.is_real_climb() or not self.has_climb_finished()
 
     def deploy(self) -> None:
         if self.has_deploy_finished():
@@ -99,6 +110,7 @@ class Climber:
                 self.status_lights.climbing_arm_retracted()
                 self.last_position = self.POSITION.RETRACTED
         elif self.has_deploy_finished():
+            self.seen_deploy_limit_switch = True
             if self.last_position is not self.POSITION.DEPLOYED:
                 self.status_lights.climbing_arm_fully_extended()
                 self.last_position = self.POSITION.DEPLOYED

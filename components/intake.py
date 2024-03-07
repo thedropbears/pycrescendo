@@ -13,9 +13,12 @@ from wpimath.controller import ArmFeedforward
 from wpimath.trajectory import TrapezoidProfile
 
 from ids import TalonIds, SparkMaxIds, DioChannels
+from components.climber import Climber
 
 
 class IntakeComponent:
+    climber: Climber
+
     motor_speed = tunable(0.8)
     inject_intake_speed = tunable(0.3)
     inject_shoot_speed = tunable(1.0)
@@ -240,6 +243,12 @@ class IntakeComponent:
             self.stall_detection_enabled = False
         elif self.motor.get_velocity().value > self.INTAKE_RUNNING_VELOCITY:
             self.stall_detection_enabled = True
+
+        # lock the component if climbing or finished a real climb
+        if self.climber.should_lock_mechanisms():
+            self.retract()
+            self.direction = self.Direction.STOPPED
+            self.desired_injector_speed = 0.0
 
         intake_request = VoltageOut(self.direction.value * self.motor_speed * 12.0)
 
