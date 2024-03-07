@@ -169,7 +169,7 @@ class MyRobot(magicbot.MagicRobot):
                 self.shooter_component.MAX_INCLINE_ANGLE,
             )
 
-        self.intake.execute()
+        self.intake_component.execute()
         self.shooter_component.execute()
         self.climber.execute()
 
