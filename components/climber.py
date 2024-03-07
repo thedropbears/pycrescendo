@@ -96,7 +96,7 @@ class Climber:
 
         if self.has_climb_finished():
             if self.last_position is not self.POSITION.RETRACTED:
-                self.status_lights.no_note()
+                self.status_lights.climbing_arm_retracted()
         elif self.has_deploy_finished():
             if self.last_position is not self.POSITION.DEPLOYED:
                 self.status_lights.climbing_arm_fully_extended()
