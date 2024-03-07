@@ -46,6 +46,9 @@ class Shooter(StateMachine):
         self.range = self.translation_to_goal().norm()
         self.shooter_component.set_range(self.range)
 
+    def try_jettison(self):
+        self.engage(self.preparing_to_jettison)
+
     @feedback
     def in_range(self):
         return self.shooter_component.is_range_in_bounds(self.range)

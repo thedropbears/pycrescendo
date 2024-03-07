@@ -38,6 +38,7 @@ class ShooterComponent:
     INCLINATOR_VELOCITY_CONVERSION_FACTOR = (
         INCLINATOR_POSITION_CONVERSION_FACTOR / 60
     )  # rpm -> radians/s
+    INCLINATOR_JETTISON_ANGLE = (MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2
 
     # Add extra point outside our range to ramp speed down to zero
     FLYWHEEL_DISTANCE_LOOKUP = (0, 2.0, 3.0, 4.0, 5.75, 7.75)
@@ -175,6 +176,10 @@ class ShooterComponent:
 
     def coast_down(self) -> None:
         self.desired_flywheel_speed = 0
+
+    def prepare_to_jettison(self) -> None:
+        self.desired_inclinator_angle = self.INCLINATOR_JETTISON_ANGLE
+        self.desired_flywheel_speed = self.FLYWHEEL_JETTISON_SPEED
 
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
