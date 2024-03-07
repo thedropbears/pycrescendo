@@ -10,6 +10,7 @@ from phoenix6.configs import (
     MotorOutputConfigs,
     Slot0Configs,
     FeedbackConfigs,
+    ClosedLoopRampsConfigs,
 )
 from phoenix6.signals import NeutralModeValue
 from wpilib import DigitalInput, DutyCycle, SmartDashboard
@@ -23,6 +24,8 @@ class ShooterComponent:
     FLYWHEEL_TOLERANCE = 1  # rps
 
     FLYWHEEL_SHOOTING_SPEED = 75
+    FLYWHEEL_JETTISON_SPEED = 10
+    FLYWHEEL_RAMP_TIME = 1
 
     MAX_INCLINE_ANGLE = 1.045  # ~60 degrees
     MIN_INCLINE_ANGLE = 0.354  # ~20 degrees
@@ -36,6 +39,7 @@ class ShooterComponent:
     INCLINATOR_VELOCITY_CONVERSION_FACTOR = (
         INCLINATOR_POSITION_CONVERSION_FACTOR / 60
     )  # rpm -> radians/s
+    INCLINATOR_JETTISON_ANGLE = (MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2
 
     # Add extra point outside our range to ramp speed down to zero
     FLYWHEEL_DISTANCE_LOOKUP = (0, 2.0, 3.0, 4.0, 5.75, 7.75)
@@ -98,6 +102,13 @@ class ShooterComponent:
             self.FLYWHEEL_GEAR_RATIO
         )
 
+        flywheel_left_closed_loop_ramp_config = (
+            ClosedLoopRampsConfigs().with_voltage_closed_loop_ramp_period(
+                self.FLYWHEEL_RAMP_TIME
+            )
+        )
+
+        flywheel_left_config.apply(flywheel_left_closed_loop_ramp_config)
         flywheel_left_config.apply(flywheel_motor_config)
         flywheel_left_config.apply(flywheel_pid)
         flywheel_left_config.apply(flywheel_gear_ratio)
@@ -166,6 +177,10 @@ class ShooterComponent:
 
     def coast_down(self) -> None:
         self.desired_flywheel_speed = 0
+
+    def prepare_to_jettison(self) -> None:
+        self.desired_inclinator_angle = self.INCLINATOR_JETTISON_ANGLE
+        self.desired_flywheel_speed = self.FLYWHEEL_JETTISON_SPEED
 
     def execute(self) -> None:
         """This gets called at the end of the control loop"""
