@@ -103,7 +103,7 @@ class Climber:
                 self.status_lights.climbing_arm_fully_extended()
                 self.last_position = self.POSITION.DEPLOYED
         elif self.last_position is not self.POSITION.DEPLOYING:
-            self.status_lights.climbing_arm_extended()
+            self.status_lights.climbing_arm_extending()
             self.last_position = self.POSITION.DEPLOYING
 
         self.climbing_motor.set(self.speed)
