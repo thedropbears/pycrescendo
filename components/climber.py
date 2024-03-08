@@ -97,11 +97,14 @@ class Climber:
         if self.has_climb_finished():
             if self.last_position is not self.POSITION.RETRACTED:
                 self.status_lights.climbing_arm_retracted()
+                self.last_position = self.POSITION.RETRACTED
         elif self.has_deploy_finished():
             if self.last_position is not self.POSITION.DEPLOYED:
                 self.status_lights.climbing_arm_fully_extended()
+                self.last_position = self.POSITION.DEPLOYED
         elif self.last_position is not self.POSITION.DEPLOYING:
             self.status_lights.climbing_arm_extended()
+            self.last_position = self.POSITION.DEPLOYING
 
         self.climbing_motor.set(self.speed)
         self.speed = 0.0
