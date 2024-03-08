@@ -147,24 +147,14 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getXButton():
             self.intake_component.intake()
 
-        # Climbing arm controls
-        if self.gamepad.getLeftBumper():
-            self.climber.deploy()
-
-        if self.gamepad.getRightBumper():
-            self.climber.retract()
-
-        if self.gamepad.getBackButton():
-            self.intake_component.hover()
-
-        if self.gamepad.getLeftTriggerAxis() > 0.5:
+        if self.gamepad.getLeftBumperPressed() > 0.5:
             self.shooter_component.desired_inclinator_angle = clamp(
                 self.shooter_component.desired_inclinator_angle + 0.01,
                 self.shooter_component.MIN_INCLINE_ANGLE,
                 self.shooter_component.MAX_INCLINE_ANGLE,
             )
 
-        if self.gamepad.getRightTriggerAxis() > 0.5:
+        if self.gamepad.getRightBumperPressed():
             self.shooter_component.desired_inclinator_angle = clamp(
                 self.shooter_component.desired_inclinator_angle - 0.01,
                 self.shooter_component.MIN_INCLINE_ANGLE,
