@@ -109,52 +109,46 @@ class Solid(Pattern):
         return self.colour.value
 
 
-@dataclasses.dataclass(eq=False)
-class CommonPattern(ABC, Pattern):
+@dataclasses.dataclass
+class TimeBasedPattern(ABC, Pattern):
     colour: HsvColour
     clock: Callable[[], float] = time.monotonic
-    start_time: float = dataclasses.field(init=False)
-
-    def __post_init__(self) -> None:
-        self.start_time = self.clock()
-
-    def elapsed_time(self) -> float:
-        return self.clock() - self.start_time
 
     @abstractmethod
     def update(self) -> Hsv: ...
 
 
 @dataclasses.dataclass
-class Flash(CommonPattern):
+class Flash(TimeBasedPattern):
     speed: float = FLASH_SPEED
 
     def update(self) -> Hsv:
-        brightness = math.cos(self.speed * self.elapsed_time() * math.tau) >= 0
+        brightness = math.cos(self.speed * self.clock() * math.tau) >= 0
         return self.colour.with_relative_brightness(brightness)
 
 
 @dataclasses.dataclass
-class Breathe(CommonPattern):
+class Breathe(TimeBasedPattern):
     speed: float = BREATHE_SPEED
 
     def update(self) -> Hsv:
-        brightness = (math.sin(self.speed * self.elapsed_time() * math.tau) + 1) / 2
+        brightness = (math.sin(self.speed * self.clock() * math.tau) + 1) / 2
         return self.colour.with_relative_brightness(brightness)
 
 
 @dataclasses.dataclass
-class Rainbow(CommonPattern):
+class Rainbow(TimeBasedPattern):
     speed: float = RAINBOW_SPEED
 
     def update(self) -> Hsv:
-        hue = round(360 * (self.elapsed_time() / self.speed % 1))
+        hue = round(360 * (self.clock() / self.speed % 1))
         return self.colour.with_hue(hue)
 
 
-@dataclasses.dataclass
-class Morse(CommonPattern):
+@dataclasses.dataclass(eq=False)
+class Morse(TimeBasedPattern):
     speed: float = MORSE_SPEED
+    start_time: float = dataclasses.field(init=False)
 
     # NOTE Might be better to read this data from a file?
     MESSAGES = (
@@ -207,8 +201,11 @@ class Morse(CommonPattern):
     SPACE_LENGTH = 4
 
     def __post_init__(self) -> None:
-        super().__post_init__()
+        self.start_time = self.clock()
         self.pick_new_message()
+
+    def elapsed_time(self) -> float:
+        return self.clock() - self.start_time
 
     def update(self) -> Hsv:
         elapsed_time = self.elapsed_time()
