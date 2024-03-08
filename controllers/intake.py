@@ -40,10 +40,14 @@ class Intake(StateMachine):
         if self.intake_component.has_note() or self.cancel_desired:
             self.done()
 
-    @state
+    @state(must_finish=True)
     def outtaking(self) -> None:
+        self.intake_component.hover()
         self.intake_component.backdrive_intake()
+        if not self.outtake_desired:
+            self.done()
 
     @timed_state(duration=0.5, next_state="intaking", must_finish=True)
     def unstall_intake(self) -> None:
+        self.intake_component.hover()
         self.intake_component.backdrive_intake()
