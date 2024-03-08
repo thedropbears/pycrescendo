@@ -77,17 +77,17 @@ class LightStrip:
     def not_in_range(self) -> None:
         self.pattern = Solid(HsvColour.RED)
 
-    def climbing_arm_extended(self) -> None:
+    def climbing_arm_extending(self) -> None:
         self.high_priority_pattern = Flash(HsvColour.YELLOW)
 
-    def climbing_arm_fully_extended(self) -> None:  # Called every tick
+    def climbing_arm_fully_extended(self) -> None:
         self.high_priority_pattern = Solid(HsvColour.YELLOW)
 
     def climbing_arm_retracted(self) -> None:
         self.high_priority_pattern = None
 
     def morse(self) -> None:
-        self.pattern = Morse(HsvColour.YELLOW)
+        self.pattern = Morse(HsvColour.ORANGE)
 
     def rainbow(self) -> None:
         self.pattern = Rainbow(HsvColour.RED)
@@ -216,8 +216,11 @@ class Morse(TimeBasedPattern):
 
     def update(self) -> Hsv:
         elapsed_time = self.elapsed_time()
+
+        # End of the message. Pick new one
         if elapsed_time > self.message_time:
-            return self.colour.value
+            self.pick_new_message()
+            return HsvColour.OFF.value
 
         # TODO Might be better to store current token index and time?
         running_total = 0.0
@@ -261,7 +264,7 @@ class Morse(TimeBasedPattern):
             morse_message += cls.MORSE_TRANSLATION[letter] + " "
 
         # Add some space at end of message
-        morse_message += "  "
+        morse_message += "    "
         return morse_message
 
     @classmethod
