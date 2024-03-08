@@ -233,7 +233,10 @@ class IntakeComponent:
             self.maybe_reindex_deployment_encoder()
 
         # stall detection gating
-        if self.direction is self.Direction.STOPPED:
+        if (
+            self.direction is self.Direction.STOPPED
+            or self.direction is self.Direction.BACKWARD
+        ):
             self.stall_detection_enabled = False
         elif self.motor.get_velocity().value > self.INTAKE_RUNNING_VELOCITY:
             self.stall_detection_enabled = True
