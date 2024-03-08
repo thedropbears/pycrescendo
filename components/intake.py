@@ -27,11 +27,13 @@ class IntakeComponent:
 
     SHAFT_REV_RETRACT_HARD_LIMIT = 1.778579
     SHAFT_REV_DEPLOY_HARD_LIMIT = 0.0
+    SHAFT_REV_HOVER_POINT = SHAFT_REV_DEPLOY_HARD_LIMIT + math.radians(15)
 
     ALLOWABLE_ERROR = 0.01
 
     RETRACTED_STATE = TrapezoidProfile.State(SHAFT_REV_RETRACT_HARD_LIMIT, 0.0)
     DEPLOYED_STATE = TrapezoidProfile.State(SHAFT_REV_DEPLOY_HARD_LIMIT, 0.0)
+    HOVER_STATE = TrapezoidProfile.State(SHAFT_REV_HOVER_POINT, 0.0)
     INTAKE_STALL_VELOCITY = 1  # rot/s below which we consider mechanism stalled
     INTAKE_RUNNING_VELOCITY = 3  # rot/s above which stall detection is enabled
 
@@ -166,6 +168,13 @@ class IntakeComponent:
             self.target_deployment_state = self.RETRACTED_STATE
             self.pid_slot = self.retract_pid_slot
 
+    def hover(self) -> None:
+        # hover a bit off the ground to facilitate outtaking
+        if self.target_deployment_state is not self.HOVER_STATE:
+            self.last_setpoint_update_time = time.monotonic()
+            self.target_deployment_state = self.HOVER_STATE
+            self.pid_slot = self.retract_pid_slot
+
     def intake(self) -> None:
         self.direction = self.Direction.FORWARD
         self.desired_injector_speed = (
@@ -224,7 +233,10 @@ class IntakeComponent:
             self.maybe_reindex_deployment_encoder()
 
         # stall detection gating
-        if self.direction is self.Direction.STOPPED:
+        if (
+            self.direction is self.Direction.STOPPED
+            or self.direction is self.Direction.BACKWARD
+        ):
             self.stall_detection_enabled = False
         elif self.motor.get_velocity().value > self.INTAKE_RUNNING_VELOCITY:
             self.stall_detection_enabled = True
@@ -244,7 +256,10 @@ class IntakeComponent:
         ff = self.feed_forward_calculator.calculate(
             desired_state.position, desired_state.velocity
         )
-        if self.target_deployment_state is self.DEPLOYED_STATE:
+        if (
+            self.target_deployment_state is self.DEPLOYED_STATE
+            or self.target_deployment_state is self.HOVER_STATE
+        ):
             self.pid_controller.setReference(
                 desired_state.position,
                 CANSparkMax.ControlType.kPosition,

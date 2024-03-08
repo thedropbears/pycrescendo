@@ -25,10 +25,15 @@ class Intake(StateMachine):
             self.intake_component.retract()
 
     @state(first=True, must_finish=True)
-    def intaking(self, initial_call) -> None:
+    def dropping_intake(self, initial_call) -> None:
         if initial_call:
             self.status_lights.intake_deployed()
             self.intake_component.deploy()
+        if self.intake_component.is_fully_deployed():
+            self.next_state(self.intaking)
+
+    @state(must_finish=True)
+    def intaking(self) -> None:
         self.intake_component.intake()
 
         if self.intake_component.has_intake_stalled():
@@ -40,10 +45,14 @@ class Intake(StateMachine):
         if self.intake_component.has_note() or self.cancel_desired:
             self.done()
 
-    @state
+    @state(must_finish=True)
     def outtaking(self) -> None:
+        self.intake_component.hover()
         self.intake_component.backdrive_intake()
+        if not self.outtake_desired:
+            self.done()
 
-    @timed_state(duration=0.5, next_state="intaking", must_finish=True)
+    @timed_state(duration=0.5, next_state="dropping_intake", must_finish=True)
     def unstall_intake(self) -> None:
+        self.intake_component.hover()
         self.intake_component.backdrive_intake()

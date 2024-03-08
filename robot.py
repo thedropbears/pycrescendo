@@ -116,8 +116,7 @@ class MyRobot(magicbot.MagicRobot):
 
         # Reverse intake and shoot shooter
         if self.gamepad.getBackButton():
-            self.shooter.try_jettison()
-            self.intake.try_outtake()
+            self.note_manager.jettison()
 
         # Intake
         if self.gamepad.getLeftTriggerAxis() > 0.5:
@@ -154,6 +153,9 @@ class MyRobot(magicbot.MagicRobot):
 
         if self.gamepad.getRightBumper():
             self.climber.retract()
+
+        if self.gamepad.getBackButton():
+            self.intake_component.hover()
 
         if self.gamepad.getLeftTriggerAxis() > 0.5:
             self.shooter_component.desired_inclinator_angle = clamp(

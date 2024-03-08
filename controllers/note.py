@@ -16,6 +16,7 @@ class NoteManager(StateMachine):
     shot_desired = will_reset_to(False)
     intake_desired = will_reset_to(False)
     cancel_intake_desired = will_reset_to(False)
+    jettison_desired = will_reset_to(False)
 
     def __init__(self) -> None:
         self.last_state = ""
@@ -28,6 +29,9 @@ class NoteManager(StateMachine):
 
     def try_shoot(self) -> None:
         self.shot_desired = True
+
+    def jettison(self) -> None:
+        self.jettison_desired = True
 
     @feedback
     def has_note(self) -> bool:
@@ -56,6 +60,10 @@ class NoteManager(StateMachine):
     def holding_note(self) -> None:
         self.shooter.update_range()
 
+        if self.jettison_desired:
+            self.next_state(self.outtaking)
+            return
+
         if self.shooter.in_range():
             self.status_lights.in_range()
             if self.shot_desired:
@@ -71,6 +79,10 @@ class NoteManager(StateMachine):
         if initial_call:
             self.status_lights.no_note()
 
+        if self.jettison_desired:
+            self.next_state(self.outtaking)
+            return
+
         self.shooter.coast_down()
         if self.intake_desired:
             self.shooter.update_range()
@@ -81,3 +93,14 @@ class NoteManager(StateMachine):
 
         elif self.has_note():
             self.next_state(self.holding_note)
+
+    @state(must_finish=True)
+    def outtaking(self) -> None:
+        self.intake.try_outtake()
+        self.shooter.try_jettison()
+
+        if not self.jettison_desired:
+            if self.has_note():
+                self.next_state(self.holding_note)
+            else:
+                self.next_state(self.not_holding_note)
