@@ -53,8 +53,8 @@ class ShooterComponent:
     )
     FLYWHEEL_ANGLE_LOOKUP = (
         MAX_INCLINE_ANGLE,
-        0.81,
-        0.61,
+        0.70,
+        0.56,
         0.48,
         MIN_INCLINE_ANGLE,
         MIN_INCLINE_ANGLE,
