@@ -56,6 +56,19 @@ class LightStrip:
         self.leds.setLength(strip_length)
         self.strip_length = strip_length
 
+        # binary split: 0, 000, 0000
+        # match state, led status, match id
+
+        # 0-255 as it is converted to 8bit binary to send over serial port
+        self.front_panel_instruction = 0b00000000
+
+        self.front_panel_port = wpilib.SerialPort(
+            baudRate=9600, port=wpilib.SerialPort.Port.kUSB2, dataBits=8
+        )
+        self.front_panel_port.setWriteBufferMode(
+            wpilib.SerialPort.WriteBufferMode.kFlushOnAccess
+        )
+
         self.led_data = wpilib.AddressableLED.LEDData()
         self.strip_data = [self.led_data] * strip_length
 
@@ -67,21 +80,38 @@ class LightStrip:
 
     def no_note(self) -> None:
         self.pattern = Solid(HsvColour.OFF)
+        self.front_panel_instruction &= 0b10001111
+        self.send_packet()
 
     def intake_deployed(self) -> None:
         self.pattern = Flash(HsvColour.MAGENTA)
+        self.front_panel_instruction &= 0b10001111
+        self.front_panel_instruction |= 0b001 << 4
+        self.send_packet()
 
     def in_range(self) -> None:
         self.pattern = Solid(HsvColour.GREEN)
+        self.front_panel_instruction &= 0b10001111
+        self.front_panel_instruction |= 0b010 << 4
+        self.send_packet()
 
     def not_in_range(self) -> None:
         self.pattern = Solid(HsvColour.RED)
+        self.front_panel_instruction &= 0b10001111
+        self.front_panel_instruction |= 0b011 << 4
+        self.send_packet()
 
     def climbing_arm_extending(self) -> None:
         self.high_priority_pattern = Flash(HsvColour.YELLOW)
+        self.front_panel_instruction &= 0b10001111
+        self.front_panel_instruction |= 0b100 << 4
+        self.send_packet()
 
     def climbing_arm_fully_extended(self) -> None:
         self.high_priority_pattern = Solid(HsvColour.YELLOW)
+        self.front_panel_instruction &= 0b10001111
+        self.front_panel_instruction |= 0b101 << 4
+        self.send_packet()
 
     def climbing_arm_retracted(self) -> None:
         self.high_priority_pattern = None
@@ -102,6 +132,9 @@ class LightStrip:
             colour = self.high_priority_pattern.update()
         self.led_data.setHSV(*colour)
         self.leds.setData(self.strip_data)
+
+    def send_packet(self) -> None:
+        self.front_panel_port.write(self.front_panel_instruction.to_bytes())
 
 
 class Pattern(Protocol):
