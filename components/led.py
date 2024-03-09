@@ -208,7 +208,6 @@ class Morse(TimeBasedPattern):
     SPACE_LENGTH = 4
 
     def __post_init__(self) -> None:
-        self.start_time = self.clock()
         self.pick_new_message()
 
     def elapsed_time(self) -> float:
