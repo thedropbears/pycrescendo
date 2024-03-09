@@ -66,7 +66,7 @@ class LightStrip:
         self.leds.start()
 
     def no_note(self) -> None:
-        self.pattern = Solid(HsvColour.OFF)
+        self.pattern = Solid(HsvColour.WHITE)
 
     def intake_deployed(self) -> None:
         self.pattern = Flash(HsvColour.MAGENTA)
@@ -93,7 +93,7 @@ class LightStrip:
         self.pattern = Rainbow(HsvColour.RED)
 
     def disabled(self) -> None:
-        self.pattern = Solid(HsvColour.WHITE)
+        self.pattern = Solid(HsvColour.OFF)
 
     def execute(self) -> None:
         if self.high_priority_pattern is None:
