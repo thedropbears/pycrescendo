@@ -67,6 +67,6 @@ def is_red() -> bool:
 
 def get_goal_speaker_position() -> Translation3d:
     if is_red():
-        return RED_SPEAKER_TARGET_POSITION
+        return RED_SPEAKER_POSE.translation()
 
-    return BLUE_SPEAKER_TARGET_POSITION
+    return BLUE_SPEAKER_POSE.translation()
