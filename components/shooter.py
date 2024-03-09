@@ -117,7 +117,7 @@ class ShooterComponent:
         flywheel_right_config.apply(flywheel_pid)
         flywheel_right_config.apply(flywheel_gear_ratio)
 
-        self.inclinator_controller = PIDController(3, 0, 0)
+        self.inclinator_controller = PIDController(0.8, 0, 0.05)
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
         SmartDashboard.putData(self.inclinator_controller)
 
