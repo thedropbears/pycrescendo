@@ -42,21 +42,21 @@ class ShooterComponent:
     INCLINATOR_JETTISON_ANGLE = (MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2
 
     # Add extra point outside our range to ramp speed down to zero
-    FLYWHEEL_DISTANCE_LOOKUP = (0, 2.0, 3.0, 4.0, 5.75, 7.75)
+    FLYWHEEL_DISTANCE_LOOKUP = (1.3, 2.0, 3.0, 4.0, 5.0, 7.0)
     FLYWHEEL_SPEED_LOOKUP = (
-        FLYWHEEL_SHOOTING_SPEED,
-        FLYWHEEL_SHOOTING_SPEED,
-        FLYWHEEL_SHOOTING_SPEED,
-        FLYWHEEL_SHOOTING_SPEED,
-        FLYWHEEL_SHOOTING_SPEED,
+        70,
+        76,
+        76,
+        77,
+        90,
         0,
     )
     FLYWHEEL_ANGLE_LOOKUP = (
-        MAX_INCLINE_ANGLE,
-        0.70,
-        0.56,
-        0.48,
-        MIN_INCLINE_ANGLE,
+        0.96,
+        0.80,
+        0.61,
+        0.50,
+        0.45,
         MIN_INCLINE_ANGLE,
     )
 
@@ -121,8 +121,14 @@ class ShooterComponent:
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
         SmartDashboard.putData(self.inclinator_controller)
 
+        self.range = 0
+
     def on_enable(self) -> None:
         self.inclinator_controller.reset()
+
+    @feedback
+    def current_range(self):
+        return self.range
 
     @feedback
     def is_ready(self) -> bool:
@@ -163,6 +169,7 @@ class ShooterComponent:
         return self.flywheel_left.get_velocity().value
 
     def set_range(self, range: float) -> None:
+        self.range = range
         self.desired_inclinator_angle = float(
             np.interp(range, self.FLYWHEEL_DISTANCE_LOOKUP, self.FLYWHEEL_ANGLE_LOOKUP)
         )
