@@ -147,7 +147,7 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamepad.getXButton():
             self.intake_component.intake()
 
-        if self.gamepad.getLeftBumperPressed() > 0.5:
+        if self.gamepad.getLeftBumperPressed():
             self.shooter_component.desired_inclinator_angle = clamp(
                 self.shooter_component.desired_inclinator_angle + 0.01,
                 self.shooter_component.MIN_INCLINE_ANGLE,
