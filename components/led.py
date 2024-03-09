@@ -244,6 +244,7 @@ class Morse(TimeBasedPattern):
 
     def pick_new_message(self) -> None:
         # QUESTION? Should functions take args or assume previous step already done
+        self.start_time = self.clock()  # Reset the time of the pattern
         self.message = self.random_message()
         self.morse_message = self.translate_message(self.message)
         self.message_length = self.calculate_message_length(self.morse_message)
