@@ -115,6 +115,9 @@ class LightStrip:
 
     def climbing_arm_retracted(self) -> None:
         self.high_priority_pattern = None
+        self.front_panel_instruction &= 0b10001111
+        self.front_panel_instruction |= 0b110 << 4
+        self.send_packet()
 
     def morse(self) -> None:
         self.pattern = Morse(HsvColour.ORANGE)
