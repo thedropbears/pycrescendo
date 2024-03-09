@@ -78,10 +78,10 @@ class LightStrip:
         self.pattern = Solid(HsvColour.RED)
 
     def climbing_arm_extending(self) -> None:
-        self.high_priority_pattern = Solid(HsvColour.YELLOW)
+        self.high_priority_pattern = Flash(HsvColour.YELLOW)
 
     def climbing_arm_fully_extended(self) -> None:
-        self.high_priority_pattern = Solid(HsvColour.ORANGE)
+        self.high_priority_pattern = Solid(HsvColour.YELLOW)
 
     def climbing_arm_retracted(self) -> None:
         self.high_priority_pattern = None
