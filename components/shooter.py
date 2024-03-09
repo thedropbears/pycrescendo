@@ -4,7 +4,7 @@ from magicbot import tunable, feedback
 from rev import CANSparkMax
 from ids import SparkMaxIds, TalonIds, DioChannels
 
-from phoenix6.controls import VelocityVoltage, Follower, VoltageOut
+from phoenix6.controls import VelocityVoltage, Follower, NeutralOut
 from phoenix6.hardware import TalonFX
 from phoenix6.configs import (
     MotorOutputConfigs,
@@ -198,6 +198,6 @@ class ShooterComponent:
         self.inclinator.set(inclinator_speed)
 
         if self.desired_flywheel_speed == 0:
-            self.flywheel_left.set_control(VoltageOut(0))
+            self.flywheel_left.set_control(NeutralOut())
         else:
             self.flywheel_left.set_control(VelocityVoltage(self.desired_flywheel_speed))
