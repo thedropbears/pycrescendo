@@ -121,14 +121,10 @@ class ShooterComponent:
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
         SmartDashboard.putData(self.inclinator_controller)
 
-        self.range = 0
+    range = tunable(0.0)
 
     def on_enable(self) -> None:
         self.inclinator_controller.reset()
-
-    @feedback
-    def current_range(self):
-        return self.range
 
     @feedback
     def is_ready(self) -> bool:
