@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import random
 import typing
 
@@ -78,19 +79,31 @@ def fuzz_xbox_gamepad(gamepad: wpilib.simulation.XboxControllerSim) -> None:
     gamepad.setPOV(rand_pov())
 
 
-def _test_fuzz(
-    control: TestController, station: hal.AllianceStationID, fuzz_disabled_hids: bool
-) -> None:
+def get_alliance_stations() -> list[str]:
+    stations = (1, 2, 3)
+    if "CI" in os.environ:  # pragma: no branch
+        return [
+            f"{alliance}{station}"
+            for alliance in ("Blue", "Red")
+            for station in stations
+        ]
+    else:  # pragma: no cover
+        return [f"Blue{random.choice(stations)}", f"Red{random.choice(stations)}"]
+
+
+@pytest.mark.parametrize("station", get_alliance_stations())
+def test_fuzz(control: TestController, station: str) -> None:
+    station_id = getattr(hal.AllianceStationID, f"k{station}")
+
     with control.run_robot():
         things = AllTheThings()
         hids = DSInputs()
 
         # Disabled mode
         control.step_timing(seconds=0.2, autonomous=False, enabled=False)
-        DriverStationSim.setAllianceStationId(station)
+        DriverStationSim.setAllianceStationId(station_id)
         things.fuzz()
-        if fuzz_disabled_hids:
-            hids.fuzz()
+        hids.fuzz()
         control.step_timing(seconds=0.2, autonomous=False, enabled=False)
 
         # Autonomous mode
@@ -112,24 +125,6 @@ def _test_fuzz(
             control.step_timing(seconds=0.1, autonomous=False, enabled=True)
 
         DriverStationSim.setAllianceStationId(hal.AllianceStationID.kUnknown)
-
-
-alliance_stations = [
-    station
-    for station in hal.AllianceStationID.__members__.values()
-    if station != hal.AllianceStationID.kUnknown
-]
-alliance_station_names = [station.name[1:] for station in alliance_stations]
-
-
-@pytest.mark.parametrize("station", alliance_stations, ids=alliance_station_names)
-def test_fuzz(control: TestController, station: hal.AllianceStationID) -> None:
-    _test_fuzz(control, station, fuzz_disabled_hids=False)
-
-
-@pytest.mark.parametrize("station", alliance_stations, ids=alliance_station_names)
-def test_fuzz_disabled(control: TestController, station: hal.AllianceStationID) -> None:
-    _test_fuzz(control, station, fuzz_disabled_hids=True)
 
 
 def test_fuzz_test(control: TestController) -> None:
