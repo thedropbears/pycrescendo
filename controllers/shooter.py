@@ -2,7 +2,7 @@ import math
 
 from wpimath.geometry import Translation2d
 
-from magicbot import StateMachine, state, timed_state, feedback
+from magicbot import StateMachine, state, timed_state, feedback, tunable
 
 from components.chassis import ChassisComponent
 from components.intake import IntakeComponent
@@ -21,6 +21,8 @@ class Shooter(StateMachine):
     # make sure this is always > chassis heading tolerance
     ANGLE_TOLERANCES = (math.radians(5), math.radians(1))
     RANGES = (0, 5)
+    SPEED_LIMIT = tunable(10)
+    SPINNING_SPEED_LIMIT = tunable(1)
 
     def __init__(self):
         self.range = 0.0
@@ -65,10 +67,19 @@ class Shooter(StateMachine):
                 self.is_aiming_finished()
                 and self.shooter_component.is_ready()
                 and self.in_range()
+                and self.is_below_speed_limit()
+                and self.is_below_spinning_limit()
             ):
                 self.next_state(self.firing)
             else:
                 self.aim()
+
+    def is_below_speed_limit(self) -> bool:
+        vel = self.chassis.get_velocity()
+        return math.hypot(vel.vx, vel.vy) < self.SPEED_LIMIT
+
+    def is_below_spinning_limit(self) -> bool:
+        return self.chassis.get_velocity().omega < self.SPINNING_SPEED_LIMIT
 
     def aim(self) -> None:
         # Update range

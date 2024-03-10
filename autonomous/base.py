@@ -134,27 +134,21 @@ class AutoBase(AutonomousStateMachine):
     @state
     def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
-            last_waypoint = self.shoot_paths_working_copy[0].waypoints[-1]
             self.trajectory = self.calculate_trajectory(
                 self.shoot_paths_working_copy.pop(0)
-            )
-            translation_to_goal = self.translation_to_goal(last_waypoint)
-            self.goal_heading = Rotation2d(
-                math.atan2(translation_to_goal.y, translation_to_goal.x) + math.pi
             )
 
         # Do some driving...
         self.drive_on_trajectory(state_tm)
+        self.note_manager.try_shoot()
 
-        if self.is_at_goal():
-            if self.note_manager.has_note():
-                # If we are in position, remove this note from the list and shoot it
-                self.next_state("shoot_note")
+        if self.note_manager.has_just_fired() or (
+            self.is_at_goal() and not self.note_manager.has_note()
+        ):
+            if len(self.shoot_paths_working_copy) != 0:
+                self.next_state("pick_up")
             else:
-                if len(self.note_paths_working_copy) != 0:
-                    self.next_state("pick_up")
-                else:
-                    self.done()
+                self.done()
 
     def drive_on_trajectory(
         self, trajectory_tm: float, enforce_tangent_heading: bool = False
@@ -171,7 +165,7 @@ class AutoBase(AutonomousStateMachine):
         self.chassis.drive_local(
             chassis_speed.vx,
             chassis_speed.vy,
-            chassis_speed.omega,
+            0,
         )
 
         # if we are enforcing heading, hijack rotational control from the main controller
@@ -184,8 +178,6 @@ class AutoBase(AutonomousStateMachine):
                 )
                 self.goal_heading = Rotation2d(heading_target)
                 self.chassis.snap_to_heading(heading_target)
-        else:
-            self.chassis.snap_to_heading(self.goal_heading.radians())
 
     def calculate_trajectory(self, path: Path) -> Trajectory:
         pose = self.chassis.get_pose()

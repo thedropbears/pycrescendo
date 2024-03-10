@@ -291,6 +291,12 @@ class ChassisComponent:
 
         wpilib.SmartDashboard.putData("Heading PID", self.heading_controller)
 
+    def get_velocity(self) -> ChassisSpeeds:
+        return self.kinematics.toChassisSpeeds(self.get_module_states())
+
+    def get_module_states(self) -> list[SwerveModuleState]:
+        return [module.get() for module in self.modules]
+
     def setup(self) -> None:
         initial_pose = TeamPoses.RED_TEST_POSE if is_red() else TeamPoses.BLUE_TEST_POSE
 
