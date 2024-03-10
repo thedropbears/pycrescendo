@@ -54,7 +54,8 @@ class MyRobot(magicbot.MagicRobot):
         self.field = wpilib.Field2d()
         wpilib.SmartDashboard.putData(self.field)
 
-        self.status_lights_strip_length = 144
+        # side: (28*3)*2 + front: (30*3) - 2 (R.I.P)
+        self.status_lights_strip_length = 172
 
         self.vision_port_name = "ardu_cam_port"
         self.vision_port_pos = Translation3d(0.005, 0.221, 0.503)

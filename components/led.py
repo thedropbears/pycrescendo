@@ -60,12 +60,13 @@ class LightStrip:
         self.strip_data = [self.led_data] * strip_length
 
         self.pattern: Pattern = Rainbow(HsvColour.MAGENTA)
+        self.high_priority_pattern: Pattern | None = None
 
         self.leds.setData(self.strip_data)
         self.leds.start()
 
     def no_note(self) -> None:
-        self.pattern = Breathe(HsvColour.OFF)
+        self.pattern = Solid(HsvColour.OFF)
 
     def intake_deployed(self) -> None:
         self.pattern = Flash(HsvColour.MAGENTA)
@@ -76,23 +77,29 @@ class LightStrip:
     def not_in_range(self) -> None:
         self.pattern = Solid(HsvColour.RED)
 
-    def climbing_arm_extended(self) -> None:
-        self.pattern = Flash(HsvColour.YELLOW)
+    def climbing_arm_extending(self) -> None:
+        self.high_priority_pattern = Flash(HsvColour.YELLOW)
 
     def climbing_arm_fully_extended(self) -> None:
-        self.pattern = Solid(HsvColour.YELLOW)
+        self.high_priority_pattern = Solid(HsvColour.YELLOW)
+
+    def climbing_arm_retracted(self) -> None:
+        self.high_priority_pattern = None
 
     def morse(self) -> None:
-        self.pattern = Morse(HsvColour.YELLOW)
+        self.pattern = Morse(HsvColour.ORANGE)
 
     def rainbow(self) -> None:
         self.pattern = Rainbow(HsvColour.RED)
 
     def disabled(self) -> None:
-        self.pattern = Solid(HsvColour.WHITE)
+        self.pattern = Solid(HsvColour.OFF)
 
     def execute(self) -> None:
-        colour = self.pattern.update()
+        if self.high_priority_pattern is None:
+            colour = self.pattern.update()
+        else:
+            colour = self.high_priority_pattern.update()
         self.led_data.setHSV(*colour)
         self.leds.setData(self.strip_data)
 
@@ -201,7 +208,6 @@ class Morse(TimeBasedPattern):
     SPACE_LENGTH = 4
 
     def __post_init__(self) -> None:
-        self.start_time = self.clock()
         self.pick_new_message()
 
     def elapsed_time(self) -> float:
@@ -209,8 +215,11 @@ class Morse(TimeBasedPattern):
 
     def update(self) -> Hsv:
         elapsed_time = self.elapsed_time()
+
+        # End of the message. Pick new one
         if elapsed_time > self.message_time:
-            return self.colour.value
+            self.pick_new_message()
+            return HsvColour.OFF.value
 
         # TODO Might be better to store current token index and time?
         running_total = 0.0
@@ -234,6 +243,7 @@ class Morse(TimeBasedPattern):
 
     def pick_new_message(self) -> None:
         # QUESTION? Should functions take args or assume previous step already done
+        self.start_time = self.clock()  # Reset the time of the pattern
         self.message = self.random_message()
         self.morse_message = self.translate_message(self.message)
         self.message_length = self.calculate_message_length(self.morse_message)
@@ -254,7 +264,7 @@ class Morse(TimeBasedPattern):
             morse_message += cls.MORSE_TRANSLATION[letter] + " "
 
         # Add some space at end of message
-        morse_message += "  "
+        morse_message += "    "
         return morse_message
 
     @classmethod
