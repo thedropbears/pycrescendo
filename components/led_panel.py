@@ -2,6 +2,14 @@ import wpilib
 
 
 class LEDPanel:
+    # Key: Match number, Value: Drop Bears match number (<=15)
+    # TODO: Fill with proper values when the draw comes out
+    matches: dict[int, int] = {
+        1: 1,
+        2: 2,
+        3: 3,
+    }
+
     def __init__(self) -> None:
         # custom packet: 0, 000, 0000
         # match state, led status, match id
@@ -9,9 +17,24 @@ class LEDPanel:
         self.panel_port = wpilib.SerialPort(
             baudRate=9600, port=wpilib.SerialPort.Port.kUSB2, dataBits=8
         )
+        self.set_match_id()
 
     def send_packet(self) -> None:
         self.panel_port.write(self.packet.to_bytes())
+
+    def set_match_id(self) -> None:
+        match_type = wpilib.DriverStation.getMatchType()
+        match_id = 0
+        if (
+            match_type == wpilib.DriverStation.MatchType.kQualification
+            or match_type == wpilib.DriverStation.MatchType.kElimination
+        ):
+            match_id = self.matches[wpilib.DriverStation.getMatchNumber()]
+            # Can't be greater than 15 as it is sent as 4bits
+            match_id = max(match_id, 15)
+
+        self.packet |= match_id
+        self.send_packet()
 
     def no_note(self) -> None:
         self.packet &= 0b10001111
