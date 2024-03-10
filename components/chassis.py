@@ -92,7 +92,7 @@ class SwerveModule:
         )
 
         # configuration for motor pid
-        steer_pid = Slot0Configs().with_k_p(3).with_k_i(0).with_k_d(0.1)
+        steer_pid = Slot0Configs().with_k_p(2.4206).with_k_i(0).with_k_d(0.060654)
         steer_closed_loop_config = ClosedLoopGeneralConfigs()
         steer_closed_loop_config.continuous_wrap = True
 
