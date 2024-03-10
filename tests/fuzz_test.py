@@ -81,13 +81,13 @@ def fuzz_xbox_gamepad(gamepad: wpilib.simulation.XboxControllerSim) -> None:
 
 def get_alliance_stations() -> list[str]:
     stations = (1, 2, 3)
-    if "CI" in os.environ:
+    if "CI" in os.environ:  # pragma: no branch
         return [
             f"{alliance}{station}"
             for alliance in ("Blue", "Red")
             for station in stations
         ]
-    else:
+    else:  # pragma: no cover
         return [f"Blue{random.choice(stations)}", f"Red{random.choice(stations)}"]
 
 
