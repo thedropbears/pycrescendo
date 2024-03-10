@@ -66,7 +66,7 @@ class LightStrip:
         self.leds.start()
 
     def no_note(self) -> None:
-        self.pattern = Solid(HsvColour.WHITE)
+        self.pattern = Solid(HsvColour.OFF)
 
     def intake_deployed(self) -> None:
         self.pattern = Flash(HsvColour.MAGENTA)

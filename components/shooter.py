@@ -157,7 +157,9 @@ class ShooterComponent:
 
     def is_range_in_bounds(self, range) -> bool:
         return (
-            self.FLYWHEEL_DISTANCE_LOOKUP[0] < range < self.FLYWHEEL_DISTANCE_LOOKUP[-1]
+            self.FLYWHEEL_DISTANCE_LOOKUP[0]
+            < range
+            <= self.FLYWHEEL_DISTANCE_LOOKUP[-2]
         )
 
     @feedback
