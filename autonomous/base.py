@@ -20,7 +20,6 @@ from wpimath.spline import Spline3
 
 from utilities.position import Path
 import utilities.game as game
-from utilities.game import get_goal_speaker_position
 
 from components.chassis import ChassisComponent
 from components.intake import IntakeComponent
@@ -36,7 +35,7 @@ class AutoBase(AutonomousStateMachine):
     intake_component: IntakeComponent
 
     POSITION_TOLERANCE = 0.05
-    SHOOTING_POSITION_TOLERANCE = 0.5
+    SHOOTING_POSITION_TOLERANCE = 1
     ANGLE_TOLERANCE = math.radians(5)
     MAX_VEL = 4
     MAX_ACCEL = 3
@@ -64,12 +63,7 @@ class AutoBase(AutonomousStateMachine):
         # Since robot is stationary from one action to another, point the control vector at the goal to avoid the robot taking unnecessary turns before moving towards the goal
         self.kD = 0.3
 
-        for i, path in enumerate(self.shoot_paths):
-            self.shoot_paths[i].final_heading = rotation_to_red_speaker(
-                path.waypoints[-1]
-            )
-
-        self.goal_heading: Rotation2d
+        self.goal_heading: float
         self.trajectory_marker = self.field.getObject("auto_trajectory")
         self.trajectory: Optional[Trajectory] = None
 
@@ -136,16 +130,13 @@ class AutoBase(AutonomousStateMachine):
         self.note_manager.try_intake()
 
         # Drive with the intake always facing the tangent
-        self.drive_on_trajectory(state_tm, enforce_tangent_heading=True)
+        self.drive_on_trajectory(state_tm)
 
         if self.note_manager.has_note() or self.is_at_goal():
             # Check if we have a note collected
             # Return heading control to path controller
             self.chassis.stop_snapping()
             self.next_state(self.drive_and_shoot)
-
-    def translation_to_goal(self, position: Translation2d) -> Translation2d:
-        return get_goal_speaker_position().toTranslation2d() - position
 
     @state
     def drive_and_shoot(self, state_tm: float, initial_call: bool) -> None:
@@ -169,9 +160,7 @@ class AutoBase(AutonomousStateMachine):
             else:
                 self.done()
 
-    def drive_on_trajectory(
-        self, trajectory_tm: float, enforce_tangent_heading: bool = False
-    ):
+    def drive_on_trajectory(self, trajectory_tm: float):
         if not self.trajectory:
             return
 
@@ -182,7 +171,7 @@ class AutoBase(AutonomousStateMachine):
         chassis_speed = self.drive_controller.calculate(
             self.chassis.get_pose(),
             target_state,
-            self.goal_heading,
+            Rotation2d(self.goal_heading),
         )
         self.chassis.drive_local(
             chassis_speed.vx,
@@ -190,16 +179,9 @@ class AutoBase(AutonomousStateMachine):
             0,
         )
 
-        # if we are enforcing heading, hijack rotational control from the main controller
-        if enforce_tangent_heading:
-            speed = Translation2d(chassis_speed.vx, chassis_speed.vy).norm()
-            if speed > self.ENFORCE_HEADING_SPEED:
-                field_chassis_speeds = self.chassis.to_field_oriented(chassis_speed)
-                heading_target = math.atan2(
-                    field_chassis_speeds.vy, field_chassis_speeds.vx
-                )
-                self.goal_heading = Rotation2d(heading_target)
-                self.chassis.snap_to_heading(heading_target)
+        # let aiming override path headings
+        if not self.note_manager.shooter.is_executing:
+            self.chassis.snap_to_heading(self.goal_heading)
 
     def calculate_trajectory(self, path: Path) -> Trajectory:
         pose = self.chassis.get_pose()
@@ -215,7 +197,7 @@ class AutoBase(AutonomousStateMachine):
                 for waypoint in path.waypoints[:-1]
             ]
             self.goal = game.field_flip_translation2d(path.waypoints[-1])
-            self.goal_heading = game.field_flip_rotation2d(path.final_heading)
+            self.goal_heading = game.field_flip_angle(path.final_heading)
 
         traj_config = TrajectoryConfig(
             maxVelocity=self.MAX_VEL, maxAcceleration=self.MAX_ACCEL
@@ -256,6 +238,16 @@ class AutoBase(AutonomousStateMachine):
         except Exception:
             return Trajectory([Trajectory.State(0, 0, 0, pose)])
 
+        # face along final path leg if we are not trying to shoot
+        if not path.face_target:
+            waypoints = path.waypoints
+            endpoint = waypoints[-1]
+            # second last pose might be our our current pose
+            second_last = waypoints[-2] if len(waypoints) > 1 else pose.translation()
+            disp = endpoint - second_last
+            heading_target = math.atan2(disp.y, disp.x)
+            self.goal_heading = heading_target
+
         self.trajectory_marker.setTrajectory(trajectory)
         return trajectory
 
@@ -268,8 +260,3 @@ class AutoBase(AutonomousStateMachine):
         self.chassis.stop_snapping()
         self.trajectory_marker.setPoses([])
         super().done()
-
-
-def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
-    t = game.RED_SPEAKER_POSE.toPose2d().translation() - position
-    return t.angle() + Rotation2d(math.pi)

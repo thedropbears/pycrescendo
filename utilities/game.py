@@ -1,3 +1,4 @@
+import math
 import typing
 
 import robotpy_apriltag
@@ -58,6 +59,10 @@ def field_flip_rotation2d(r: Rotation2d):
     return Rotation2d(-r.cos(), r.sin())
 
 
+def field_flip_angle(r: float):
+    return math.atan2(math.sin(r + math.pi), math.cos(r + math.pi))
+
+
 def field_flip_translation2d(t: Translation2d):
     return Translation2d(FIELD_LENGTH - t.x, t.y)
 
@@ -72,3 +77,7 @@ def get_goal_speaker_position() -> Translation3d:
         return RED_SPEAKER_POSE.translation()
 
     return BLUE_SPEAKER_POSE.translation()
+
+
+def translation_to_goal(position: Translation2d) -> Translation2d:
+    return get_goal_speaker_position().toTranslation2d() - position
