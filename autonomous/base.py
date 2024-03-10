@@ -1,6 +1,7 @@
 import math
 from typing import Optional
 from magicbot.state_machine import AutonomousStateMachine, state
+from magicbot import feedback
 from wpimath.trajectory import (
     TrajectoryConfig,
     Trajectory,
@@ -35,6 +36,7 @@ class AutoBase(AutonomousStateMachine):
     intake_component: IntakeComponent
 
     POSITION_TOLERANCE = 0.05
+    SHOOTING_POSITION_TOLERANCE = 0.5
     ANGLE_TOLERANCE = math.radians(5)
     MAX_VEL = 4
     MAX_ACCEL = 3
@@ -69,6 +71,7 @@ class AutoBase(AutonomousStateMachine):
 
         self.goal_heading: Rotation2d
         self.trajectory_marker = self.field.getObject("auto_trajectory")
+        self.trajectory: Optional[Trajectory] = None
 
     def on_enable(self):
         # Setup starting position in the simulator
@@ -78,6 +81,15 @@ class AutoBase(AutonomousStateMachine):
                 starting_pose = game.field_flip_pose2d(self.starting_pose)
             self.chassis.set_pose(starting_pose)
         super().on_enable()
+
+    @feedback
+    def is_close_enough_to_shoot(self) -> bool:
+        if self.trajectory:
+            last = self.trajectory.sample(self.trajectory.totalTime())
+            return (
+                last.pose.translation() - self.chassis.get_pose().translation()
+            ).norm() < self.SHOOTING_POSITION_TOLERANCE
+        return False
 
     @state(first=True)
     def initialise(self) -> None:
@@ -120,19 +132,17 @@ class AutoBase(AutonomousStateMachine):
         # Drive with the intake always facing the tangent
         self.drive_on_trajectory(state_tm, enforce_tangent_heading=True)
 
-        if self.note_manager.has_note():
+        if self.note_manager.has_note() or self.is_at_goal():
             # Check if we have a note collected
             # Return heading control to path controller
             self.chassis.stop_snapping()
-            self.next_state("drive_to_shoot")
-        if self.is_at_goal():
-            self.next_state(self.drive_to_shoot)
+            self.next_state(self.drive_and_shoot)
 
     def translation_to_goal(self, position: Translation2d) -> Translation2d:
         return get_goal_speaker_position().toTranslation2d() - position
 
     @state
-    def drive_to_shoot(self, state_tm: float, initial_call: bool) -> None:
+    def drive_and_shoot(self, state_tm: float, initial_call: bool) -> None:
         if initial_call:
             self.trajectory = self.calculate_trajectory(
                 self.shoot_paths_working_copy.pop(0)
@@ -140,7 +150,10 @@ class AutoBase(AutonomousStateMachine):
 
         # Do some driving...
         self.drive_on_trajectory(state_tm)
-        self.note_manager.try_shoot()
+
+        # And maybe some shooting...
+        if self.is_close_enough_to_shoot():
+            self.note_manager.try_shoot()
 
         if self.note_manager.has_just_fired() or (
             self.is_at_goal() and not self.note_manager.has_note()
@@ -153,6 +166,9 @@ class AutoBase(AutonomousStateMachine):
     def drive_on_trajectory(
         self, trajectory_tm: float, enforce_tangent_heading: bool = False
     ):
+        if not self.trajectory:
+            return
+
         # Grabbing the target position at the current point in time from the trajectory.
         target_state = self.trajectory.sample(trajectory_tm)
 
