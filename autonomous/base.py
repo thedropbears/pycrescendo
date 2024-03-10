@@ -36,8 +36,8 @@ class AutoBase(AutonomousStateMachine):
 
     POSITION_TOLERANCE = 0.05
     ANGLE_TOLERANCE = math.radians(5)
-    MAX_VEL = 3
-    MAX_ACCEL = 2
+    MAX_VEL = 4
+    MAX_ACCEL = 3
     ENFORCE_HEADING_SPEED = MAX_VEL / 6
 
     def __init__(
