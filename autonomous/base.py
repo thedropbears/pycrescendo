@@ -52,8 +52,8 @@ class AutoBase(AutonomousStateMachine):
         self.starting_pose = starting_pose
 
     def setup(self) -> None:
-        x_controller = PIDController(2.5, 0, 0)
-        y_controller = PIDController(2.5, 0, 0)
+        x_controller = PIDController(3.5, 0, 0.4)
+        y_controller = PIDController(3.5, 0, 0.4)
         heading_controller = self.chassis.heading_controller
 
         self.drive_controller = HolonomicDriveController(

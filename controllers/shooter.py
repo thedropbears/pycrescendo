@@ -86,7 +86,7 @@ class Shooter(StateMachine):
         translation_to_goal = self.translation_to_goal()
 
         # We need to aim at least a note's radius inside the outer bounds of the goal. Also add a safety margin
-        margin = 0.05
+        margin = 0.10
         offset = (SPEAKER_HOOD_WIDTH - NOTE_DIAMETER) / 2.0 - margin
         offset_bearing = constrain_angle(
             math.atan2(translation_to_goal.y + offset, translation_to_goal.x) + math.pi
