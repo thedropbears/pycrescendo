@@ -3,7 +3,7 @@ import math
 
 from phoenix6.hardware import TalonFX, CANcoder
 from phoenix6.controls import VoltageOut, VelocityVoltage, PositionDutyCycle
-from phoenix6.signals import InvertedValue, NeutralModeValue, StaticFeedforwardSignValue
+from phoenix6.signals import InvertedValue, NeutralModeValue
 from phoenix6.configs import (
     ClosedLoopGeneralConfigs,
     MotorOutputConfigs,
@@ -92,16 +92,7 @@ class SwerveModule:
         )
 
         # configuration for motor pid
-        steer_pid = (
-            Slot0Configs()
-            .with_k_p(2.4206)
-            .with_k_i(0)
-            .with_k_d(0.060654)
-            .with_k_s(0.16784)
-            .with_static_feedforward_sign(
-                StaticFeedforwardSignValue.USE_CLOSED_LOOP_SIGN
-            )
-        )
+        steer_pid = Slot0Configs().with_k_p(2.4206).with_k_i(0).with_k_d(0.060654)
         steer_closed_loop_config = ClosedLoopGeneralConfigs()
         steer_closed_loop_config.continuous_wrap = True
 
