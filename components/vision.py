@@ -7,6 +7,7 @@ import wpiutil.log
 from magicbot import tunable
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.photonTrackedTarget import PhotonTrackedTarget
+from wpimath import objectToRobotPose
 from wpimath.geometry import Pose2d, Rotation3d, Transform3d, Translation3d, Pose3d
 
 from components.chassis import ChassisComponent
@@ -43,7 +44,8 @@ class VisualLocalizer:
         chassis: ChassisComponent,
     ) -> None:
         self.camera = PhotonCamera(name)
-        self.camera_to_robot = Transform3d(pos, rot).inverse()
+        self.robot_to_camera = Transform3d(pos, rot)
+        self.camera_to_robot = self.robot_to_camera.inverse()
         self.last_timestamp = -1
         self.last_recieved_timestep = -1.0
 
@@ -111,7 +113,7 @@ class VisualLocalizer:
                 if target.getPoseAmbiguity() > 0.25:
                     continue
 
-                poses = estimate_poses_from_apriltag(self.camera_to_robot, target)
+                poses = estimate_poses_from_apriltag(self.robot_to_camera, target)
                 if poses is None:
                     # tag doesn't exist
                     continue
@@ -151,22 +153,20 @@ class VisualLocalizer:
 
 
 def estimate_poses_from_apriltag(
-    cam_to_robot: Transform3d, target: PhotonTrackedTarget
+    robot_to_camera: Transform3d, target: PhotonTrackedTarget
 ) -> Optional[tuple[Pose2d, Pose2d, float]]:
     tag_id = target.getFiducialId()
     tag_pose = apriltag_layout.getTagPose(tag_id)
     if tag_pose is None:
         return None
 
-    best_pose = tag_pose.transformBy(
-        target.getBestCameraToTarget().inverse()
-    ).transformBy(cam_to_robot)
-    alternate_pose = (
-        tag_pose.transformBy(target.getAlternateCameraToTarget().inverse())
-        .transformBy(cam_to_robot)
-        .toPose2d()
+    best_pose = objectToRobotPose(
+        tag_pose, target.getBestCameraToTarget(), robot_to_camera
     )
-    return best_pose.toPose2d(), alternate_pose, best_pose.z
+    alternate_pose = objectToRobotPose(
+        tag_pose, target.getAlternateCameraToTarget(), robot_to_camera
+    )
+    return best_pose.toPose2d(), alternate_pose.toPose2d(), best_pose.z
 
 
 def get_target_skew(target: PhotonTrackedTarget) -> float:
