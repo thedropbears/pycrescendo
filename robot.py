@@ -12,6 +12,7 @@ from components.shooter import ShooterComponent
 from components.intake import IntakeComponent
 from components.climber import Climber
 from components.led import LightStrip
+from components.led_panel import LEDPanel
 
 from controllers.note import NoteManager
 from controllers.intake import Intake
@@ -38,6 +39,7 @@ class MyRobot(magicbot.MagicRobot):
     intake_component: IntakeComponent
 
     status_lights: LightStrip
+    led_panel: LEDPanel
 
     max_speed = magicbot.tunable(4)  # m/s
     lower_max_speed = magicbot.tunable(2)  # m/s
