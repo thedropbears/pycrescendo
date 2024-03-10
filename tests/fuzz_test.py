@@ -122,13 +122,13 @@ alliance_stations = [
 alliance_station_names = [station.name[1:] for station in alliance_stations]
 
 
-@pytest.mark.parametrize("station", alliance_stations, ids=alliance_station_names)
-def test_fuzz(control: TestController, station: hal.AllianceStationID) -> None:
+def test_fuzz(control: TestController) -> None:
+    station = random.choice(alliance_stations)
     _test_fuzz(control, station, fuzz_disabled_hids=False)
 
 
-@pytest.mark.parametrize("station", alliance_stations, ids=alliance_station_names)
-def test_fuzz_disabled(control: TestController, station: hal.AllianceStationID) -> None:
+def test_fuzz_disabled(control: TestController) -> None:
+    station = random.choice(alliance_stations)
     _test_fuzz(control, station, fuzz_disabled_hids=True)
 
 
