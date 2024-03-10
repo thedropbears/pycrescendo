@@ -87,11 +87,13 @@ class NoteManager(StateMachine):
         if self.intake_desired:
             self.shooter.update_range()
             self.intake.engage()
+        elif wpilib.DriverStation.isAutonomous():
+            self.shooter.update_range()
 
-        elif self.cancel_intake_desired:
+        if self.cancel_intake_desired:
             self.intake.try_cancel_intake()
 
-        elif self.has_note():
+        if self.has_note():
             self.next_state(self.holding_note)
 
     @state(must_finish=True)
