@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import random
 import typing
 
@@ -114,22 +115,30 @@ def _test_fuzz(
         DriverStationSim.setAllianceStationId(hal.AllianceStationID.kUnknown)
 
 
-alliance_stations = [
-    station
-    for station in hal.AllianceStationID.__members__.values()
-    if station != hal.AllianceStationID.kUnknown
-]
-alliance_station_names = [station.name[1:] for station in alliance_stations]
+def get_alliance_stations(for_disabled: bool = False) -> list[str]:
+    stations = (1, 2, 3)
+    if "CI" in os.environ:
+        return [
+            f"{alliance}{station}"
+            for alliance in ("Blue", "Red")
+            for station in stations
+        ]
+    elif for_disabled:
+        return [f"Blue{random.choice(stations)}"]
+    else:
+        return [f"Red{random.choice(stations)}"]
 
 
-@pytest.mark.parametrize("station", alliance_stations, ids=alliance_station_names)
-def test_fuzz(control: TestController, station: hal.AllianceStationID) -> None:
-    _test_fuzz(control, station, fuzz_disabled_hids=False)
+@pytest.mark.parametrize("station", get_alliance_stations())
+def test_fuzz(control: TestController, station: str) -> None:
+    station_id = getattr(hal.AllianceStationID, f"k{station}")
+    _test_fuzz(control, station_id, fuzz_disabled_hids=False)
 
 
-@pytest.mark.parametrize("station", alliance_stations, ids=alliance_station_names)
-def test_fuzz_disabled(control: TestController, station: hal.AllianceStationID) -> None:
-    _test_fuzz(control, station, fuzz_disabled_hids=True)
+@pytest.mark.parametrize("station", get_alliance_stations(for_disabled=True))
+def test_fuzz_disabled(control: TestController, station: str) -> None:
+    station_id = getattr(hal.AllianceStationID, f"k{station}")
+    _test_fuzz(control, station_id, fuzz_disabled_hids=True)
 
 
 def test_fuzz_test(control: TestController) -> None:
