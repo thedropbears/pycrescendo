@@ -140,6 +140,16 @@ class MyRobot(magicbot.MagicRobot):
         elif self.gamepad.getYButton():
             self.intake_component.retract()
 
+        dpad = self.gamepad.getPOV()
+        if dpad != -1:
+            if is_red():
+                self.chassis.snap_to_heading(-math.radians(dpad) + math.pi)
+            else:
+                self.chassis.snap_to_heading(-math.radians(dpad))
+        else:
+            self.chassis.stop_snapping()
+            self.chassis.drive_local(0, 0, 0)
+
         # injecting
         if self.gamepad.getBButton():
             self.intake_component.feed_shooter()
@@ -164,6 +174,7 @@ class MyRobot(magicbot.MagicRobot):
         self.intake_component.execute()
         self.shooter_component.execute()
         self.climber.execute()
+        self.chassis.execute()
 
         self.chassis.update_odometry()
 
