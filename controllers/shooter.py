@@ -18,7 +18,7 @@ class Shooter(StateMachine):
     intake_component: IntakeComponent
     status_lights: LightStrip
 
-    SPEED_LIMIT = tunable(10)
+    SPEED_LIMIT = tunable(1)
     SPINNING_SPEED_LIMIT = tunable(1)
 
     def __init__(self):
