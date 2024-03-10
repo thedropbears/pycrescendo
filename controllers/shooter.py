@@ -18,9 +18,6 @@ class Shooter(StateMachine):
     intake_component: IntakeComponent
     status_lights: LightStrip
 
-    # make sure this is always > chassis heading tolerance
-    ANGLE_TOLERANCES = (math.radians(5), math.radians(1))
-    RANGES = (0, 5)
     SPEED_LIMIT = tunable(10)
     SPINNING_SPEED_LIMIT = tunable(1)
 
