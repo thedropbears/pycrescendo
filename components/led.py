@@ -54,13 +54,15 @@ class HsvColour(Enum):
 class LightStrip:
     led_panel: LEDPanel
 
-    def __init__(self, strip_length: int) -> None:
+    def __init__(self) -> None:
         self.leds = wpilib.AddressableLED(PwmChannels.led_strip)
-        self.leds.setLength(strip_length)
-        self.strip_length = strip_length
+
+        self.strip_length = (28 * 3) * 2 + (30 * 3) - 2
+        self.leds.setLength(self.strip_length)
+        self.strip_length = self.strip_length
 
         self.led_data = wpilib.AddressableLED.LEDData()
-        self.strip_data = [self.led_data] * strip_length
+        self.strip_data = [self.led_data] * self.strip_length
 
         self.pattern: Pattern = Rainbow(HsvColour.MAGENTA)
         self.high_priority_pattern: Pattern | None = None
