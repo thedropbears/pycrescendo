@@ -94,18 +94,10 @@ class VisualLocalizer:
 
             if self.should_log:
                 self.multi_best_log.setPose(
-                    Pose2d(
-                        p.best.x,
-                        p.best.y,
-                        p.best.rotation().toRotation2d().radians(),
-                    )
+                    Pose2d(p.best.x, p.best.y, p.best.rotation().toRotation2d())
                 )
                 self.multi_alt_log.setPose(
-                    Pose2d(
-                        p.alt.x,
-                        p.alt.y,
-                        p.alt.rotation().toRotation2d().radians(),
-                    )
+                    Pose2d(p.alt.x, p.alt.y, p.alt.rotation().toRotation2d())
                 )
         else:
             for target in results.getTargets():
@@ -133,18 +125,14 @@ class VisualLocalizer:
                         Pose2d(
                             target.bestCameraToTarget.x,
                             target.bestCameraToTarget.y,
-                            target.bestCameraToTarget.rotation()
-                            .toRotation2d()
-                            .radians(),
+                            target.bestCameraToTarget.rotation().toRotation2d(),
                         )
                     )
                     self.single_alt_log.setPose(
                         Pose2d(
                             target.altCameraToTarget.x,
                             target.altCameraToTarget.y,
-                            target.altCameraToTarget.rotation()
-                            .toRotation2d()
-                            .radians(),
+                            target.altCameraToTarget.rotation().toRotation2d(),
                         )
                     )
 
