@@ -227,7 +227,7 @@ class ChassisComponent:
     def __init__(self) -> None:
         self.imu = navx.AHRS.create_spi()
         self.heading_controller = ProfiledPIDControllerRadians(
-            4, 0, 0, TrapezoidProfileRadians.Constraints(5, 5)
+            3, 0, 0, TrapezoidProfileRadians.Constraints(100, 100)
         )
         self.heading_controller.enableContinuousInput(-math.pi, math.pi)
         self.snapping_to_heading = False
@@ -288,6 +288,8 @@ class ChassisComponent:
         self.measurements_publisher = module_states_table.getStructArrayTopic(
             "measured", SwerveModuleState
         ).publish()
+
+        wpilib.SmartDashboard.putData("Heading PID", self.heading_controller)
 
     def setup(self) -> None:
         initial_pose = TeamPoses.RED_TEST_POSE if is_red() else TeamPoses.BLUE_TEST_POSE
