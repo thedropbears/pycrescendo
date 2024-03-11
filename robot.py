@@ -17,10 +17,12 @@ from controllers.note import NoteManager
 from controllers.intake import Intake
 from controllers.shooter import Shooter
 
+from autonomous.base import AutoBase
 
 from utilities.game import is_red
 from utilities.scalers import rescale_js
 from utilities.functions import clamp
+from utilities.position import on_same_side_of_stage
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -191,11 +193,24 @@ class MyRobot(magicbot.MagicRobot):
         self.vision_port.execute()
         self.vision_starboard.execute()
 
+        # check if we can see targets
         if (
             not self.vision_port.sees_target()
             and not self.vision_starboard.sees_target()
         ):
-            self.status_lights.invalid_start()
+            self.status_lights.no_vision()
+        else:
+            # check we start on the correct side of the stage
+            selected_auto = self._automodes.chooser.getSelected()
+            if isinstance(selected_auto, AutoBase):
+                intended_start_pose = selected_auto.get_starting_pose()
+                if intended_start_pose is not None:
+                    if on_same_side_of_stage(
+                        intended_start_pose, self.chassis.get_pose()
+                    ):
+                        self.status_lights.rainbow()
+                    else:
+                        self.status_lights.invalid_start()
 
     def autonomousInit(self) -> None:
         pass
