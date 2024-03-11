@@ -14,6 +14,9 @@ class Path:
         self.final_heading = Rotation2d(0)
 
 
+stage_tolerance = 0.35
+
+
 class NotePositions:
     # These are the 3 close notes, named for the nearest element
     amp = Translation2d(13.645, 7.00045)
@@ -29,9 +32,13 @@ class NotePositions:
 
     # The podium note is very close to the stage leg so we need different positions to avoid collisions
     # Directions are in the field coordinate system for red side
-    podium_NW = podium + Translation2d(0.5, 0.5)
-    podium_NE = podium + Translation2d(0.5, -0.5)
-    podium_N = podium + Translation2d(0.5, 0)
+    podium_N = podium + Translation2d(stage_tolerance, 0)
+    podium_NW = podium + Translation2d(
+        stage_tolerance / math.sqrt(2), stage_tolerance / math.sqrt(2)
+    )
+    podium_NE = podium + Translation2d(
+        stage_tolerance / math.sqrt(2), -stage_tolerance / math.sqrt(2)
+    )
 
 
 class ShootingPositions:

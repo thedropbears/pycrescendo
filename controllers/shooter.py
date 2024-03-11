@@ -2,7 +2,7 @@ import math
 
 from wpimath.geometry import Translation2d
 
-from magicbot import StateMachine, state, timed_state, feedback
+from magicbot import StateMachine, state, timed_state, feedback, tunable
 
 from components.chassis import ChassisComponent
 from components.intake import IntakeComponent
@@ -18,9 +18,8 @@ class Shooter(StateMachine):
     intake_component: IntakeComponent
     status_lights: LightStrip
 
-    # make sure this is always > chassis heading tolerance
-    ANGLE_TOLERANCES = (math.radians(5), math.radians(1))
-    RANGES = (0, 5)
+    SPEED_LIMIT = tunable(1)
+    SPINNING_SPEED_LIMIT = tunable(1)
 
     def __init__(self):
         self.range = 0.0
@@ -65,10 +64,19 @@ class Shooter(StateMachine):
                 self.is_aiming_finished()
                 and self.shooter_component.is_ready()
                 and self.in_range()
+                and self.is_below_speed_limit()
+                and self.is_below_spinning_limit()
             ):
                 self.next_state(self.firing)
             else:
                 self.aim()
+
+    def is_below_speed_limit(self) -> bool:
+        vel = self.chassis.get_velocity()
+        return math.hypot(vel.vx, vel.vy) < self.SPEED_LIMIT
+
+    def is_below_spinning_limit(self) -> bool:
+        return self.chassis.get_velocity().omega < self.SPINNING_SPEED_LIMIT
 
     def aim(self) -> None:
         # Update range
@@ -78,7 +86,7 @@ class Shooter(StateMachine):
         translation_to_goal = self.translation_to_goal()
 
         # We need to aim at least a note's radius inside the outer bounds of the goal. Also add a safety margin
-        margin = 0.05
+        margin = 0.10
         offset = (SPEAKER_HOOD_WIDTH - NOTE_DIAMETER) / 2.0 - margin
         offset_bearing = constrain_angle(
             math.atan2(translation_to_goal.y + offset, translation_to_goal.x) + math.pi

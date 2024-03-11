@@ -235,7 +235,7 @@ class ChassisComponent:
 
         self.on_red_alliance = False
 
-        self.modules = [
+        self.modules = (
             # Front Left
             SwerveModule(
                 self.WHEEL_BASE / 2,
@@ -268,7 +268,7 @@ class ChassisComponent:
                 TalonIds.steer_4,
                 CancoderIds.swerve_4,
             ),
-        ]
+        )
 
         self.kinematics = SwerveDrive4Kinematics(
             self.modules[0].translation,
@@ -290,6 +290,21 @@ class ChassisComponent:
         ).publish()
 
         wpilib.SmartDashboard.putData("Heading PID", self.heading_controller)
+
+    def get_velocity(self) -> ChassisSpeeds:
+        return self.kinematics.toChassisSpeeds(self.get_module_states())
+
+    def get_module_states(
+        self,
+    ) -> tuple[
+        SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState
+    ]:
+        return (
+            self.modules[0].get(),
+            self.modules[1].get(),
+            self.modules[2].get(),
+            self.modules[3].get(),
+        )
 
     def setup(self) -> None:
         initial_pose = TeamPoses.RED_TEST_POSE if is_red() else TeamPoses.BLUE_TEST_POSE

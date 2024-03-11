@@ -70,7 +70,9 @@ class PhysicsEngine:
         self.physics_controller = physics_controller
 
         self.kinematics: SwerveDrive4Kinematics = robot.chassis.kinematics
-        self.swerve_modules: list[SwerveModule] = robot.chassis.modules
+        self.swerve_modules: tuple[
+            SwerveModule, SwerveModule, SwerveModule, SwerveModule
+        ] = robot.chassis.modules
 
         # Motors
         self.wheels = [

@@ -3,6 +3,25 @@ from autonomous.base import AutoBase, rotation_to_red_speaker
 from wpimath.geometry import Pose2d, Translation2d
 
 
+class PodiumSpeakerAmpTopcentre(AutoBase):
+    MODE_NAME = "5 notes: internal, podium, speaker, amp, top centre"
+
+    def __init__(self) -> None:
+        note_paths = [
+            Path([NotePositions.podium_NW]),
+            Path([NotePositions.speaker]),
+            Path([NotePositions.amp]),
+            Path([PathPositions.avoid_wall, NotePositions.Centre1]),
+        ]
+        shoot_paths = [
+            Path([ShootingPositions.close_straight]),
+            Path([ShootingPositions.amp_speaker_bounce]),
+            Path([NotePositions.amp]),
+            Path([PathPositions.avoid_wall, NotePositions.amp]),
+        ]
+        super().__init__(note_paths, shoot_paths)
+
+
 class PodiumSpeakerAmp(AutoBase):
     MODE_NAME = "4 notes: internal, podium, speaker, amp"
 
