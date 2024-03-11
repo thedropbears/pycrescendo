@@ -245,6 +245,8 @@ class AutoBase(AutonomousStateMachine):
             # second last pose might be our our current pose
             second_last = waypoints[-2] if len(waypoints) > 1 else pose.translation()
             disp = endpoint - second_last
+            if not game.is_red():
+                disp = game.field_flip_translation2d(disp)
             heading_target = math.atan2(disp.y, disp.x)
             self.goal_heading = heading_target
 

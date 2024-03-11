@@ -2,12 +2,13 @@ import math
 
 from wpimath.geometry import Rotation2d, Translation2d, Pose2d
 
-from utilities.game import RED_SPEAKER_POSE, field_flip_pose2d, translation_to_goal
-
-
-def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
-    t = translation_to_goal(position)
-    return t.angle() + Rotation2d(math.pi)
+from utilities.game import (
+    RED_SPEAKER_POSE,
+    field_flip_pose2d,
+    field_flip_translation2d,
+    get_goal_speaker_position,
+    field_flip_angle,
+)
 
 
 class Path:
@@ -19,9 +20,16 @@ class Path:
         self.waypoints = waypoints
         self.face_target = face_target
         if face_target:
+            last_waypoint = waypoints[-1]
             self.final_heading = (
-                rotation_to_red_speaker(waypoints[-1]).radians() + math.pi
+                (
+                    get_goal_speaker_position().toTranslation2d()
+                    - field_flip_translation2d(last_waypoint)
+                )
+                .angle()
+                .radians()
             )
+            self.final_heading = field_flip_angle(self.final_heading) + math.pi
         else:
             self.final_heading = 0
 

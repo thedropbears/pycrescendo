@@ -60,7 +60,7 @@ def field_flip_rotation2d(r: Rotation2d):
 
 
 def field_flip_angle(r: float):
-    return math.atan2(math.sin(r + math.pi), math.cos(r + math.pi))
+    return math.atan2(math.sin(math.pi - r), math.cos(math.pi - r))
 
 
 def field_flip_translation2d(t: Translation2d):

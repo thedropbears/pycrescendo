@@ -1,12 +1,19 @@
+import math
+
 from utilities.position import (
     NotePositions,
     Path,
     ShootingPositions,
     PathPositions,
-    rotation_to_red_speaker,
 )
+from utilities import game
 from autonomous.base import AutoBase
-from wpimath.geometry import Pose2d, Translation2d
+from wpimath.geometry import Pose2d, Translation2d, Rotation2d
+
+
+def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
+    t = game.RED_SPEAKER_POSE.toPose2d().translation() - position
+    return t.angle() + Rotation2d(math.pi)
 
 
 class PodiumSpeakerAmpTopcentre(AutoBase):
