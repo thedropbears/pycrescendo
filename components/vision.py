@@ -1,4 +1,5 @@
 import math
+import time
 from typing import Optional
 
 import wpilib
@@ -21,6 +22,9 @@ class VisualLocalizer:
     # Give bias to the best pose by multiplying this const to the alt dist
     BEST_POSE_BIAS = 1.2
 
+    # Time since the last target sighting we allow before informing drivers
+    TIMEOUT = 1  # s
+
     add_to_estimator = tunable(True)
     should_log = tunable(False)
 
@@ -41,6 +45,7 @@ class VisualLocalizer:
         self.camera = PhotonCamera(name)
         self.camera_to_robot = Transform3d(pos, rot).inverse()
         self.last_timestamp = -1
+        self.last_recieved_timestep = -1.0
 
         self.single_best_log = field.getObject(name + "single_best_log")
         self.single_alt_log = field.getObject(name + "single_alt_log")
@@ -68,6 +73,7 @@ class VisualLocalizer:
 
         if timestamp == self.last_timestamp:
             return
+        self.last_recieved_timestep = time.monotonic()
         self.last_timestamp = timestamp
 
         if results.multiTagResult.estimatedPose.isPresent:
@@ -139,6 +145,9 @@ class VisualLocalizer:
                             .radians(),
                         )
                     )
+
+    def sees_target(self):
+        return time.monotonic() - self.last_recieved_timestep < self.TIMEOUT
 
 
 def estimate_poses_from_apriltag(
