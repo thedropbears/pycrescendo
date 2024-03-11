@@ -4,9 +4,9 @@ from wpimath.geometry import Rotation2d, Translation2d, Pose2d
 
 from utilities.game import (
     RED_SPEAKER_POSE,
+    BLUE_SPEAKER_POSE,
     field_flip_pose2d,
     field_flip_translation2d,
-    get_goal_speaker_position,
     field_flip_angle,
 )
 
@@ -23,7 +23,7 @@ class Path:
             last_waypoint = waypoints[-1]
             self.final_heading = (
                 (
-                    get_goal_speaker_position().toTranslation2d()
+                    BLUE_SPEAKER_POSE.translation().toTranslation2d()
                     - field_flip_translation2d(last_waypoint)
                 )
                 .angle()
