@@ -187,6 +187,7 @@ class MyRobot(magicbot.MagicRobot):
         self.chassis.update_odometry()
 
         self.status_lights.execute()
+        self.led_panel.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()
 
@@ -196,6 +197,7 @@ class MyRobot(magicbot.MagicRobot):
 
         self.intake_component.maybe_reindex_deployment_encoder()
         self.status_lights.execute()
+        self.led_panel.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()
 
