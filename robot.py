@@ -22,7 +22,7 @@ from autonomous.base import AutoBase
 from utilities.game import is_red
 from utilities.scalers import rescale_js
 from utilities.functions import clamp
-from utilities.position import on_same_side_of_stage
+from utilities.position import on_same_side_of_stage, y_close_to_stage
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -204,11 +204,13 @@ class MyRobot(magicbot.MagicRobot):
             selected_auto = self._automodes.chooser.getSelected()
             if isinstance(selected_auto, AutoBase):
                 intended_start_pose = selected_auto.get_starting_pose()
+                current_pose = self.chassis.get_pose()
                 if intended_start_pose is not None:
-                    if on_same_side_of_stage(
-                        intended_start_pose, self.chassis.get_pose()
-                    ):
-                        self.status_lights.rainbow()
+                    if on_same_side_of_stage(intended_start_pose, current_pose):
+                        if y_close_to_stage(current_pose):
+                            self.status_lights.too_close_to_stage()
+                        else:
+                            self.status_lights.rainbow()
                     else:
                         self.status_lights.invalid_start()
                 else:
