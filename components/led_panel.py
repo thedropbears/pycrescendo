@@ -13,7 +13,8 @@ class LEDPanel:
     def __init__(self) -> None:
         # Custom packet: 00 000000
         # match state, state specific information
-        self.packet = 0b00000000
+        self.match_state = 0
+        self.packet = 0b01000000
         self.panel_port = wpilib.SerialPort(
             baudRate=9600, port=wpilib.SerialPort.Port.kUSB1, dataBits=8
         )
@@ -23,17 +24,27 @@ class LEDPanel:
         self.panel_port.write(self.packet.to_bytes())
 
     def set_match_state(self) -> None:
-        self.packet &= 0b00111111
+        # self.packet &= 0b00111111
 
-        if wpilib.DriverStation.isAutonomous() or wpilib.DriverStation.isTeleop():
-            # During
-            self.packet |= 0b01 << 6
-        elif wpilib.DriverStation.getMatchTime() <= 0:
-            # Post match
-            self.packet |= 0b10 << 6
-        else:
-            # Pre match
-            self.packet |= 0b00 << 6
+        # if wpilib.DriverStation.isAutonomousEnabled() or wpilib.DriverStation.isTeleopEnabled():
+        #     # During
+        #     self.packet |= 0b01 << 6
+        #     if self.match_state != 1:
+        #         self.send_packet()
+        #         self.match_state = 1
+        # elif wpilib.DriverStation.getMatchTime() <= 0:
+        #     # Post match
+        #     self.packet |= 0b10 << 6
+        #     if self.match_state != 2:
+        #         self.send_packet()
+        #         self.match_state = 2
+        # else:
+        #     # Pre match
+        #     self.packet |= 0b00 << 6
+        #     if self.match_state != 0:
+        #         self.send_packet()
+        #         self.match_state = 0
+        pass
 
     def set_match_id(self) -> None:
         match_type = wpilib.DriverStation.getMatchType()
