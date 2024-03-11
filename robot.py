@@ -74,6 +74,13 @@ class MyRobot(magicbot.MagicRobot):
         pass
 
     def teleopPeriodic(self) -> None:
+        if self.climber.should_lock_mechanisms():
+            self.shooter_component.lock()
+            self.intake_component.lock()
+        else:
+            self.shooter_component.unlock()
+            self.intake_component.unlock()
+
         # Set max speed
         max_speed = self.max_speed
         max_spin_rate = self.max_spin_rate

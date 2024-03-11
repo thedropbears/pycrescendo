@@ -66,6 +66,7 @@ class ShooterComponent:
     desired_flywheel_speed = tunable(0.0)
 
     def __init__(self) -> None:
+        self.locked = False
         self.inclinator = CANSparkMax(
             SparkMaxIds.shooter_inclinator, CANSparkMax.MotorType.kBrushless
         )
@@ -131,6 +132,12 @@ class ShooterComponent:
 
     def on_enable(self) -> None:
         self.inclinator_controller.reset()
+
+    def lock(self) -> None:
+        self.locked = True
+
+    def unlock(self) -> None:
+        self.locked = False
 
     @feedback
     def is_ready(self) -> bool:
@@ -204,6 +211,10 @@ class ShooterComponent:
             ),
         )
         self.inclinator.set(inclinator_speed)
+
+        # stop the flywheels while climbing or permenantly after a real climb
+        if self.locked:
+            self.desired_flywheel_speed = 0
 
         if self.desired_flywheel_speed == 0:
             self.flywheel_left.set_control(NeutralOut())

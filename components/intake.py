@@ -148,6 +148,14 @@ class IntakeComponent:
         self.has_indexed = False
         self.stall_detection_enabled = False
 
+        self.locked = False
+
+    def lock(self) -> None:
+        self.locked = True
+
+    def unlock(self) -> None:
+        self.locked = False
+
     @feedback
     def _at_retract_hard_limit(self) -> bool:
         return self.retract_limit_switch.get()
@@ -240,6 +248,12 @@ class IntakeComponent:
             self.stall_detection_enabled = False
         elif self.motor.get_velocity().value > self.INTAKE_RUNNING_VELOCITY:
             self.stall_detection_enabled = True
+
+        # lock the component if climbing or finished a real climb
+        if self.locked:
+            self.retract()
+            self.direction = self.Direction.STOPPED
+            self.desired_injector_speed = 0.0
 
         intake_request = VoltageOut(self.direction.value * self.motor_speed * 12.0)
 

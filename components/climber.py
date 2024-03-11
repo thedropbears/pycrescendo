@@ -33,42 +33,24 @@ class Climber:
         self.climb_encoder = self.climbing_motor.getEncoder()
         self.climb_encoder.setPositionConversionFactor(self.GEAR_RATIO)
 
-        self.encoder_limit_enabled = False
-        self.climbing_motor.setSoftLimit(
-            CANSparkMax.SoftLimitDirection.kForward, self.SHAFT_REV_TOP_LIMIT
-        )
-        self.climbing_motor.setSoftLimit(
-            CANSparkMax.SoftLimitDirection.kReverse, self.SHAFT_REV_BOTTOM_LIMIT
-        )
-        self.climbing_motor.enableSoftLimit(
-            CANSparkMax.SoftLimitDirection.kForward, False
-        )
-        self.climbing_motor.enableSoftLimit(
-            CANSparkMax.SoftLimitDirection.kReverse, False
-        )
         self.last_position = self.POSITION.RETRACTED
+
+        self.seen_deploy_limit_switch = False
+
+    def on_disable(self) -> None:
+        self.seen_deploy_limit_switch = False
 
     @feedback
     def has_climb_finished(self) -> bool:
-        return not self.retract_limit_switch.get() or (
-            self.encoder_limit_enabled
-            and self.climbing_motor.getFault(CANSparkMax.FaultID.kSoftLimitRev)
-        )
+        return not self.retract_limit_switch.get()
 
     @feedback
     def has_deploy_finished(self) -> bool:
-        return not self.deploy_limit_switch.get() or (
-            self.encoder_limit_enabled
-            and self.climbing_motor.getFault(CANSparkMax.FaultID.kSoftLimitFwd)
-        )
+        return not self.deploy_limit_switch.get()
 
-    def enable_soft_limits(self) -> None:
-        self.climbing_motor.enableSoftLimit(
-            CANSparkMax.SoftLimitDirection.kForward, True
-        )
-        self.climbing_motor.enableSoftLimit(
-            CANSparkMax.SoftLimitDirection.kReverse, True
-        )
+    def should_lock_mechanisms(self) -> bool:
+        # Climbs in the last 20 seconds are real climbs...
+        return self.seen_deploy_limit_switch
 
     def deploy(self) -> None:
         if self.has_deploy_finished():
@@ -83,22 +65,21 @@ class Climber:
             self.speed = -1.0
 
     def execute(self) -> None:
-        if not self.encoder_limit_enabled:
-            if self.has_climb_finished():
-                self.enable_soft_limits()
-                self.encoder_limit_enabled = True
-                self.climb_encoder.setPosition(self.SHAFT_REV_BOTTOM_LIMIT)
+        if self.has_climb_finished():
+            self.climb_encoder.setPosition(self.SHAFT_REV_BOTTOM_LIMIT)
 
-            if self.has_deploy_finished():
-                self.enable_soft_limits()
-                self.encoder_limit_enabled = True
-                self.climb_encoder.setPosition(self.SHAFT_REV_TOP_LIMIT)
+        if self.has_deploy_finished():
+            self.climb_encoder.setPosition(self.SHAFT_REV_TOP_LIMIT)
 
         if self.has_climb_finished():
             if self.last_position is not self.POSITION.RETRACTED:
                 self.status_lights.climbing_arm_retracted()
                 self.last_position = self.POSITION.RETRACTED
+            if wpilib.DriverStation.getMatchTime() > 20:
+                # reset in case of accidental climb
+                self.seen_deploy_limit_switch = False
         elif self.has_deploy_finished():
+            self.seen_deploy_limit_switch = True
             if self.last_position is not self.POSITION.DEPLOYED:
                 self.status_lights.climbing_arm_fully_extended()
                 self.last_position = self.POSITION.DEPLOYED
