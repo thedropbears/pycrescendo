@@ -101,6 +101,9 @@ class LightStrip:
     def no_vision(self) -> None:
         self.pattern = Flash(HsvColour.ORANGE)
 
+    def too_close_to_stage(self) -> None:
+        self.pattern = Flash(HsvColour.MAGENTA)
+
     def disabled(self) -> None:
         self.pattern = Solid(HsvColour.OFF)
 
