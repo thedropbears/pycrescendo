@@ -17,9 +17,8 @@ from controllers.note import NoteManager
 from controllers.intake import Intake
 from controllers.shooter import Shooter
 
+
 from utilities.game import is_red
-
-
 from utilities.scalers import rescale_js
 from utilities.functions import clamp
 
@@ -191,6 +190,12 @@ class MyRobot(magicbot.MagicRobot):
         self.status_lights.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()
+
+        if (
+            not self.vision_port.sees_target()
+            and not self.vision_starboard.sees_target()
+        ):
+            self.status_lights.invalid_start()
 
     def autonomousInit(self) -> None:
         pass

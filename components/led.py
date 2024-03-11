@@ -92,6 +92,9 @@ class LightStrip:
     def rainbow(self) -> None:
         self.pattern = Rainbow(HsvColour.RED)
 
+    def invalid_start(self) -> None:
+        self.pattern = Flash(HsvColour.RED)
+
     def disabled(self) -> None:
         self.pattern = Solid(HsvColour.OFF)
 

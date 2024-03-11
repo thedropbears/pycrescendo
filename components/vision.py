@@ -23,7 +23,7 @@ class VisualLocalizer:
     BEST_POSE_BIAS = 1.2
 
     # Time since the last target sighting we allow before informing drivers
-    TIMEOUT = 1  # s
+    TIMEOUT = 1.0  # s
 
     add_to_estimator = tunable(True)
     should_log = tunable(False)
