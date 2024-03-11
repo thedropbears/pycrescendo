@@ -36,7 +36,12 @@ class PodiumSpeakerAmp(AutoBase):
             Path([ShootingPositions.amp_speaker_bounce]),
             Path([NotePositions.amp]),
         ]
-        super().__init__(note_paths, shoot_paths)
+        # Start pose only needs to be on the correct half of the field,
+        # so choose the podium as a reference point
+        start_pose = Pose2d(
+            NotePositions.podium, rotation_to_red_speaker(NotePositions.podium)
+        )
+        super().__init__(note_paths, shoot_paths, start_pose)
 
 
 class AmpCentre1(AutoBase):
@@ -52,7 +57,12 @@ class AmpCentre1(AutoBase):
             Path([NotePositions.amp]),
             Path([PathPositions.avoid_wall, NotePositions.amp]),
         ]
-        super().__init__(note_paths, shoot_paths)
+        # Start pose only needs to be on the correct half of the field,
+        # so choose the amp as a reference point
+        start_pose = Pose2d(
+            NotePositions.amp, rotation_to_red_speaker(NotePositions.amp)
+        )
+        super().__init__(note_paths, shoot_paths, start_pose)
 
 
 class SpeakerCentre3(AutoBase):
@@ -68,7 +78,12 @@ class SpeakerCentre3(AutoBase):
             Path([NotePositions.speaker]),
             Path([PathPositions.stage_transition_N, NotePositions.speaker]),
         ]
-        super().__init__(note_paths, shoot_paths)
+        # Start pose only needs to be on the correct half of the field,
+        # so choose the speaker as a reference point
+        start_pose = Pose2d(
+            NotePositions.speaker, rotation_to_red_speaker(NotePositions.speaker)
+        )
+        super().__init__(note_paths, shoot_paths, start_pose)
 
 
 class Centre3Centre5(AutoBase):

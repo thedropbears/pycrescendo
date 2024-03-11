@@ -95,6 +95,9 @@ class LightStrip:
     def invalid_start(self) -> None:
         self.pattern = Flash(HsvColour.RED)
 
+    def missing_start_pose(self) -> None:
+        self.pattern = Flash(HsvColour.CYAN)
+
     def no_vision(self) -> None:
         self.pattern = Flash(HsvColour.ORANGE)
 
@@ -111,7 +114,8 @@ class LightStrip:
 
 
 class Pattern(Protocol):
-    def update(self) -> Hsv: ...
+    def update(self) -> Hsv:
+        ...
 
 
 @dataclasses.dataclass
@@ -128,7 +132,8 @@ class TimeBasedPattern(ABC, Pattern):
     clock: Callable[[], float] = time.monotonic
 
     @abstractmethod
-    def update(self) -> Hsv: ...
+    def update(self) -> Hsv:
+        ...
 
 
 @dataclasses.dataclass

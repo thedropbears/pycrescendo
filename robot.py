@@ -211,6 +211,8 @@ class MyRobot(magicbot.MagicRobot):
                         self.status_lights.rainbow()
                     else:
                         self.status_lights.invalid_start()
+                else:
+                    self.status_lights.missing_start_pose()
 
     def autonomousInit(self) -> None:
         pass
