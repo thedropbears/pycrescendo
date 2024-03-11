@@ -114,8 +114,7 @@ class LightStrip:
 
 
 class Pattern(Protocol):
-    def update(self) -> Hsv:
-        ...
+    def update(self) -> Hsv: ...
 
 
 @dataclasses.dataclass
@@ -132,8 +131,7 @@ class TimeBasedPattern(ABC, Pattern):
     clock: Callable[[], float] = time.monotonic
 
     @abstractmethod
-    def update(self) -> Hsv:
-        ...
+    def update(self) -> Hsv: ...
 
 
 @dataclasses.dataclass
