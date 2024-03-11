@@ -75,10 +75,8 @@ class AutoBase(AutonomousStateMachine):
 
     def on_enable(self):
         # Setup starting position in the simulator
-        if RobotBase.isSimulation() and self.starting_pose is not None:
-            starting_pose = self.starting_pose
-            if not game.is_red():
-                starting_pose = game.field_flip_pose2d(self.starting_pose)
+        starting_pose = self.get_starting_pose()
+        if RobotBase.isSimulation() and starting_pose is not None:
             self.chassis.set_pose(starting_pose)
         super().on_enable()
 
@@ -90,6 +88,14 @@ class AutoBase(AutonomousStateMachine):
                 last.pose.translation() - self.chassis.get_pose().translation()
             ).norm() < self.SHOOTING_POSITION_TOLERANCE
         return False
+
+    def get_starting_pose(self) -> Pose2d | None:
+        starting_pose = self.starting_pose
+        if starting_pose is None:
+            return None
+        if not game.is_red():
+            starting_pose = game.field_flip_pose2d(starting_pose)
+        return starting_pose
 
     @state(first=True)
     def initialise(self) -> None:
