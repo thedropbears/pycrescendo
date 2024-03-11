@@ -77,9 +77,7 @@ class Climber:
 
     def should_lock_mechanisms(self) -> bool:
         # Climbs in the last 20 seconds are real climbs...
-        return (
-            wpilib.DriverStation.getMatchTime() < 20 and self.seen_deploy_limit_switch
-        )
+        return self.seen_deploy_limit_switch
 
     def deploy(self) -> None:
         if self.has_deploy_finished():
@@ -109,7 +107,7 @@ class Climber:
             if self.last_position is not self.POSITION.RETRACTED:
                 self.status_lights.climbing_arm_retracted()
                 self.last_position = self.POSITION.RETRACTED
-            if wpilib.DriverStation.getMatchTime() < 20:
+            if wpilib.DriverStation.getMatchTime() > 20:
                 # reset in case of accidental climb
                 self.seen_deploy_limit_switch = False
         elif self.has_deploy_finished():
