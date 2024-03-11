@@ -1,6 +1,19 @@
-from utilities.position import NotePositions, Path, ShootingPositions, PathPositions
-from autonomous.base import AutoBase, rotation_to_red_speaker
-from wpimath.geometry import Pose2d, Translation2d
+import math
+
+from utilities.position import (
+    NotePositions,
+    Path,
+    ShootingPositions,
+    PathPositions,
+)
+from utilities import game
+from autonomous.base import AutoBase
+from wpimath.geometry import Pose2d, Translation2d, Rotation2d
+
+
+def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
+    t = game.RED_SPEAKER_POSE.toPose2d().translation() - position
+    return t.angle() + Rotation2d(math.pi)
 
 
 class PodiumSpeakerAmpTopcentre(AutoBase):
@@ -8,16 +21,16 @@ class PodiumSpeakerAmpTopcentre(AutoBase):
 
     def __init__(self) -> None:
         note_paths = [
-            Path([NotePositions.podium_NW]),
-            Path([NotePositions.speaker]),
-            Path([NotePositions.amp]),
-            Path([PathPositions.avoid_wall, NotePositions.Centre1]),
+            Path([NotePositions.podium_NW], face_target=False),
+            Path([NotePositions.speaker], face_target=False),
+            Path([NotePositions.amp], face_target=False),
+            Path([PathPositions.avoid_wall, NotePositions.Centre1], face_target=False),
         ]
         shoot_paths = [
-            Path([ShootingPositions.close_straight]),
-            Path([ShootingPositions.amp_speaker_bounce]),
-            Path([NotePositions.amp]),
-            Path([PathPositions.avoid_wall, NotePositions.amp]),
+            Path([ShootingPositions.close_straight], face_target=True),
+            Path([ShootingPositions.amp_speaker_bounce], face_target=True),
+            Path([NotePositions.amp], face_target=True),
+            Path([PathPositions.avoid_wall, NotePositions.amp], face_target=True),
         ]
         super().__init__(note_paths, shoot_paths)
 
@@ -27,14 +40,14 @@ class PodiumSpeakerAmp(AutoBase):
 
     def __init__(self) -> None:
         note_paths = [
-            Path([NotePositions.podium_NW]),
-            Path([NotePositions.speaker]),
-            Path([NotePositions.amp]),
+            Path([NotePositions.podium_NW], face_target=False),
+            Path([NotePositions.speaker], face_target=False),
+            Path([NotePositions.amp], face_target=False),
         ]
         shoot_paths = [
-            Path([ShootingPositions.close_straight]),
-            Path([ShootingPositions.amp_speaker_bounce]),
-            Path([NotePositions.amp]),
+            Path([ShootingPositions.close_straight], face_target=True),
+            Path([ShootingPositions.amp_speaker_bounce], face_target=True),
+            Path([NotePositions.amp], face_target=True),
         ]
         # Start pose only needs to be on the correct half of the field,
         # so choose the podium as a reference point
@@ -50,12 +63,12 @@ class AmpCentre1(AutoBase):
 
     def __init__(self) -> None:
         note_paths = [
-            Path([NotePositions.amp]),
-            Path([PathPositions.avoid_wall, NotePositions.Centre1]),
+            Path([NotePositions.amp], face_target=False),
+            Path([PathPositions.avoid_wall, NotePositions.Centre1], face_target=False),
         ]
         shoot_paths = [
-            Path([NotePositions.amp]),
-            Path([PathPositions.avoid_wall, NotePositions.amp]),
+            Path([NotePositions.amp], face_target=True),
+            Path([PathPositions.avoid_wall, NotePositions.amp], face_target=True),
         ]
         # Start pose only needs to be on the correct half of the field,
         # so choose the amp as a reference point
@@ -71,12 +84,18 @@ class SpeakerCentre3(AutoBase):
 
     def __init__(self) -> None:
         note_paths = [
-            Path([NotePositions.speaker]),
-            Path([PathPositions.stage_transition_N, NotePositions.Centre3]),
+            Path([NotePositions.speaker], face_target=False),
+            Path(
+                [PathPositions.stage_transition_N, NotePositions.Centre3],
+                face_target=False,
+            ),
         ]
         shoot_paths = [
-            Path([NotePositions.speaker]),
-            Path([PathPositions.stage_transition_N, NotePositions.speaker]),
+            Path([NotePositions.speaker], face_target=True),
+            Path(
+                [PathPositions.stage_transition_N, NotePositions.speaker],
+                face_target=True,
+            ),
         ]
         # Start pose only needs to be on the correct half of the field,
         # so choose the speaker as a reference point
@@ -99,9 +118,10 @@ class Centre3Centre5(AutoBase):
                     PathPositions.stage_transition_S_entry,
                     PathPositions.stage_transition_S,
                     NotePositions.Centre3,
-                ]
+                ],
+                face_target=False,
             ),
-            Path([NotePositions.Centre5]),
+            Path([NotePositions.Centre5], face_target=False),
         ]
 
         shoot_paths = [
@@ -110,9 +130,10 @@ class Centre3Centre5(AutoBase):
                     PathPositions.stage_transition_S,
                     PathPositions.stage_transition_S_entry,
                     ShootingPositions.source_side,
-                ]
+                ],
+                face_target=True,
             ),
-            Path([ShootingPositions.source_side]),
+            Path([ShootingPositions.source_side], face_target=True),
         ]
         sim_start_pos = Translation2d(15.4, 2.94)
         rotation = rotation_to_red_speaker(sim_start_pos)
