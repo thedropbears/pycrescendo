@@ -15,7 +15,7 @@ class LEDPanel:
         # match state, state specific information
         self.packet = 0b00000000
         self.panel_port = wpilib.SerialPort(
-            baudRate=9600, port=wpilib.SerialPort.Port.kUSB2, dataBits=8
+            baudRate=9600, port=wpilib.SerialPort.Port.kUSB1, dataBits=8
         )
         self.set_match_id()
 
