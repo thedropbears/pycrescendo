@@ -56,6 +56,12 @@ class TeamPoses:
     RED_PODIUM = field_flip_pose2d(BLUE_PODIUM)
 
 
+def on_same_side_of_stage(pose1: Pose2d, pose2: Pose2d) -> bool:
+    return not (
+        (pose1.y > TeamPoses.BLUE_PODIUM.y) ^ (pose2.y > TeamPoses.BLUE_PODIUM.y)
+    )
+
+
 class PathPositions:
     stage_transition_N = Translation2d(11.4, 4.5)
     stage_transition_S = Translation2d(11.4, 3.74)
