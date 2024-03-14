@@ -4,11 +4,7 @@ import wpilib
 class LEDPanel:
     # Key: Match number, Value: Drop Bears match number (<=15)
     # TODO: Fill with proper values when the draw comes out
-    matches: dict[int, int] = {
-        1: 1,
-        2: 2,
-        3: 3,
-    }
+    matches: dict[int, int] = {1: 1}
 
     def __init__(self) -> None:
         # Custom packet: 00 000000
@@ -24,27 +20,26 @@ class LEDPanel:
         self.panel_port.write(self.packet.to_bytes())
 
     def set_match_state(self) -> None:
-        # self.packet &= 0b00111111
+        self.packet &= 0b00111111
 
-        # if wpilib.DriverStation.isAutonomousEnabled() or wpilib.DriverStation.isTeleopEnabled():
-        #     # During
-        #     self.packet |= 0b01 << 6
-        #     if self.match_state != 1:
-        #         self.send_packet()
-        #         self.match_state = 1
-        # elif wpilib.DriverStation.getMatchTime() <= 0:
-        #     # Post match
-        #     self.packet |= 0b10 << 6
-        #     if self.match_state != 2:
-        #         self.send_packet()
-        #         self.match_state = 2
-        # else:
-        #     # Pre match
-        #     self.packet |= 0b00 << 6
-        #     if self.match_state != 0:
-        #         self.send_packet()
-        #         self.match_state = 0
-        pass
+        if wpilib.DriverStation.isEnabled():
+            # During
+            self.packet |= 0b01 << 6
+            if self.match_state != 1:
+                self.send_packet()
+                self.match_state = 1
+        elif wpilib.DriverStation.getMatchTime() <= 0:
+            # Post match
+            self.packet |= 0b10 << 6
+            if self.match_state != 2:
+                self.send_packet()
+                self.match_state = 2
+        else:
+            # Pre match
+            self.packet |= 0b00 << 6
+            if self.match_state != 0:
+                self.send_packet()
+                self.match_state = 0
 
     def set_match_id(self) -> None:
         match_type = wpilib.DriverStation.getMatchType()
@@ -53,9 +48,11 @@ class LEDPanel:
             match_type == wpilib.DriverStation.MatchType.kQualification
             or match_type == wpilib.DriverStation.MatchType.kElimination
         ):
-            match_id = self.matches[wpilib.DriverStation.getMatchNumber()]
-            # Can't be greater than 15
-            match_id = max(match_id, 15)
+            match_number = wpilib.DriverStation.getMatchNumber()
+            if match_number in self.matches:
+                match_id = self.matches[match_number]
+                # Can't be greater than 15
+                match_id = max(match_id, 15)
 
         self.packet |= match_id
         self.send_packet()
