@@ -5,6 +5,7 @@ from utilities.position import (
     Path,
     ShootingPositions,
     PathPositions,
+    TeamPoses,
 )
 from utilities import game
 from autonomous.base import AutoBase
@@ -16,7 +17,7 @@ def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
     return t.angle() + Rotation2d(math.pi)
 
 
-class PodiumSpeakerAmpTopcentre(AutoBase):
+class PodiumSpeakerAmpCentre1(AutoBase):
     MODE_NAME = "5 notes: podium, speaker, amp, centre 1"
 
     def __init__(self) -> None:
@@ -50,9 +51,10 @@ class PodiumSpeakerAmp(AutoBase):
             Path([NotePositions.amp], face_target=True),
         ]
         # Start pose only needs to be on the correct half of the field,
-        # so choose the podium as a reference point
+        # so choose the subwoofer
         start_pose = Pose2d(
-            NotePositions.podium, rotation_to_red_speaker(NotePositions.podium)
+            TeamPoses.RED_TEST_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
@@ -71,9 +73,10 @@ class AmpCentre1(AutoBase):
             Path([PathPositions.avoid_wall, NotePositions.amp], face_target=True),
         ]
         # Start pose only needs to be on the correct half of the field,
-        # so choose the amp as a reference point
+        # so choose the subwoofer
         start_pose = Pose2d(
-            NotePositions.amp, rotation_to_red_speaker(NotePositions.amp)
+            TeamPoses.RED_TEST_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
@@ -98,9 +101,10 @@ class SpeakerCentre3(AutoBase):
             ),
         ]
         # Start pose only needs to be on the correct half of the field,
-        # so choose the speaker as a reference point
+        # so choose the subwoofer
         start_pose = Pose2d(
-            NotePositions.speaker, rotation_to_red_speaker(NotePositions.speaker)
+            TeamPoses.RED_TEST_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
