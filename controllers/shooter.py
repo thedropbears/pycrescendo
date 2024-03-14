@@ -1,6 +1,8 @@
 import math
 
 from wpimath.geometry import Translation2d
+from wpiutil.log import DataLog, FloatArrayLogEntry, FloatLogEntry
+from wpilib import DriverStation
 
 from magicbot import StateMachine, state, timed_state, feedback, tunable
 
@@ -18,6 +20,8 @@ class Shooter(StateMachine):
     intake_component: IntakeComponent
     status_lights: LightStrip
 
+    data_log: DataLog
+
     SPEED_LIMIT = tunable(1)
     SPINNING_SPEED_LIMIT = tunable(1)
 
@@ -25,6 +29,13 @@ class Shooter(StateMachine):
         self.range = 0.0
         self.bearing_tolerance = 0.0
         self.bearing_to_speaker = 0.0
+
+    def setup(self):
+        self.shot_time_entry = FloatLogEntry(self.data_log, "Shooter: Shot match times")
+        self.shot_range_entry = FloatLogEntry(self.data_log, "Shooter: Shot ranges")
+        self.shot_pos_entry = FloatArrayLogEntry(
+            self.data_log, "Shooter: Field translation from target"
+        )
 
     def translation_to_goal(self) -> Translation2d:
         return (
@@ -48,11 +59,17 @@ class Shooter(StateMachine):
         self.range = self.translation_to_goal().norm()
         self.shooter_component.set_range(self.range)
 
-    def try_jettison(self):
+    def try_jettison(self) -> None:
         self.engage(self.preparing_to_jettison)
 
+    def log_shot(self) -> None:
+        translation = self.translation_to_goal()
+        self.shot_time_entry.append(DriverStation.getMatchTime())
+        self.shot_range_entry.append(self.range)
+        self.shot_pos_entry.append([translation.x, translation.y])
+
     @feedback
-    def in_range(self):
+    def in_range(self) -> bool:
         return self.shooter_component.is_range_in_bounds(self.range)
 
     @state(first=True)
@@ -67,6 +84,7 @@ class Shooter(StateMachine):
                 and self.is_below_speed_limit()
                 and self.is_below_spinning_limit()
             ):
+                self.log_shot()
                 self.next_state(self.firing)
             else:
                 self.aim()
