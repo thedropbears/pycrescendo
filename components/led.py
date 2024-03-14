@@ -93,16 +93,16 @@ class LightStrip:
         self.pattern = Rainbow(HsvColour.RED)
 
     def invalid_start(self) -> None:
-        self.pattern = Flash(HsvColour.RED)
+        self.pattern = Breathe(HsvColour.RED)
 
     def missing_start_pose(self) -> None:
-        self.pattern = Flash(HsvColour.CYAN)
+        self.pattern = Breathe(HsvColour.CYAN)
 
     def no_vision(self) -> None:
-        self.pattern = Flash(HsvColour.ORANGE)
+        self.pattern = Breathe(HsvColour.ORANGE)
 
     def too_close_to_stage(self) -> None:
-        self.pattern = Flash(HsvColour.MAGENTA)
+        self.pattern = Breathe(HsvColour.MAGENTA)
 
     def disabled(self) -> None:
         self.pattern = Solid(HsvColour.OFF)
