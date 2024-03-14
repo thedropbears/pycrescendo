@@ -5,6 +5,7 @@ from utilities.position import (
     Path,
     ShootingPositions,
     PathPositions,
+    TeamPoses,
 )
 from utilities import game
 from autonomous.base import AutoBase
@@ -16,8 +17,8 @@ def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
     return t.angle() + Rotation2d(math.pi)
 
 
-class PodiumSpeakerAmpTopcentre(AutoBase):
-    MODE_NAME = "5 notes: internal, podium, speaker, amp, top centre"
+class PodiumSpeakerAmpCentre1(AutoBase):
+    MODE_NAME = "5 notes: podium, speaker, amp, centre 1"
 
     def __init__(self) -> None:
         note_paths = [
@@ -36,7 +37,7 @@ class PodiumSpeakerAmpTopcentre(AutoBase):
 
 
 class PodiumSpeakerAmp(AutoBase):
-    MODE_NAME = "4 notes: internal, podium, speaker, amp"
+    MODE_NAME = "4 notes: podium, speaker, amp"
 
     def __init__(self) -> None:
         note_paths = [
@@ -50,16 +51,17 @@ class PodiumSpeakerAmp(AutoBase):
             Path([NotePositions.amp], face_target=True),
         ]
         # Start pose only needs to be on the correct half of the field,
-        # so choose the podium as a reference point
+        # so choose the subwoofer
         start_pose = Pose2d(
-            NotePositions.podium, rotation_to_red_speaker(NotePositions.podium)
+            TeamPoses.RED_TEST_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
 
 class AmpCentre1(AutoBase):
     # The "top" or north notes of the field
-    MODE_NAME = "3 notes: internal, amp, centre 1"
+    MODE_NAME = "3 notes: amp, centre 1"
 
     def __init__(self) -> None:
         note_paths = [
@@ -71,16 +73,41 @@ class AmpCentre1(AutoBase):
             Path([PathPositions.avoid_wall, NotePositions.amp], face_target=True),
         ]
         # Start pose only needs to be on the correct half of the field,
-        # so choose the amp as a reference point
+        # so choose the subwoofer
         start_pose = Pose2d(
-            NotePositions.amp, rotation_to_red_speaker(NotePositions.amp)
+            TeamPoses.RED_TEST_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+        )
+        super().__init__(note_paths, shoot_paths, start_pose)
+
+
+class AmpCentre1Centre2(AutoBase):
+    # The "top" or north notes of the field
+    MODE_NAME = "4 notes: amp, centre 1, centre 2"
+
+    def __init__(self) -> None:
+        note_paths = [
+            Path([NotePositions.amp], face_target=False),
+            Path([PathPositions.avoid_wall, NotePositions.Centre1], face_target=False),
+            Path([PathPositions.avoid_wall, NotePositions.Centre2], face_target=False),
+        ]
+        shoot_paths = [
+            Path([NotePositions.amp], face_target=True),
+            Path([PathPositions.avoid_wall, NotePositions.amp], face_target=True),
+            Path([PathPositions.avoid_wall, NotePositions.amp], face_target=True),
+        ]
+        # Start pose only needs to be on the correct half of the field,
+        # so choose the subwoofer
+        start_pose = Pose2d(
+            TeamPoses.RED_TEST_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
 
 class SpeakerCentre3(AutoBase):
     # Moving through the stage
-    MODE_NAME = "3 notes: internal, speaker, centre 3"
+    MODE_NAME = "3 notes: speaker, centre 3"
 
     def __init__(self) -> None:
         note_paths = [
@@ -98,21 +125,96 @@ class SpeakerCentre3(AutoBase):
             ),
         ]
         # Start pose only needs to be on the correct half of the field,
-        # so choose the speaker as a reference point
+        # so choose the subwoofer
         start_pose = Pose2d(
-            NotePositions.speaker, rotation_to_red_speaker(NotePositions.speaker)
+            TeamPoses.RED_TEST_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
 
-class Centre3Centre5(AutoBase):
-    # Stay in the south of the field to avoid interfering with allies using the close notes
-    MODE_NAME = "3 notes: internal, center 3, center 5"
-    # Not yet tested
-    DISABLED = True
+class SpeakerCentre3Centre4(AutoBase):
+    # Moving through the stage
+    MODE_NAME = "4 notes: speaker, centre 3, centre 4"
 
     def __init__(self) -> None:
         note_paths = [
+            Path([NotePositions.speaker], face_target=False),
+            Path(
+                [PathPositions.stage_transition_N, NotePositions.Centre3],
+                face_target=False,
+            ),
+            Path(
+                [PathPositions.stage_transition_N, NotePositions.Centre4],
+                face_target=False,
+            ),
+        ]
+        shoot_paths = [
+            Path([NotePositions.speaker], face_target=True),
+            Path(
+                [PathPositions.stage_transition_N, NotePositions.speaker],
+                face_target=True,
+            ),
+            Path(
+                [PathPositions.stage_transition_N, NotePositions.speaker],
+                face_target=True,
+            ),
+        ]
+        # Start pose only needs to be on the correct half of the field,
+        # so choose the subwoofer
+        start_pose = Pose2d(
+            TeamPoses.RED_TEST_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+        )
+        super().__init__(note_paths, shoot_paths, start_pose)
+
+
+class Centre5Centre4(AutoBase):
+    # Stay in the south of the field to avoid interfering with allies using the close notes
+    MODE_NAME = "3 notes: centre 5, centre 4"
+
+    def __init__(self) -> None:
+        note_paths = [
+            Path([NotePositions.Centre5], face_target=False),
+            Path(
+                [
+                    PathPositions.avoid_stage_S,
+                    NotePositions.Centre4,
+                ],
+                face_target=False,
+            ),
+        ]
+
+        shoot_paths = [
+            Path([ShootingPositions.source_side], face_target=True),
+            Path(
+                [
+                    PathPositions.avoid_stage_S,
+                    ShootingPositions.source_side,
+                ],
+                face_target=True,
+            ),
+        ]
+        sim_start_pos = Translation2d(15.4, 2.94)
+        rotation = rotation_to_red_speaker(sim_start_pos)
+        sim_start_pose = Pose2d(sim_start_pos, rotation)
+        super().__init__(note_paths, shoot_paths, sim_start_pose)
+
+
+class Centre5Centre4Centre3(AutoBase):
+    # Stay in the south of the field to avoid interfering with allies using the close notes
+    MODE_NAME = "4 notes: centre 5, centre 4, centre 3"
+
+    def __init__(self) -> None:
+        note_paths = [
+            Path([NotePositions.Centre5], face_target=False),
+            Path(
+                [
+                    PathPositions.avoid_stage_S,
+                    NotePositions.Centre4,
+                ],
+                face_target=False,
+            ),
             Path(
                 [
                     PathPositions.stage_transition_S_entry,
@@ -121,10 +223,17 @@ class Centre3Centre5(AutoBase):
                 ],
                 face_target=False,
             ),
-            Path([NotePositions.Centre5], face_target=False),
         ]
 
         shoot_paths = [
+            Path([ShootingPositions.source_side], face_target=True),
+            Path(
+                [
+                    PathPositions.avoid_stage_S,
+                    ShootingPositions.source_side,
+                ],
+                face_target=True,
+            ),
             Path(
                 [
                     PathPositions.stage_transition_S,
@@ -133,7 +242,6 @@ class Centre3Centre5(AutoBase):
                 ],
                 face_target=True,
             ),
-            Path([ShootingPositions.source_side], face_target=True),
         ]
         sim_start_pos = Translation2d(15.4, 2.94)
         rotation = rotation_to_red_speaker(sim_start_pos)
