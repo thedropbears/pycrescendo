@@ -92,3 +92,4 @@ class PathPositions:
     stage_transition_S = Translation2d(11.4, 3.74)
     stage_transition_S_entry = Translation2d(13.0, 2.5)
     avoid_wall = Translation2d(10.80, 6.55)
+    avoid_stage_S = Translation2d(10.66, 1.40)
