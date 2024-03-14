@@ -17,7 +17,7 @@ def rotation_to_red_speaker(position: Translation2d) -> Rotation2d:
 
 
 class PodiumSpeakerAmpTopcentre(AutoBase):
-    MODE_NAME = "5 notes: internal, podium, speaker, amp, top centre"
+    MODE_NAME = "5 notes: podium, speaker, amp, centre 1"
 
     def __init__(self) -> None:
         note_paths = [
@@ -36,7 +36,7 @@ class PodiumSpeakerAmpTopcentre(AutoBase):
 
 
 class PodiumSpeakerAmp(AutoBase):
-    MODE_NAME = "4 notes: internal, podium, speaker, amp"
+    MODE_NAME = "4 notes: podium, speaker, amp"
 
     def __init__(self) -> None:
         note_paths = [
@@ -59,7 +59,7 @@ class PodiumSpeakerAmp(AutoBase):
 
 class AmpCentre1(AutoBase):
     # The "top" or north notes of the field
-    MODE_NAME = "3 notes: internal, amp, centre 1"
+    MODE_NAME = "3 notes: amp, centre 1"
 
     def __init__(self) -> None:
         note_paths = [
@@ -80,7 +80,7 @@ class AmpCentre1(AutoBase):
 
 class SpeakerCentre3(AutoBase):
     # Moving through the stage
-    MODE_NAME = "3 notes: internal, speaker, centre 3"
+    MODE_NAME = "3 notes: speaker, centre 3"
 
     def __init__(self) -> None:
         note_paths = [
@@ -107,7 +107,7 @@ class SpeakerCentre3(AutoBase):
 
 class Centre3Centre5(AutoBase):
     # Stay in the south of the field to avoid interfering with allies using the close notes
-    MODE_NAME = "3 notes: internal, center 3, center 5"
+    MODE_NAME = "3 notes: center 3, center 5"
     # Not yet tested
     DISABLED = True
 
