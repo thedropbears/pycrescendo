@@ -8,6 +8,7 @@ from typing import Callable, Protocol
 
 import wpilib
 from ids import PwmChannels
+from components.led_panel import LEDPanel
 
 
 MAX_BRIGHTNESS = 50  # Integer value 0-255
@@ -51,13 +52,17 @@ class HsvColour(Enum):
 
 
 class LightStrip:
-    def __init__(self, strip_length: int) -> None:
+    led_panel: LEDPanel
+
+    def __init__(self) -> None:
         self.leds = wpilib.AddressableLED(PwmChannels.led_strip)
-        self.leds.setLength(strip_length)
-        self.strip_length = strip_length
+
+        self.strip_length = (28 * 3) * 2 + (30 * 3) - 2
+        self.leds.setLength(self.strip_length)
+        self.strip_length = self.strip_length
 
         self.led_data = wpilib.AddressableLED.LEDData()
-        self.strip_data = [self.led_data] * strip_length
+        self.strip_data = [self.led_data] * self.strip_length
 
         self.pattern: Pattern = Rainbow(HsvColour.MAGENTA)
         self.high_priority_pattern: Pattern | None = None
@@ -67,24 +72,31 @@ class LightStrip:
 
     def no_note(self) -> None:
         self.pattern = Solid(HsvColour.OFF)
+        self.led_panel.no_note()
 
     def intake_deployed(self) -> None:
         self.pattern = Flash(HsvColour.MAGENTA)
+        self.led_panel.intake_deployed()
 
     def in_range(self) -> None:
         self.pattern = Solid(HsvColour.GREEN)
+        self.led_panel.in_range()
 
     def not_in_range(self) -> None:
         self.pattern = Solid(HsvColour.RED)
+        self.led_panel.not_in_range()
 
     def climbing_arm_extending(self) -> None:
         self.high_priority_pattern = Flash(HsvColour.YELLOW)
+        self.led_panel.climbing_arm_extending()
 
     def climbing_arm_fully_extended(self) -> None:
         self.high_priority_pattern = Solid(HsvColour.YELLOW)
+        self.led_panel.climbing_arm_fully_extended()
 
     def climbing_arm_retracted(self) -> None:
         self.high_priority_pattern = None
+        self.led_panel.climbing_arm_retracted()
 
     def morse(self) -> None:
         self.pattern = Morse(HsvColour.ORANGE)

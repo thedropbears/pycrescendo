@@ -12,6 +12,7 @@ from components.shooter import ShooterComponent
 from components.intake import IntakeComponent
 from components.climber import Climber
 from components.led import LightStrip
+from components.led_panel import LEDPanel
 
 from controllers.note import NoteManager
 from controllers.intake import Intake
@@ -38,6 +39,7 @@ class MyRobot(magicbot.MagicRobot):
     intake_component: IntakeComponent
 
     status_lights: LightStrip
+    led_panel: LEDPanel
 
     max_speed = magicbot.tunable(4)  # m/s
     lower_max_speed = magicbot.tunable(2)  # m/s
@@ -54,9 +56,6 @@ class MyRobot(magicbot.MagicRobot):
 
         self.field = wpilib.Field2d()
         wpilib.SmartDashboard.putData(self.field)
-
-        # side: (28*3)*2 + front: (30*3) - 2 (R.I.P)
-        self.status_lights_strip_length = (28 * 3) * 2 + (30 * 3) - 2
 
         self.vision_port_name = "ardu_cam_port"
         self.vision_port_pos = Translation3d(0.005, 0.221, 0.503)
@@ -188,6 +187,7 @@ class MyRobot(magicbot.MagicRobot):
         self.chassis.update_odometry()
 
         self.status_lights.execute()
+        self.led_panel.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()
 
@@ -197,6 +197,7 @@ class MyRobot(magicbot.MagicRobot):
 
         self.intake_component.maybe_reindex_deployment_encoder()
         self.status_lights.execute()
+        self.led_panel.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()
 
