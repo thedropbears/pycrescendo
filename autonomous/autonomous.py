@@ -169,54 +169,13 @@ class SpeakerCentre3Centre4(AutoBase):
         super().__init__(note_paths, shoot_paths, start_pose)
 
 
-class Centre3Centre5(AutoBase):
+class Centre5Centre4(AutoBase):
     # Stay in the south of the field to avoid interfering with allies using the close notes
-    MODE_NAME = "3 notes: centre 3, centre 5"
+    MODE_NAME = "3 notes: centre 5, centre 4"
 
     def __init__(self) -> None:
         note_paths = [
-            Path(
-                [
-                    PathPositions.stage_transition_S_entry,
-                    PathPositions.stage_transition_S,
-                    NotePositions.Centre3,
-                ],
-                face_target=False,
-            ),
             Path([NotePositions.Centre5], face_target=False),
-        ]
-
-        shoot_paths = [
-            Path(
-                [
-                    PathPositions.stage_transition_S,
-                    PathPositions.stage_transition_S_entry,
-                    ShootingPositions.source_side,
-                ],
-                face_target=True,
-            ),
-            Path([ShootingPositions.source_side], face_target=True),
-        ]
-        sim_start_pos = Translation2d(15.4, 2.94)
-        rotation = rotation_to_red_speaker(sim_start_pos)
-        sim_start_pose = Pose2d(sim_start_pos, rotation)
-        super().__init__(note_paths, shoot_paths, sim_start_pose)
-
-
-class Centre3Centre4Centre5(AutoBase):
-    # Stay in the south of the field to avoid interfering with allies using the close notes
-    MODE_NAME = "4 notes: centre 3, centre 4, centre 5"
-
-    def __init__(self) -> None:
-        note_paths = [
-            Path(
-                [
-                    PathPositions.stage_transition_S_entry,
-                    PathPositions.stage_transition_S,
-                    NotePositions.Centre3,
-                ],
-                face_target=False,
-            ),
             Path(
                 [
                     PathPositions.avoid_stage_S,
@@ -224,10 +183,57 @@ class Centre3Centre4Centre5(AutoBase):
                 ],
                 face_target=False,
             ),
-            Path([NotePositions.Centre5], face_target=False),
         ]
 
         shoot_paths = [
+            Path([ShootingPositions.source_side], face_target=True),
+            Path(
+                [
+                    PathPositions.avoid_stage_S,
+                    ShootingPositions.source_side,
+                ],
+                face_target=True,
+            ),
+        ]
+        sim_start_pos = Translation2d(15.4, 2.94)
+        rotation = rotation_to_red_speaker(sim_start_pos)
+        sim_start_pose = Pose2d(sim_start_pos, rotation)
+        super().__init__(note_paths, shoot_paths, sim_start_pose)
+
+
+class Centre5Centre4Centre3(AutoBase):
+    # Stay in the south of the field to avoid interfering with allies using the close notes
+    MODE_NAME = "4 notes: centre 5, centre 4, centre 3"
+
+    def __init__(self) -> None:
+        note_paths = [
+            Path([NotePositions.Centre5], face_target=False),
+            Path(
+                [
+                    PathPositions.avoid_stage_S,
+                    NotePositions.Centre4,
+                ],
+                face_target=False,
+            ),
+            Path(
+                [
+                    PathPositions.stage_transition_S_entry,
+                    PathPositions.stage_transition_S,
+                    NotePositions.Centre3,
+                ],
+                face_target=False,
+            ),
+        ]
+
+        shoot_paths = [
+            Path([ShootingPositions.source_side], face_target=True),
+            Path(
+                [
+                    PathPositions.avoid_stage_S,
+                    ShootingPositions.source_side,
+                ],
+                face_target=True,
+            ),
             Path(
                 [
                     PathPositions.stage_transition_S,
@@ -236,14 +242,6 @@ class Centre3Centre4Centre5(AutoBase):
                 ],
                 face_target=True,
             ),
-            Path(
-                [
-                    PathPositions.avoid_stage_S,
-                    ShootingPositions.source_side,
-                ],
-                face_target=True,
-            ),
-            Path([ShootingPositions.source_side], face_target=True),
         ]
         sim_start_pos = Translation2d(15.4, 2.94)
         rotation = rotation_to_red_speaker(sim_start_pos)
