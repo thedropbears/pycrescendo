@@ -39,7 +39,7 @@ class MyRobot(magicbot.MagicRobot):
 
     status_lights: LightStrip
 
-    max_speed = magicbot.tunable(4)  # m/s
+    max_speed = magicbot.tunable(5)  # m/s
     lower_max_speed = magicbot.tunable(2)  # m/s
     max_spin_rate = magicbot.tunable(4)  # m/s
     lower_max_spin_rate = magicbot.tunable(2)  # m/s
