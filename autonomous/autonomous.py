@@ -33,7 +33,11 @@ class PodiumSpeakerAmpCentre1(AutoBase):
             Path([NotePositions.amp], face_target=True),
             Path([PathPositions.avoid_wall, NotePositions.amp], face_target=True),
         ]
-        super().__init__(note_paths, shoot_paths)
+        start_pose = Pose2d(
+            TeamPoses.RED_TEST_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+        )
+        super().__init__(note_paths, shoot_paths, start_pose)
 
 
 class PodiumSpeakerAmp(AutoBase):
