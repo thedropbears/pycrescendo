@@ -89,8 +89,8 @@ class MyRobot(magicbot.MagicRobot):
             max_spin_rate = self.lower_max_spin_rate
 
         # Driving
-        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * max_speed
-        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * max_speed
+        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.05, 2.5) * max_speed
+        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.05, 2.5) * max_speed
         drive_z = (
             -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * max_spin_rate
         )
