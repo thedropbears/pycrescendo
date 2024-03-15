@@ -74,6 +74,7 @@ class TeamPoses:
     BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
     BLUE_PODIUM = Pose2d(Translation2d(2.992, 4.08455), Rotation2d(math.pi))
     RED_PODIUM = field_flip_pose2d(BLUE_PODIUM)
+    RED_AMP_START_POSE = Pose2d(15.9, 6.7, math.pi)
 
 
 def distance_between(intended_start_pose: Pose2d, current_pose: Pose2d) -> float:

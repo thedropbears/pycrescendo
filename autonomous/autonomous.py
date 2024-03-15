@@ -75,8 +75,8 @@ class AmpCentre1(AutoBase):
         # Start pose only needs to be on the correct half of the field,
         # so choose the subwoofer
         start_pose = Pose2d(
-            TeamPoses.RED_TEST_POSE.translation(),
-            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+            TeamPoses.RED_AMP_START_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_AMP_START_POSE.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
@@ -99,8 +99,8 @@ class AmpCentre1Centre2(AutoBase):
         # Start pose only needs to be on the correct half of the field,
         # so choose the subwoofer
         start_pose = Pose2d(
-            TeamPoses.RED_TEST_POSE.translation(),
-            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+            TeamPoses.RED_AMP_START_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_AMP_START_POSE.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
