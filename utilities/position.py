@@ -76,15 +76,8 @@ class TeamPoses:
     RED_PODIUM = field_flip_pose2d(BLUE_PODIUM)
 
 
-def on_same_side_of_stage(intended_start_pose: Pose2d, current_pose: Pose2d) -> bool:
-    return not (
-        (intended_start_pose.y > TeamPoses.BLUE_PODIUM.y)
-        ^ (current_pose.y > TeamPoses.BLUE_PODIUM.y)
-    )
-
-
-def y_close_to_stage(pose: Pose2d) -> bool:
-    return abs(pose.y - TeamPoses.BLUE_PODIUM.y) < 0.9
+def distance_between(intended_start_pose: Pose2d, current_pose: Pose2d) -> float:
+    return (intended_start_pose.translation() - current_pose.translation()).norm()
 
 
 class PathPositions:
