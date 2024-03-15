@@ -176,7 +176,12 @@ class Centre5Centre4(AutoBase):
     def __init__(self) -> None:
         note_paths = [
             Path(
-                [PathPositions.avoid_stage_S, NotePositions.Centre5], face_target=False
+                [
+                    PathPositions.avoid_starting_faults,
+                    PathPositions.avoid_stage_S,
+                    NotePositions.Centre5,
+                ],
+                face_target=False,
             ),
             Path(
                 [
@@ -213,7 +218,12 @@ class Centre5Centre4Centre3(AutoBase):
     def __init__(self) -> None:
         note_paths = [
             Path(
-                [PathPositions.avoid_stage_S, NotePositions.Centre5], face_target=False
+                [
+                    PathPositions.avoid_starting_faults,
+                    PathPositions.avoid_stage_S,
+                    NotePositions.Centre5,
+                ],
+                face_target=False,
             ),
             Path(
                 [
