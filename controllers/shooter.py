@@ -22,8 +22,8 @@ class Shooter(StateMachine):
 
     data_log: DataLog
 
-    SPEED_LIMIT = tunable(1)
-    SPINNING_SPEED_LIMIT = tunable(1)
+    SPEED_LIMIT = tunable(0.1)
+    SPINNING_SPEED_LIMIT = tunable(0.1)
 
     def __init__(self):
         self.range = 0.0
