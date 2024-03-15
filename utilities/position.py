@@ -34,7 +34,7 @@ class Path:
             self.final_heading = 0
 
 
-stage_tolerance = 0.35
+stage_tolerance = 0.4
 
 
 class NotePositions:
