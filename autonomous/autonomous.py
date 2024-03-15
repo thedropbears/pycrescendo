@@ -207,7 +207,9 @@ class Centre5Centre4Centre3(AutoBase):
 
     def __init__(self) -> None:
         note_paths = [
-            Path([NotePositions.Centre5], face_target=False),
+            Path(
+                [PathPositions.avoid_stage_S, NotePositions.Centre5], face_target=False
+            ),
             Path(
                 [
                     PathPositions.avoid_stage_S,
@@ -226,7 +228,10 @@ class Centre5Centre4Centre3(AutoBase):
         ]
 
         shoot_paths = [
-            Path([ShootingPositions.source_side], face_target=True),
+            Path(
+                [PathPositions.avoid_stage_S, ShootingPositions.source_side],
+                face_target=True,
+            ),
             Path(
                 [
                     PathPositions.avoid_stage_S,
@@ -243,7 +248,7 @@ class Centre5Centre4Centre3(AutoBase):
                 face_target=True,
             ),
         ]
-        sim_start_pos = Translation2d(15.4, 2.94)
+        sim_start_pos = ShootingPositions.source_side
         rotation = rotation_to_red_speaker(sim_start_pos)
         sim_start_pose = Pose2d(sim_start_pos, rotation)
         super().__init__(note_paths, shoot_paths, sim_start_pose)

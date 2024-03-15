@@ -66,7 +66,7 @@ class ShootingPositions:
     amp_speaker_bounce = Translation2d(
         14.7, (NotePositions.amp.y + NotePositions.speaker.y) / 2
     )
-    source_side = Translation2d(14.7, 2.8)
+    source_side = Translation2d(15.556, 4.034)
 
 
 class TeamPoses:
