@@ -21,6 +21,8 @@ class Intake(StateMachine):
 
     @default_state
     def idling(self) -> None:
+        if not self.intake_component.is_fully_retracted():
+            self.intake_component.backdrive_intake()
         if not DriverStation.isAutonomous():
             self.intake_component.retract()
 
