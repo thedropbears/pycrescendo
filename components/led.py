@@ -87,7 +87,8 @@ class LightStrip:
         self.high_priority_pattern = None
 
     def morse(self) -> None:
-        self.pattern = Morse(HsvColour.ORANGE)
+        if not isinstance(self.pattern, Morse):
+            self.pattern = Morse(HsvColour.ORANGE)
 
     def rainbow(self) -> None:
         self.pattern = Rainbow(HsvColour.RED)
