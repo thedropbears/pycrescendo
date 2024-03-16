@@ -174,7 +174,6 @@ class Morse(TimeBasedPattern):
     MESSAGES = (
         "KILL ALL HUMANS",
         "MORSE CODE IS FOR NERDS",
-        "HONEYBADGER DONT CARE",
         "GLHF",
         "I HATE MORSE CODE",
     )
