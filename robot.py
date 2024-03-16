@@ -84,7 +84,7 @@ class MyRobot(magicbot.MagicRobot):
         # Set max speed
         max_speed = self.max_speed
         max_spin_rate = self.max_spin_rate
-        if self.gamepad.getXButton():
+        if self.gamepad.getRightBumper():
             max_speed = self.lower_max_speed
             max_spin_rate = self.lower_max_spin_rate
 
