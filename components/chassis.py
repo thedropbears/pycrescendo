@@ -294,6 +294,10 @@ class ChassisComponent:
     def get_velocity(self) -> ChassisSpeeds:
         return self.kinematics.toChassisSpeeds(self.get_module_states())
 
+    @feedback
+    def imu_rotation(self) -> float:
+        return self.imu.getAngle()
+
     def get_module_states(
         self,
     ) -> tuple[
