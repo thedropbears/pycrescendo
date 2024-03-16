@@ -198,7 +198,6 @@ class MyRobot(magicbot.MagicRobot):
         self.chassis.update_odometry()
 
         self.intake_component.maybe_reindex_deployment_encoder()
-        self.status_lights.execute()
         self.vision_port.execute()
         self.vision_starboard.execute()
 
@@ -230,6 +229,8 @@ class MyRobot(magicbot.MagicRobot):
                     self.status_lights.missing_start_pose()
             else:
                 self.status_lights.missing_start_pose()
+
+        self.status_lights.execute()
 
     def autonomousInit(self) -> None:
         self.field.getObject("Intended start pos").setPoses([])
