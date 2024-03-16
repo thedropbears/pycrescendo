@@ -86,5 +86,6 @@ class PathPositions:
     stage_transition_S = Translation2d(11.4, 3.74)
     stage_transition_S_entry = Translation2d(13.0, 2.5)
     avoid_wall = Translation2d(10.80, 6.55)
-    avoid_stage_S = Translation2d(10.66, 1.40)
+    avoid_stage_S = Translation2d(11.66, 1.40)
     avoid_starting_faults = Translation2d(14.429, 2.946)
+    enforce_pickup_angle = Translation2d(9.6, 1.6)

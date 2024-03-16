@@ -184,6 +184,7 @@ class Centre5Centre4(AutoBase):
             Path(
                 [
                     PathPositions.avoid_stage_S,
+                    PathPositions.enforce_pickup_angle,
                     NotePositions.Centre4,
                 ],
                 face_target=False,
@@ -226,6 +227,7 @@ class Centre5Centre4Centre3(AutoBase):
             Path(
                 [
                     PathPositions.avoid_stage_S,
+                    PathPositions.enforce_pickup_angle,
                     NotePositions.Centre4,
                 ],
                 face_target=False,
