@@ -311,7 +311,7 @@ class ChassisComponent:
         )
 
     def setup(self) -> None:
-        initial_pose = TeamPoses.RED_TEST_POSE if is_red() else TeamPoses.BLUE_TEST_POSE
+        initial_pose = TeamPoses.RED_SUBWOOFER if is_red() else TeamPoses.BLUE_SUBWOOFER
 
         self.estimator = SwerveDrive4PoseEstimator(
             self.kinematics,
@@ -419,9 +419,9 @@ class ChassisComponent:
         if is_red() != self.on_red_alliance:
             self.on_red_alliance = is_red()
             if self.on_red_alliance:
-                self.set_pose(TeamPoses.RED_TEST_POSE)
+                self.set_pose(TeamPoses.RED_SUBWOOFER)
             else:
-                self.set_pose(TeamPoses.BLUE_TEST_POSE)
+                self.set_pose(TeamPoses.BLUE_SUBWOOFER)
 
     def update_odometry(self) -> None:
         self.estimator.update(self.imu.getRotation2d(), self.get_module_positions())
@@ -451,9 +451,9 @@ class ChassisComponent:
     def reset_odometry(self) -> None:
         """Reset odometry to current team's podium"""
         if is_red():
-            self.set_pose(TeamPoses.RED_PODIUM)
+            self.set_pose(TeamPoses.RED_SUBWOOFER)
         else:
-            self.set_pose(TeamPoses.BLUE_PODIUM)
+            self.set_pose(TeamPoses.BLUE_SUBWOOFER)
 
     def get_module_positions(
         self,

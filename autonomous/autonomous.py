@@ -34,8 +34,8 @@ class PodiumSpeakerAmpCentre1(AutoBase):
             Path([PathPositions.avoid_wall, NotePositions.amp], face_target=True),
         ]
         start_pose = Pose2d(
-            TeamPoses.RED_TEST_POSE.translation(),
-            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+            TeamPoses.RED_SUBWOOFER.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_SUBWOOFER.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
@@ -57,8 +57,8 @@ class PodiumSpeakerAmp(AutoBase):
         # Start pose only needs to be on the correct half of the field,
         # so choose the subwoofer
         start_pose = Pose2d(
-            TeamPoses.RED_TEST_POSE.translation(),
-            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+            TeamPoses.RED_SUBWOOFER.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_SUBWOOFER.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
@@ -127,8 +127,8 @@ class SpeakerCentre3(AutoBase):
             ),
         ]
         start_pose = Pose2d(
-            TeamPoses.RED_TEST_POSE.translation(),
-            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+            TeamPoses.RED_SUBWOOFER.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_SUBWOOFER.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
@@ -161,8 +161,8 @@ class SpeakerCentre3Centre4(AutoBase):
             ),
         ]
         start_pose = Pose2d(
-            TeamPoses.RED_TEST_POSE.translation(),
-            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+            TeamPoses.RED_SUBWOOFER.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_SUBWOOFER.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
