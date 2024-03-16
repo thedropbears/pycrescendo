@@ -14,7 +14,7 @@ MAX_BRIGHTNESS = 50  # Integer value 0-255
 Hsv = tuple[int, int, int]
 
 FLASH_SPEED = 2
-BREATHE_SPEED = 4
+BREATHE_SPEED = 0.5
 RAINBOW_SPEED = 8
 MORSE_SPEED = 0.2
 

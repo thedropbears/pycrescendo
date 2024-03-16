@@ -152,13 +152,11 @@ class AutoBase(AutonomousStateMachine):
         if self.is_close_enough_to_shoot():
             self.note_manager.try_shoot()
 
-        if self.note_manager.has_just_fired() or (
-            self.is_at_goal() and not self.note_manager.has_note()
-        ):
-            if len(self.shoot_paths_working_copy) != 0:
-                self.next_state("pick_up")
-            else:
-                self.done()
+        if (
+            self.note_manager.has_just_fired()
+            or (self.is_at_goal() and not self.note_manager.has_note())
+        ) and len(self.shoot_paths_working_copy) != 0:
+            self.next_state("pick_up")
 
     def drive_on_trajectory(self, trajectory_tm: float):
         if not self.trajectory:

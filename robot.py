@@ -22,7 +22,7 @@ from autonomous.base import AutoBase
 from utilities.game import is_red
 from utilities.scalers import rescale_js
 from utilities.functions import clamp
-from utilities.position import on_same_side_of_stage, y_close_to_stage
+from utilities.position import distance_between
 
 
 class MyRobot(magicbot.MagicRobot):
@@ -39,13 +39,15 @@ class MyRobot(magicbot.MagicRobot):
 
     status_lights: LightStrip
 
-    max_speed = magicbot.tunable(4)  # m/s
+    max_speed = magicbot.tunable(5)  # m/s
     lower_max_speed = magicbot.tunable(2)  # m/s
     max_spin_rate = magicbot.tunable(4)  # m/s
     lower_max_spin_rate = magicbot.tunable(2)  # m/s
     inclination_angle = tunable(0.0)
     vision_port: VisualLocalizer
     vision_starboard: VisualLocalizer
+
+    START_POS_TOLERANCE = 1
 
     def createObjects(self) -> None:
         self.data_log = wpilib.DataLogManager.getLog()
@@ -71,7 +73,7 @@ class MyRobot(magicbot.MagicRobot):
         )
 
     def teleopInit(self) -> None:
-        pass
+        self.field.getObject("Intended start pos").setPoses([])
 
     def teleopPeriodic(self) -> None:
         if self.climber.should_lock_mechanisms():
@@ -84,13 +86,13 @@ class MyRobot(magicbot.MagicRobot):
         # Set max speed
         max_speed = self.max_speed
         max_spin_rate = self.max_spin_rate
-        if self.gamepad.getXButton():
+        if self.gamepad.getRightBumper():
             max_speed = self.lower_max_speed
             max_spin_rate = self.lower_max_spin_rate
 
         # Driving
-        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.1) * max_speed
-        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.1) * max_speed
+        drive_x = -rescale_js(self.gamepad.getLeftY(), 0.05, 2.5) * max_speed
+        drive_y = -rescale_js(self.gamepad.getLeftX(), 0.05, 2.5) * max_speed
         drive_z = (
             -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * max_spin_rate
         )
@@ -204,6 +206,7 @@ class MyRobot(magicbot.MagicRobot):
         if (
             not self.vision_port.sees_target()
             and not self.vision_starboard.sees_target()
+            and not self.isSimulation()
         ):
             self.status_lights.no_vision()
         else:
@@ -213,11 +216,14 @@ class MyRobot(magicbot.MagicRobot):
                 intended_start_pose = selected_auto.get_starting_pose()
                 current_pose = self.chassis.get_pose()
                 if intended_start_pose is not None:
-                    if on_same_side_of_stage(intended_start_pose, current_pose):
-                        if y_close_to_stage(current_pose):
-                            self.status_lights.too_close_to_stage()
-                        else:
-                            self.status_lights.rainbow()
+                    self.field.getObject("Intended start pos").setPose(
+                        intended_start_pose
+                    )
+                    if (
+                        distance_between(intended_start_pose, current_pose)
+                        < self.START_POS_TOLERANCE
+                    ):
+                        self.status_lights.rainbow()
                     else:
                         self.status_lights.invalid_start()
                 else:
@@ -226,7 +232,7 @@ class MyRobot(magicbot.MagicRobot):
                 self.status_lights.missing_start_pose()
 
     def autonomousInit(self) -> None:
-        pass
+        self.field.getObject("Intended start pos").setPoses([])
 
 
 if __name__ == "__main__":

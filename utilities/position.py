@@ -34,7 +34,7 @@ class Path:
             self.final_heading = 0
 
 
-stage_tolerance = 0.35
+stage_tolerance = 0.4
 
 
 class NotePositions:
@@ -66,7 +66,7 @@ class ShootingPositions:
     amp_speaker_bounce = Translation2d(
         14.7, (NotePositions.amp.y + NotePositions.speaker.y) / 2
     )
-    source_side = Translation2d(14.7, 2.8)
+    source_side = Translation2d(15.556, 4.034)
 
 
 class TeamPoses:
@@ -74,17 +74,11 @@ class TeamPoses:
     BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
     BLUE_PODIUM = Pose2d(Translation2d(2.992, 4.08455), Rotation2d(math.pi))
     RED_PODIUM = field_flip_pose2d(BLUE_PODIUM)
+    RED_AMP_START_POSE = Pose2d(15.9, 6.7, math.pi)
 
 
-def on_same_side_of_stage(intended_start_pose: Pose2d, current_pose: Pose2d) -> bool:
-    return not (
-        (intended_start_pose.y > TeamPoses.BLUE_PODIUM.y)
-        ^ (current_pose.y > TeamPoses.BLUE_PODIUM.y)
-    )
-
-
-def y_close_to_stage(pose: Pose2d) -> bool:
-    return abs(pose.y - TeamPoses.BLUE_PODIUM.y) < 0.9
+def distance_between(intended_start_pose: Pose2d, current_pose: Pose2d) -> float:
+    return (intended_start_pose.translation() - current_pose.translation()).norm()
 
 
 class PathPositions:
@@ -92,4 +86,6 @@ class PathPositions:
     stage_transition_S = Translation2d(11.4, 3.74)
     stage_transition_S_entry = Translation2d(13.0, 2.5)
     avoid_wall = Translation2d(10.80, 6.55)
-    avoid_stage_S = Translation2d(10.66, 1.40)
+    avoid_stage_S = Translation2d(11.66, 1.40)
+    avoid_starting_faults = Translation2d(14.429, 2.946)
+    enforce_pickup_angle = Translation2d(9.6, 1.6)

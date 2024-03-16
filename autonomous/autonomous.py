@@ -33,7 +33,11 @@ class PodiumSpeakerAmpCentre1(AutoBase):
             Path([NotePositions.amp], face_target=True),
             Path([PathPositions.avoid_wall, NotePositions.amp], face_target=True),
         ]
-        super().__init__(note_paths, shoot_paths)
+        start_pose = Pose2d(
+            TeamPoses.RED_TEST_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+        )
+        super().__init__(note_paths, shoot_paths, start_pose)
 
 
 class PodiumSpeakerAmp(AutoBase):
@@ -72,11 +76,9 @@ class AmpCentre1(AutoBase):
             Path([NotePositions.amp], face_target=True),
             Path([PathPositions.avoid_wall, NotePositions.amp], face_target=True),
         ]
-        # Start pose only needs to be on the correct half of the field,
-        # so choose the subwoofer
         start_pose = Pose2d(
-            TeamPoses.RED_TEST_POSE.translation(),
-            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+            TeamPoses.RED_AMP_START_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_AMP_START_POSE.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
@@ -99,8 +101,8 @@ class AmpCentre1Centre2(AutoBase):
         # Start pose only needs to be on the correct half of the field,
         # so choose the subwoofer
         start_pose = Pose2d(
-            TeamPoses.RED_TEST_POSE.translation(),
-            rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
+            TeamPoses.RED_AMP_START_POSE.translation(),
+            rotation_to_red_speaker(TeamPoses.RED_AMP_START_POSE.translation()),
         )
         super().__init__(note_paths, shoot_paths, start_pose)
 
@@ -124,8 +126,6 @@ class SpeakerCentre3(AutoBase):
                 face_target=True,
             ),
         ]
-        # Start pose only needs to be on the correct half of the field,
-        # so choose the subwoofer
         start_pose = Pose2d(
             TeamPoses.RED_TEST_POSE.translation(),
             rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
@@ -160,8 +160,6 @@ class SpeakerCentre3Centre4(AutoBase):
                 face_target=True,
             ),
         ]
-        # Start pose only needs to be on the correct half of the field,
-        # so choose the subwoofer
         start_pose = Pose2d(
             TeamPoses.RED_TEST_POSE.translation(),
             rotation_to_red_speaker(TeamPoses.RED_TEST_POSE.translation()),
@@ -175,10 +173,18 @@ class Centre5Centre4(AutoBase):
 
     def __init__(self) -> None:
         note_paths = [
-            Path([NotePositions.Centre5], face_target=False),
+            Path(
+                [
+                    PathPositions.avoid_starting_faults,
+                    PathPositions.avoid_stage_S,
+                    NotePositions.Centre5,
+                ],
+                face_target=False,
+            ),
             Path(
                 [
                     PathPositions.avoid_stage_S,
+                    PathPositions.enforce_pickup_angle,
                     NotePositions.Centre4,
                 ],
                 face_target=False,
@@ -186,7 +192,10 @@ class Centre5Centre4(AutoBase):
         ]
 
         shoot_paths = [
-            Path([ShootingPositions.source_side], face_target=True),
+            Path(
+                [PathPositions.avoid_stage_S, ShootingPositions.source_side],
+                face_target=True,
+            ),
             Path(
                 [
                     PathPositions.avoid_stage_S,
@@ -195,7 +204,7 @@ class Centre5Centre4(AutoBase):
                 face_target=True,
             ),
         ]
-        sim_start_pos = Translation2d(15.4, 2.94)
+        sim_start_pos = ShootingPositions.source_side
         rotation = rotation_to_red_speaker(sim_start_pos)
         sim_start_pose = Pose2d(sim_start_pos, rotation)
         super().__init__(note_paths, shoot_paths, sim_start_pose)
@@ -207,10 +216,18 @@ class Centre5Centre4Centre3(AutoBase):
 
     def __init__(self) -> None:
         note_paths = [
-            Path([NotePositions.Centre5], face_target=False),
+            Path(
+                [
+                    PathPositions.avoid_starting_faults,
+                    PathPositions.avoid_stage_S,
+                    NotePositions.Centre5,
+                ],
+                face_target=False,
+            ),
             Path(
                 [
                     PathPositions.avoid_stage_S,
+                    PathPositions.enforce_pickup_angle,
                     NotePositions.Centre4,
                 ],
                 face_target=False,
@@ -226,7 +243,10 @@ class Centre5Centre4Centre3(AutoBase):
         ]
 
         shoot_paths = [
-            Path([ShootingPositions.source_side], face_target=True),
+            Path(
+                [PathPositions.avoid_stage_S, ShootingPositions.source_side],
+                face_target=True,
+            ),
             Path(
                 [
                     PathPositions.avoid_stage_S,
@@ -243,7 +263,7 @@ class Centre5Centre4Centre3(AutoBase):
                 face_target=True,
             ),
         ]
-        sim_start_pos = Translation2d(15.4, 2.94)
+        sim_start_pos = ShootingPositions.source_side
         rotation = rotation_to_red_speaker(sim_start_pos)
         sim_start_pose = Pose2d(sim_start_pos, rotation)
         super().__init__(note_paths, shoot_paths, sim_start_pose)

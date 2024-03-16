@@ -294,6 +294,10 @@ class ChassisComponent:
     def get_velocity(self) -> ChassisSpeeds:
         return self.kinematics.toChassisSpeeds(self.get_module_states())
 
+    @feedback
+    def imu_rotation(self) -> float:
+        return self.imu.getAngle()
+
     def get_module_states(
         self,
     ) -> tuple[
@@ -315,7 +319,7 @@ class ChassisComponent:
             self.get_module_positions(),
             initial_pose,
             stateStdDevs=(0.05, 0.05, 0.01),
-            visionMeasurementStdDevs=(0.4, 0.4, 50),
+            visionMeasurementStdDevs=(0.4, 0.4, 0.03),
         )
         self.field_obj = self.field.getObject("fused_pose")
         self.set_pose(initial_pose)
