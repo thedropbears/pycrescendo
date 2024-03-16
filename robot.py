@@ -125,7 +125,7 @@ class MyRobot(magicbot.MagicRobot):
 
         # Reverse intake and shoot shooter
         if self.gamepad.getBackButton():
-            self.note_manager.jettison()
+            self.shooter_component.set_range(2)
 
         # Intake
         if self.gamepad.getLeftTriggerAxis() > 0.5:

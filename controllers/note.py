@@ -58,18 +58,19 @@ class NoteManager(StateMachine):
 
     @state(must_finish=True, first=True)
     def holding_note(self) -> None:
-        self.shooter.update_range()
+        # self.shooter.update_range()
 
         if self.jettison_desired:
             self.next_state(self.outtaking)
             return
 
-        if self.shooter.in_range():
-            self.status_lights.in_range()
-            if self.shot_desired:
-                self.shooter.engage()
-        else:
-            self.status_lights.not_in_range()
+        # if self.shooter.in_range():
+        #     self.status_lights.in_range()
+        #     if self.shot_desired:
+        #         pass
+        #         # self.shooter.engage()
+        # else:
+        #     self.status_lights.not_in_range()
 
         if not self.has_note():
             self.next_state(self.not_holding_note)
@@ -85,10 +86,11 @@ class NoteManager(StateMachine):
 
         self.shooter.coast_down()
         if self.intake_desired:
-            self.shooter.update_range()
+            # self.shooter.update_range()
             self.intake.engage()
         elif wpilib.DriverStation.isAutonomous():
-            self.shooter.update_range()
+            # self.shooter.update_range()
+            pass
 
         if self.cancel_intake_desired:
             self.intake.try_cancel_intake()
