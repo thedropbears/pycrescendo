@@ -28,6 +28,8 @@ class VisualLocalizer:
     add_to_estimator = tunable(True)
     should_log = tunable(False)
 
+    last_was_multi = tunable(False)
+
     last_pose_z = tunable(0.0, writeDefault=False)
 
     def __init__(
@@ -77,6 +79,7 @@ class VisualLocalizer:
         self.last_timestamp = timestamp
 
         if results.multiTagResult.estimatedPose.isPresent:
+            self.last_was_multi = True
             p = results.multiTagResult.estimatedPose
             pose = (Pose3d() + p.best + self.camera_to_robot).toPose2d()
             reprojectionErr = p.bestReprojError
@@ -106,6 +109,7 @@ class VisualLocalizer:
                     )
                 )
         else:
+            self.last_was_multi = False
             for target in results.getTargets():
                 # filter out likely bad targets
                 if target.getPoseAmbiguity() > 0.25:
