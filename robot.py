@@ -222,7 +222,7 @@ class MyRobot(magicbot.MagicRobot):
                         distance_between(intended_start_pose, current_pose)
                         < self.START_POS_TOLERANCE
                     ):
-                        self.status_lights.rainbow()
+                        self.status_lights.morse()
                     else:
                         self.status_lights.invalid_start()
                 else:
