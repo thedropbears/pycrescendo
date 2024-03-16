@@ -87,8 +87,17 @@ class LightStrip:
         self.high_priority_pattern = None
 
     def morse(self) -> None:
-        if not isinstance(self.pattern, Morse):
-            self.pattern = Morse(HsvColour.ORANGE)
+        match wpilib.DriverStation.getAlliance():
+            case wpilib.DriverStation.Alliance.kBlue:
+                colour = HsvColour.BLUE
+            case wpilib.DriverStation.Alliance.kRed:
+                colour = HsvColour.RED
+            case _:
+                colour = HsvColour.ORANGE
+        if isinstance(self.pattern, Morse):
+            self.pattern.colour = colour
+        else:
+            self.pattern = Morse(colour)
 
     def rainbow(self) -> None:
         self.pattern = Rainbow(HsvColour.RED)
