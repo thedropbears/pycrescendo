@@ -280,16 +280,16 @@ class Morse(TimeBasedPattern):
     @classmethod
     def translate_message(cls, message: str) -> str:
         message = message.upper()
-        morse_message = ""
+        morse_message = []
         for letter in message:
             if letter == " ":
-                morse_message += " "
+                morse_message.append("")
                 continue
-            morse_message += cls.MORSE_TRANSLATION[letter] + " "
+            morse_message.append(cls.MORSE_TRANSLATION[letter])
 
         # Add some space at end of message
-        morse_message += "    "
-        return morse_message
+        morse_message.append("   ")
+        return " ".join(morse_message)
 
     @classmethod
     def calculate_message_length(cls, morse_message: str) -> int:
