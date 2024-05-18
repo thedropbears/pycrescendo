@@ -5,7 +5,7 @@
 groups = ["default", "dev", "typing"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:034eff500beedebf72967b2a4c3654721382a7ab188444b590dc445aa0e3307a"
+content_hash = "sha256:faab306e15b08efe290f4c1a6d4baaaadd89082047b3a7f01879966ad68ce2cf"
 
 [[package]]
 name = "attrs"
@@ -314,7 +314,7 @@ files = [
 
 [[package]]
 name = "photonlibpy"
-version = "2024.2.6"
+version = "2024.3.1"
 summary = "Pure-python implementation of PhotonLib for interfacing with PhotonVision on coprocessors."
 groups = ["default"]
 dependencies = [
@@ -324,8 +324,8 @@ dependencies = [
     "wpilib<2025,>=2024.0.0b2",
 ]
 files = [
-    {file = "photonlibpy-2024.2.6-py3-none-any.whl", hash = "sha256:83f70bc0ac4ca5f3a93ee45fc000df1ece1b38ccf89e8a41aca4f1fef809524d"},
-    {file = "photonlibpy-2024.2.6.tar.gz", hash = "sha256:010f8cc6f3ba2890ed2e3a980e374e38740c20dd02006958beb57cadd2d6cbfa"},
+    {file = "photonlibpy-2024.3.1-py3-none-any.whl", hash = "sha256:10b712f3cff9cff14dbc7b6676d236ebe1a690c446b5f9588c1790645258bfc1"},
+    {file = "photonlibpy-2024.3.1.tar.gz", hash = "sha256:25543cf190977517ba303dec893bbab0f26f5d1cf63525c0e7d7f0124ba186d8"},
 ]
 
 [[package]]
