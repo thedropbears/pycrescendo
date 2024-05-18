@@ -70,8 +70,8 @@ class ShootingPositions:
 
 
 class TeamPoses:
-    RED_TEST_POSE = Pose2d(15.1, 5.5, math.pi)
-    BLUE_TEST_POSE = field_flip_pose2d(RED_TEST_POSE)
+    RED_SUBWOOFER = Pose2d(15.175, 5.5, math.pi)
+    BLUE_SUBWOOFER = field_flip_pose2d(RED_SUBWOOFER)
     BLUE_PODIUM = Pose2d(Translation2d(2.992, 4.08455), Rotation2d(math.pi))
     RED_PODIUM = field_flip_pose2d(BLUE_PODIUM)
     RED_AMP_START_POSE = Pose2d(15.9, 6.7, math.pi)
