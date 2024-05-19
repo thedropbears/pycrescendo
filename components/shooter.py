@@ -163,9 +163,12 @@ class ShooterComponent:
     @feedback
     def _inclination_angle(self) -> float:
         """Get the angle of the mechanism in radians measured positive upwards from zero parellel to the ground."""
+        return self._raw_inclination_angle() - self.INCLINATOR_OFFSET
+
+    @feedback
+    def _raw_inclination_angle(self) -> float:
         return (
             self.absolute_inclinator_encoder.getOutput() * self.INCLINATOR_SCALE_FACTOR
-            - self.INCLINATOR_OFFSET
         )
 
     def is_range_in_bounds(self, range) -> bool:
