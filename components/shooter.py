@@ -30,7 +30,7 @@ class ShooterComponent:
     MAX_INCLINE_ANGLE = 1.045  # ~60 degrees
     MIN_INCLINE_ANGLE = 0.354  # ~20 degrees
     INCLINATOR_TOLERANCE = math.radians(1)
-    INCLINATOR_OFFSET = 4.023 - MIN_INCLINE_ANGLE
+    INCLINATOR_OFFSET = 3.894 - MIN_INCLINE_ANGLE
     INCLINATOR_SCALE_FACTOR = math.tau  # rps -> radians
     INCLINATOR_GEAR_RATIO = 18 / 24 * 26 / 300
     INCLINATOR_POSITION_CONVERSION_FACTOR = (
@@ -163,9 +163,12 @@ class ShooterComponent:
     @feedback
     def _inclination_angle(self) -> float:
         """Get the angle of the mechanism in radians measured positive upwards from zero parellel to the ground."""
+        return self._raw_inclination_angle() - self.INCLINATOR_OFFSET
+
+    @feedback
+    def _raw_inclination_angle(self) -> float:
         return (
             self.absolute_inclinator_encoder.getOutput() * self.INCLINATOR_SCALE_FACTOR
-            - self.INCLINATOR_OFFSET
         )
 
     def is_range_in_bounds(self, range) -> bool:
