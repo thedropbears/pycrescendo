@@ -96,7 +96,7 @@ class MyRobot(magicbot.MagicRobot):
         drive_z = (
             -rescale_js(self.gamepad.getRightX(), 0.1, exponential=2) * max_spin_rate
         )
-        local_driving = self.gamepad.getYButton()
+        local_driving = self.gamepad.getXButton()
 
         if local_driving:
             self.chassis.drive_local(drive_x, drive_y, drive_z)
@@ -109,20 +109,25 @@ class MyRobot(magicbot.MagicRobot):
         # Give rotational access to the driver
         if drive_z != 0:
             self.chassis.stop_snapping()
+        # Climber Controls
+        if self.gamepad.getYButton():
+            self.climber.deploy()
+        if self.gamepad.getAButton():
+            self.climber.retract()
 
         dpad = self.gamepad.getPOV()
         # dpad upwards
-        if dpad in (0, 45, 315):
-            self.climber.deploy()
-        elif dpad in (135, 180, 235):
-            self.climber.retract()
+        # if dpad in (0, 45, 315):
+        # self.climber.deploy()
+        # elif dpad in (135, 180, 235):
+        # self.climber.retract()
 
         # Set current robot direction to forward
-        if self.gamepad.getBButtonPressed():
+        if dpad in (135, 180, 235):
             self.chassis.reset_yaw()
 
         # Reset Odometry
-        if self.gamepad.getStartButtonPressed():
+        if dpad in (0, 45, 315):
             self.chassis.reset_odometry()
 
         # Reverse intake and shoot shooter
