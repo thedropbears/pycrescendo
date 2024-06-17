@@ -131,7 +131,7 @@ class MyRobot(magicbot.MagicRobot):
             self.chassis.reset_odometry()
 
         # Reverse intake and shoot shooter
-        if self.gamepad.getBackButton():
+        if self.gamepad.getStartButton():
             self.note_manager.jettison()
 
         # Intake
