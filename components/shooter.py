@@ -44,21 +44,21 @@ class ShooterComponent:
     # Add extra point outside our range to ramp speed down to zero
     FLYWHEEL_DISTANCE_LOOKUP = (0, 1.3, 2.0, 3.0, 4.0, 5.0, 7.0)
     FLYWHEEL_SPEED_LOOKUP = (
-        70,
-        70,
-        76,
-        78,
-        78,
-        90,
+        60,
+        60,
+        60,
+        64,
+        65,
+        65,
         0,
     )
     FLYWHEEL_ANGLE_LOOKUP = (
         0.95,
         0.95,
-        0.80,
-        0.615,
-        0.495,
-        0.45,
+        0.68,
+        0.57,
+        0.49,
+        0.46,
         MIN_INCLINE_ANGLE,
     )
 
