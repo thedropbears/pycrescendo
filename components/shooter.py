@@ -53,8 +53,8 @@ class ShooterComponent:
         0,
     )
     FLYWHEEL_ANGLE_LOOKUP = (
-        0.97,
-        0.97,
+        0.98,
+        0.98,
         0.69,
         0.57,
         0.49,
