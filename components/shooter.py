@@ -39,7 +39,7 @@ class ShooterComponent:
     INCLINATOR_VELOCITY_CONVERSION_FACTOR = (
         INCLINATOR_POSITION_CONVERSION_FACTOR / 60
     )  # rpm -> radians/s
-    INCLINATOR_JETTISON_ANGLE = 1
+    INCLINATOR_JETTISON_ANGLE = 1.03
 
     # Add extra point outside our range to ramp speed down to zero
     FLYWHEEL_DISTANCE_LOOKUP = (0, 1.3, 2.0, 3.0, 4.0, 5.0, 7.0)
