@@ -24,7 +24,7 @@ class ShooterComponent:
     FLYWHEEL_TOLERANCE = 1  # rps
 
     FLYWHEEL_SHOOTING_SPEED = 75
-    FLYWHEEL_JETTISON_SPEED = 10
+    FLYWHEEL_JETTISON_SPEED = 20
     FLYWHEEL_RAMP_TIME = 1
 
     MAX_INCLINE_ANGLE = 1.045  # ~60 degrees
@@ -39,7 +39,7 @@ class ShooterComponent:
     INCLINATOR_VELOCITY_CONVERSION_FACTOR = (
         INCLINATOR_POSITION_CONVERSION_FACTOR / 60
     )  # rpm -> radians/s
-    INCLINATOR_JETTISON_ANGLE = (MAX_INCLINE_ANGLE + MIN_INCLINE_ANGLE) / 2
+    INCLINATOR_JETTISON_ANGLE = 1
 
     # Add extra point outside our range to ramp speed down to zero
     FLYWHEEL_DISTANCE_LOOKUP = (0, 1.3, 2.0, 3.0, 4.0, 5.0, 7.0)
