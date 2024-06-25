@@ -4,7 +4,7 @@ from typing import Optional
 
 import wpilib
 import wpiutil.log
-from magicbot import tunable
+from magicbot import tunable, feedback
 from photonlibpy.photonCamera import PhotonCamera
 from photonlibpy.photonTrackedTarget import PhotonTrackedTarget
 from wpimath import objectToRobotPose
@@ -27,7 +27,7 @@ class VisualLocalizer:
     TIMEOUT = 1.0  # s
 
     add_to_estimator = tunable(True)
-    should_log = tunable(False)
+    should_log = tunable(True)
 
     last_pose_z = tunable(0.0, writeDefault=False)
 
@@ -59,6 +59,11 @@ class VisualLocalizer:
         )
 
         self.chassis = chassis
+        self.current_reproj = 0.0
+
+    @feedback
+    def reproj(self) -> float:
+        return self.current_reproj
 
     def execute(self) -> None:
         # stop warnings in simulation
@@ -82,6 +87,7 @@ class VisualLocalizer:
             p = results.multiTagResult.estimatedPose
             pose = (Pose3d() + p.best + self.camera_to_robot).toPose2d()
             reprojectionErr = p.bestReprojError
+            self.current_reproj = reprojectionErr
 
             self.field_pos_obj.setPose(pose)
 
