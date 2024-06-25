@@ -39,13 +39,13 @@ class ShooterComponent:
     INCLINATOR_VELOCITY_CONVERSION_FACTOR = (
         INCLINATOR_POSITION_CONVERSION_FACTOR / 60
     )  # rpm -> radians/s
-    INCLINATOR_JETTISON_ANGLE = 1
+    INCLINATOR_JETTISON_ANGLE = 1.03
 
     # Add extra point outside our range to ramp speed down to zero
     FLYWHEEL_DISTANCE_LOOKUP = (0, 1.3, 2.0, 3.0, 4.0, 5.0, 7.0)
     FLYWHEEL_SPEED_LOOKUP = (
-        60,
-        60,
+        54,
+        54,
         60,
         64,
         65,
@@ -53,9 +53,9 @@ class ShooterComponent:
         0,
     )
     FLYWHEEL_ANGLE_LOOKUP = (
-        0.95,
-        0.95,
-        0.68,
+        0.93,
+        0.93,
+        0.77,
         0.57,
         0.49,
         0.46,
@@ -120,7 +120,7 @@ class ShooterComponent:
         flywheel_right_config.apply(flywheel_pid)
         flywheel_right_config.apply(flywheel_gear_ratio)
 
-        self.inclinator_controller = PIDController(0.6, 0, 0)
+        self.inclinator_controller = PIDController(3.0, 0, 0)
         self.inclinator_controller.setTolerance(ShooterComponent.INCLINATOR_TOLERANCE)
         SmartDashboard.putData(self.inclinator_controller)
 
