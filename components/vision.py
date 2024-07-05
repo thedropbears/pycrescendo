@@ -30,7 +30,7 @@ class VisualLocalizer:
     should_log = tunable(True)
 
     last_pose_z = tunable(0.0, writeDefault=False)
-    linear_vision_uncertainty = tunable(0.4)
+    linear_vision_uncertainty = tunable(0.04)
     rotation_vision_uncertainty = tunable(0.03)
 
     def __init__(
