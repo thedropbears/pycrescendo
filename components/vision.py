@@ -30,6 +30,8 @@ class VisualLocalizer:
     should_log = tunable(True)
 
     last_pose_z = tunable(0.0, writeDefault=False)
+    linear_vision_uncertainty = tunable(0.4)
+    rotation_vision_uncertainty = tunable(0.03)
 
     def __init__(
         self,
@@ -95,7 +97,11 @@ class VisualLocalizer:
                 self.chassis.estimator.addVisionMeasurement(
                     pose,
                     timestamp,
-                    (reprojectionErr * 1.5, reprojectionErr * 1.5, reprojectionErr / 2),
+                    (
+                        reprojectionErr * self.linear_vision_uncertainty,
+                        reprojectionErr * self.linear_vision_uncertainty,
+                        reprojectionErr * self.rotation_vision_uncertainty,
+                    ),
                 )
 
             if self.should_log:
