@@ -32,6 +32,7 @@ class VisualLocalizer:
     last_pose_z = tunable(0.0, writeDefault=False)
     linear_vision_uncertainty = tunable(0.04)
     rotation_vision_uncertainty = tunable(0.03)
+    reproj_error_threshold = 1
 
     def __init__(
         self,
@@ -93,7 +94,10 @@ class VisualLocalizer:
 
             self.field_pos_obj.setPose(pose)
 
-            if self.add_to_estimator:
+            if (
+                self.add_to_estimator
+                and self.current_reproj < self.reproj_error_threshold
+            ):
                 self.chassis.estimator.addVisionMeasurement(
                     pose,
                     timestamp,
