@@ -98,9 +98,9 @@ class VisualLocalizer:
                     pose,
                     timestamp,
                     (
-                        reprojectionErr * self.linear_vision_uncertainty,
-                        reprojectionErr * self.linear_vision_uncertainty,
-                        reprojectionErr * self.rotation_vision_uncertainty,
+                        self.linear_vision_uncertainty,
+                        self.linear_vision_uncertainty,
+                        self.rotation_vision_uncertainty,
                     ),
                 )
 
