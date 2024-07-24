@@ -16,8 +16,8 @@ from ids import TalonIds, SparkMaxIds, DioChannels
 
 
 class IntakeComponent:
-    motor_speed = tunable(0.8)
-    inject_intake_speed = tunable(0.3)
+    motor_speed = tunable(0.7)
+    inject_intake_speed = tunable(0.5)
     inject_shoot_speed = tunable(1.0)
 
     INTAKE_GEAR_RATIO = 2
