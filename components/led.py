@@ -87,7 +87,17 @@ class LightStrip:
         self.high_priority_pattern = None
 
     def morse(self) -> None:
-        self.pattern = Morse(HsvColour.ORANGE)
+        match wpilib.DriverStation.getAlliance():
+            case wpilib.DriverStation.Alliance.kBlue:
+                colour = HsvColour.BLUE
+            case wpilib.DriverStation.Alliance.kRed:
+                colour = HsvColour.RED
+            case _:
+                colour = HsvColour.ORANGE
+        if isinstance(self.pattern, Morse):
+            self.pattern.colour = colour
+        else:
+            self.pattern = Morse(colour)
 
     def rainbow(self) -> None:
         self.pattern = Rainbow(HsvColour.RED)
@@ -173,7 +183,6 @@ class Morse(TimeBasedPattern):
     MESSAGES = (
         "KILL ALL HUMANS",
         "MORSE CODE IS FOR NERDS",
-        "HONEYBADGER DONT CARE",
         "GLHF",
         "I HATE MORSE CODE",
     )
@@ -221,6 +230,10 @@ class Morse(TimeBasedPattern):
 
     def __post_init__(self) -> None:
         self.pick_new_message()
+        self.start_clock()
+
+    def start_clock(self) -> None:
+        self.start_time = self.clock()
 
     def elapsed_time(self) -> float:
         return self.clock() - self.start_time
@@ -228,9 +241,9 @@ class Morse(TimeBasedPattern):
     def update(self) -> Hsv:
         elapsed_time = self.elapsed_time()
 
-        # End of the message. Pick new one
         if elapsed_time > self.message_time:
-            self.pick_new_message()
+            # End of message, repeat the message
+            self.start_clock()
             return HsvColour.OFF.value
 
         # TODO Might be better to store current token index and time?
@@ -255,7 +268,6 @@ class Morse(TimeBasedPattern):
 
     def pick_new_message(self) -> None:
         # QUESTION? Should functions take args or assume previous step already done
-        self.start_time = self.clock()  # Reset the time of the pattern
         self.message = self.random_message()
         self.morse_message = self.translate_message(self.message)
         self.message_length = self.calculate_message_length(self.morse_message)
@@ -268,16 +280,16 @@ class Morse(TimeBasedPattern):
     @classmethod
     def translate_message(cls, message: str) -> str:
         message = message.upper()
-        morse_message = ""
+        morse_message = []
         for letter in message:
             if letter == " ":
-                morse_message += " "
+                morse_message.append("")
                 continue
-            morse_message += cls.MORSE_TRANSLATION[letter] + " "
+            morse_message.append(cls.MORSE_TRANSLATION[letter])
 
         # Add some space at end of message
-        morse_message += "    "
-        return morse_message
+        morse_message.append("   ")
+        return " ".join(morse_message)
 
     @classmethod
     def calculate_message_length(cls, morse_message: str) -> int:
